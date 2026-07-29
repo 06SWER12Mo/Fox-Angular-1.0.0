@@ -1,0 +1,63 @@
+<div class="address-selector">
+  <!-- No Addresses -->
+  <div *ngIf="addresses.length === 0" class="no-addresses">
+    <mat-icon class="empty-icon">location_off</mat-icon>
+    <p>No saved addresses found.</p>
+    <p class="hint">Please add a delivery address to continue.</p>
+    <button mat-raised-button color="primary" (click)="addNewAddress()">
+      <mat-icon>add</mat-icon> Add New Address
+    </button>
+  </div>
+
+  <!-- Address List -->
+  <div *ngFor="let address of addresses" 
+       class="address-card" 
+       [class.selected]="isSelected(address.id)"
+       (click)="selectAddress(address.id)">
+    
+    <div class="address-radio">
+      <mat-radio-button 
+        [checked]="isSelected(address.id)"
+        (click)="$event.stopPropagation()"
+        (change)="selectAddress(address.id)">
+      </mat-radio-button>
+    </div>
+
+    <div class="address-details">
+      <div class="address-header">
+        <span class="address-name">{{ address.recipientName || 'Recipient' }}</span>
+        <span class="address-badge" *ngIf="address.isDefault">
+          <mat-chip color="primary" selected>Default</mat-chip>
+        </span>
+      </div>
+      
+      <div class="address-line">{{ address.addressLine1 }}</div>
+      <div class="address-line" *ngIf="address.addressLine2">{{ address.addressLine2 }}</div>
+      <div class="address-line">{{ address.street }}</div>
+      <div class="address-line" *ngIf="address.building">
+        Building {{ address.building }}
+        <span *ngIf="address.floor">, Floor {{ address.floor }}</span>
+        <span *ngIf="address.apartment">, Apt {{ address.apartment }}</span>
+      </div>
+      <div class="address-line" *ngIf="address.landmark">Near {{ address.landmark }}</div>
+      <div class="address-line town">{{ address.townName }}</div>
+      <div class="address-phone">
+        <mat-icon>phone</mat-icon> {{ address.recipientPhone || 'No phone' }}
+      </div>
+    </div>
+
+    <button 
+      mat-icon-button 
+      class="edit-btn"
+      (click)="$event.stopPropagation(); editAddress(address.id)"
+      matTooltip="Edit Address">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  <div class="add-address-btn">
+    <button mat-button color="primary" (click)="addNewAddress()">
+      <mat-icon>add_circle</mat-icon> Add New Address
+    </button>
+  </div>
+</div>

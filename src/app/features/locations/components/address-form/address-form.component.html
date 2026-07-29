@@ -1,0 +1,128 @@
+<div class="address-form-container">
+  <div class="header">
+    <h1>{{ isEditMode ? 'Edit Address' : 'Add New Address' }}</h1>
+    <button mat-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon> Back
+    </button>
+  </div>
+
+  <mat-card *ngIf="!isLoading; else loading">
+    <mat-card-content>
+      <!-- Messages -->
+      <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+      <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+        <!-- Recipient Information -->
+        <h2>Recipient Information</h2>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Recipient Name</mat-label>
+          <input matInput formControlName="recipientName" placeholder="Full name">
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Recipient Phone</mat-label>
+          <input matInput formControlName="recipientPhone" placeholder="Phone number">
+          <mat-icon matPrefix>phone</mat-icon>
+        </mat-form-field>
+
+        <mat-divider></mat-divider>
+
+        <!-- Address Details -->
+        <h2>Address Details</h2>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address Line 1</mat-label>
+          <input matInput formControlName="addressLine1" placeholder="Street address, P.O. box">
+          <mat-error *ngIf="addressForm.get('addressLine1')?.hasError('required')">
+            Address is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address Line 2</mat-label>
+          <input matInput formControlName="addressLine2" placeholder="Apartment, suite, unit, building">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Street</mat-label>
+          <input matInput formControlName="street" placeholder="Street name">
+          <mat-error *ngIf="addressForm.get('street')?.hasError('required')">
+            Street is required
+          </mat-error>
+        </mat-form-field>
+
+        <div class="row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Building</mat-label>
+            <input matInput formControlName="building" placeholder="Building number">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Floor</mat-label>
+            <input matInput formControlName="floor" placeholder="Floor number">
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Apartment</mat-label>
+            <input matInput formControlName="apartment" placeholder="Apartment number">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Landmark</mat-label>
+            <input matInput formControlName="landmark" placeholder="Nearby landmark">
+          </mat-form-field>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Additional Info -->
+        <h2>Additional Information</h2>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address Type</mat-label>
+          <mat-select formControlName="addressType">
+            <mat-option value="home">Home</mat-option>
+            <mat-option value="work">Work</mat-option>
+            <mat-option value="other">Other</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Additional Instructions</mat-label>
+          <textarea matInput formControlName="additionalInstructions" rows="3" placeholder="Delivery instructions"></textarea>
+        </mat-form-field>
+
+        <div class="toggle-row">
+          <mat-slide-toggle formControlName="isDefault" color="primary">
+            Set as default address
+          </mat-slide-toggle>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button mat-button type="button" (click)="goBack()">Cancel</button>
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            [disabled]="isSaving || addressForm.invalid"
+          >
+            <mat-spinner diameter="20" *ngIf="isSaving"></mat-spinner>
+            <span *ngIf="!isSaving">{{ isEditMode ? 'Update' : 'Add' }} Address</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <ng-template #loading>
+    <div class="loading-spinner">
+      <mat-spinner></mat-spinner>
+    </div>
+  </ng-template>
+</div>

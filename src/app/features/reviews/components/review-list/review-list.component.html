@@ -1,0 +1,152 @@
+<div class="reviews-container">
+  <div class="reviews-header">
+    <div class="header-left">
+      <button mat-button (click)="goBack()" class="back-btn">
+        <mat-icon>arrow_back</mat-icon> Back
+      </button>
+      <h1 *ngIf="!isMyReviews && product">
+        Reviews for {{ product.name }}
+      </h1>
+      <h1 *ngIf="isMyReviews">My Reviews</h1>
+    </div>
+    <div class="header-right" *ngIf="!isMyReviews && product">
+      <button mat-raised-button color="primary" [routerLink]="['/products', productId]">
+        <mat-icon>shopping_bag</mat-icon> View Product
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-spinner></mat-spinner>
+    <p>Loading reviews...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+    <button mat-button color="primary" (click)="loadProductReviews(productId!)">Retry</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && !errorMessage">
+    <!-- Product Info -->
+    <div *ngIf="!isMyReviews && product" class="product-summary">
+      <div class="product-image">
+        <img [src]="product.primaryImageUrl || 'assets/images/default-product.png'" [alt]="product.name">
+      </div>
+      <div class="product-info">
+        <h2>{{ product.name }}</h2>
+        <div class="product-rating">
+          <app-star-rating [rating]="getAverageRating()"></app-star-rating>
+          <span class="review-count">{{ totalElements }} {{ totalElements === 1 ? 'review' : 'reviews' }}</span>
+        </div>
+        <div class="product-price">
+          {{ product.discountedPrice | currency }}
+          <span class="original-price" *ngIf="product.discountPercentage > 0">
+            {{ product.price | currency }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rating Summary -->
+    <div *ngIf="reviews.length > 0" class="rating-summary">
+      <div class="rating-overall">
+        <span class="rating-number">{{ getAverageRating() | number:'1.1-1' }}</span>
+        <app-star-rating [rating]="getAverageRating()"></app-star-rating>
+        <span class="rating-count">Based on {{ totalElements }} reviews</span>
+      </div>
+      <div class="rating-bars">
+        <div *ngFor="let dist of getRatingDistribution()" class="rating-bar-row">
+          <span class="rating-label">{{ dist.rating }} ★</span>
+          <div class="rating-bar-track">
+            <div class="rating-bar-fill" [style.width.%]="dist.percentage"></div>
+          </div>
+          <span class="rating-count">{{ dist.count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Write Review Button -->
+    <div *ngIf="!isMyReviews && productId" class="write-review-section">
+      <app-review-form
+        [productId]="productId"
+        (reviewSubmitted)="loadProductReviews(productId!)"
+      ></app-review-form>
+    </div>
+
+    <!-- Reviews List -->
+    <div *ngIf="reviews.length > 0" class="reviews-list">
+      <h3>{{ totalElements }} {{ totalElements === 1 ? 'Review' : 'Reviews' }}</h3>
+      
+      <div *ngFor="let review of paginatedReviews" class="review-item">
+        <div class="review-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">
+              {{ review.reviewerName?.[0] || 'U' }}
+            </div>
+            <div>
+              <span class="reviewer-name">{{ review.reviewerName || 'Anonymous' }}</span>
+              <span class="review-date">{{ review.createdAt | date:'medium' }}</span>
+            </div>
+          </div>
+          <div *ngIf="isMyReviews" class="review-actions">
+            <button 
+              mat-icon-button 
+              color="warn" 
+              (click)="deleteReview(review.id)"
+              matTooltip="Delete Review">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <app-star-rating [rating]="review.rating"></app-star-rating>
+        <p class="review-comment">{{ review.comment }}</p>
+        <div *ngIf="!review.approved" class="review-status">
+          <mat-icon>pending</mat-icon> Pending approval
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="pagination">
+        <button 
+          mat-button 
+          [disabled]="currentPage === 0"
+          (click)="onPageChange(currentPage - 1)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
+        <button 
+          mat-button 
+          [disabled]="currentPage >= totalPages - 1"
+          (click)="onPageChange(currentPage + 1)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="reviews.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">rate_review</mat-icon>
+      <h2 *ngIf="!isMyReviews">No Reviews Yet</h2>
+      <h2 *ngIf="isMyReviews">No Reviews Found</h2>
+      <p *ngIf="!isMyReviews">Be the first to review this product!</p>
+      <p *ngIf="isMyReviews">You haven't written any reviews yet.</p>
+      <button 
+        *ngIf="!isMyReviews" 
+        mat-raised-button 
+        color="primary" 
+        (click)="scrollToReviewForm()">
+        Write a Review
+      </button>
+      <button 
+        *ngIf="isMyReviews" 
+        mat-raised-button 
+        color="primary" 
+        routerLink="/products">
+        Browse Products
+      </button>
+    </div>
+  </div>
+</div>

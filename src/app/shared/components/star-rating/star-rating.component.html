@@ -1,0 +1,8 @@
+<div class="star-rating" [class]="size">
+  <span class="star" *ngFor="let star of stars; let i = index">
+    <span class="star-filled" [style.width.%]="getStarWidth(i)">
+      ★
+    </span>
+    <span class="star-empty">★</span>
+  </span>
+</div>

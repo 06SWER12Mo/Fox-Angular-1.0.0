@@ -1,0 +1,54 @@
+<div class="category-page">
+  <div class="container">
+    <div class="page-header">
+      <h1>Shop by Category</h1>
+      <p>Browse our curated categories to find exactly what you need</p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading categories...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="error-state">
+      <p>{{ errorMessage }}</p>
+      <button class="retry-btn" (click)="loadCategories()">Try Again</button>
+    </div>
+
+    <!-- Categories Grid -->
+    <div *ngIf="!isLoading && categories.length > 0" class="categories-grid">
+      <div
+        class="category-card"
+        *ngFor="let category of categories"
+        (click)="selectCategory(category.id)"
+      >
+        <div class="card-image">
+          <img
+            [src]="getImageUrl(category.imageUrl)"
+            [alt]="category.name"
+            loading="lazy"
+          />
+          <div class="card-overlay"></div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">{{ category.name }}</h3>
+          <p class="card-desc" *ngIf="category.description">{{ category.description }}</p>
+          <div class="card-meta">
+            <span class="product-count" *ngIf="category.subCategoryCount > 0">
+              {{ category.subCategoryCount }} subcategories
+            </span>
+            <span class="view-link">Browse →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && categories.length === 0" class="empty-state">
+      <h2>No categories found</h2>
+      <p>Check back later for new categories.</p>
+    </div>
+  </div>
+</div>

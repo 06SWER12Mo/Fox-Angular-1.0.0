@@ -1,0 +1,16 @@
+<div class="payment-form">
+  <div *ngFor="let method of paymentMethods" class="payment-card"
+       [class.selected]="isSelected(method.value)"
+       (click)="selectMethod(method.value)">
+    <div class="payment-radio">
+      <mat-radio-button [checked]="isSelected(method.value)"></mat-radio-button>
+    </div>
+    <div class="payment-details">
+      <mat-icon class="payment-icon">{{ getPaymentMethodIcon(method.value) }}</mat-icon>
+      <div class="payment-info">
+        <div class="payment-name">{{ method.label }}</div>
+        <div class="payment-description">{{ method.description }}</div>
+      </div>
+    </div>
+  </div>
+</div>

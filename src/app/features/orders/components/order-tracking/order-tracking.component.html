@@ -1,0 +1,98 @@
+<div class="tracking-container">
+  <div class="header">
+    <h1>Track Your Order</h1>
+    <p>Enter your tracking code to see the status of your order</p>
+  </div>
+
+  <!-- Tracking Form -->
+  <mat-card class="tracking-form-card">
+    <mat-card-content>
+      <form [formGroup]="trackingForm" (ngSubmit)="trackOrder()" class="tracking-form">
+        <mat-form-field appearance="outline" class="tracking-input">
+          <mat-label>Tracking Code</mat-label>
+          <input matInput formControlName="trackingCode" placeholder="Enter tracking code">
+          <mat-icon matPrefix>track_changes</mat-icon>
+          <mat-error *ngIf="trackingForm.get('trackingCode')?.hasError('required')">
+            Tracking code is required
+          </mat-error>
+        </mat-form-field>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          [disabled]="isLoading || trackingForm.invalid">
+          <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+          <span *ngIf="!isLoading">Track</span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Tracking Result -->
+  <div *ngIf="tracking && !isLoading" class="tracking-result">
+    <!-- Order Info -->
+    <mat-card class="order-info-card">
+      <mat-card-content>
+        <div class="order-info-row">
+          <div>
+            <h2>Order #{{ tracking.orderNumber }}</h2>
+            <p class="order-date">Placed on {{ tracking.createdAt | date:'medium' }}</p>
+          </div>
+          <div class="order-status">
+            <span class="status-badge" [style.background-color]="getStatusColor(tracking.currentStatus)">
+              {{ getStatusLabel(tracking.currentStatus) }}
+            </span>
+          </div>
+        </div>
+        <div class="order-details-row">
+          <div class="shipping-info">
+            <p><strong>Shipping to:</strong> {{ tracking.shippingName }}</p>
+            <p>{{ tracking.shippingAddress }}</p>
+          </div>
+          <div class="total-info">
+            <p><strong>Total:</strong> {{ tracking.totalPrice | currency }}</p>
+            <p *ngIf="tracking.trackingCode"><strong>Tracking:</strong> {{ tracking.trackingCode }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Timeline -->
+    <mat-card class="timeline-card">
+      <mat-card-header>
+        <mat-card-title>Tracking History</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="timeline">
+          <div *ngFor="let event of tracking.trackingHistory; let i = index" class="timeline-item">
+            <div class="timeline-icon" [style.background-color]="getStatusColor(event.status)">
+              <mat-icon>{{ getStatusIcon(event.status) }}</mat-icon>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <span class="timeline-status">{{ getStatusLabel(event.status) }}</span>
+                <span class="timeline-date">{{ event.timestamp | date:'medium' }}</span>
+              </div>
+              <p class="timeline-description">{{ event.description }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button mat-button (click)="goToOrder()">
+        <mat-icon>receipt</mat-icon> View Order
+      </button>
+      <button mat-button (click)="trackingForm.patchValue({ trackingCode: '' }); tracking = null">
+        <mat-icon>search</mat-icon> Track Another
+      </button>
+    </div>
+  </div>
+</div>

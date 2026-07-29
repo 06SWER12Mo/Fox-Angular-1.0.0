@@ -1,0 +1,5 @@
+<div class="price-display" [class]="size">
+  <span class="current-price">{{ price | currency }}</span>
+  <span class="original-price" *ngIf="hasDiscount()">{{ getOriginalPrice() | currency }}</span>
+  <span class="discount-badge" *ngIf="hasDiscount()">-{{ getDiscountPercentage() }}%</span>
+</div>

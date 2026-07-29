@@ -1,0 +1,69 @@
+<mat-card class="filters-card">
+  <mat-card-header>
+    <mat-card-title class="title-row">
+      <span>Filters</span>
+      <span class="active-count" *ngIf="getActiveFiltersCount() > 0">
+        {{ getActiveFiltersCount() }}
+      </span>
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="filterForm">
+      <!-- Sort -->
+      <div class="filter-group">
+        <label>Sort By</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select [value]="getSortValue()" (selectionChange)="onSortChange($event)">
+            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Price Range -->
+      <div class="filter-group">
+        <label>Price Range</label>
+        <div class="price-inputs">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Min</mat-label>
+            <span matPrefix class="currency-prefix">₪&nbsp;</span>
+            <input matInput formControlName="minPrice" type="number" step="0.01" min="0">
+          </mat-form-field>
+          <span class="price-separator">–</span>
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Max</mat-label>
+            <span matPrefix class="currency-prefix">₪&nbsp;</span>
+            <input matInput formControlName="maxPrice" type="number" step="0.01" min="0">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Stock -->
+      <div class="filter-group">
+        <label>Availability</label>
+        <mat-checkbox formControlName="inStock" color="primary">In Stock Only</mat-checkbox>
+      </div>
+
+      <!-- On Sale -->
+      <div class="filter-group">
+        <mat-checkbox formControlName="onSale" color="primary">On Sale</mat-checkbox>
+      </div>
+
+      <!-- Clear Filters -->
+      <button
+        type="button"
+        class="clear-btn"
+        [disabled]="!hasActiveFilters()"
+        (click)="onClearFilters()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Clear Filters</span>
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

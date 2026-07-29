@@ -1,0 +1,241 @@
+/* ============================================================
+   ONLINE STORE — Design System Theme
+   Single source of truth for all visual properties.
+   Every component reads from these CSS custom properties.
+   ============================================================
+   Usage:  <html data-theme="dark"> (default) | <html data-theme="light">
+   ============================================================ */
+
+/* --- Font Imports --- */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ============================================================
+   DARK MODE (default) — ink & brass
+   ------------------------------------------------------------
+   Full-page:    #14171c  (ink)
+   Surface:      #1f232b  (ink-soft)
+   Accent:       #c9a24b  (brass)
+   Primary text: #ecece4  (bone)
+   Secondary:    #a9afbb  (ash)
+   Brand font:   Fraunces (italic 600)
+   Body font:    Inter
+   ============================================================ */
+
+:root,
+[data-theme='dark'] {
+  /* ---- Backgrounds ---- */
+  --color-bg-primary: #14171c;
+  --color-bg-surface: #1f232b;
+  --color-bg-elevated: #1a1f27;
+  --color-bg-hover: rgba(255, 255, 255, 0.04);
+  --color-bg-input: rgba(255, 255, 255, 0.03);
+  --color-bg-card: #1f232b;
+
+  /* ---- Text ---- */
+  --color-text-primary: #ecece4;
+  --color-text-secondary: #a9afbb;
+  --color-text-muted: #5b6472;
+  --color-text-inverse: #1a1f27;
+  --color-text-heading: #ecece4;
+
+  /* ---- Accent (Brass) ---- */
+  --color-accent: #c9a24b;
+  --color-accent-hover: #d9b566;
+  --color-accent-dim: #8a7238;
+  --color-accent-soft: rgba(201, 162, 75, 0.1);
+  --color-accent-glow: rgba(201, 162, 75, 0.08);
+  --color-accent-border: rgba(201, 162, 75, 0.18);
+  --color-accent-border-hover: rgba(201, 162, 75, 0.35);
+
+  /* ---- Semantic ---- */
+  --color-danger: #e2596a;
+  --color-danger-soft: rgba(226, 89, 106, 0.08);
+  --color-danger-border: rgba(226, 89, 106, 0.2);
+  --color-success: #48bb78;
+  --color-success-soft: rgba(72, 187, 120, 0.08);
+  --color-success-border: rgba(72, 187, 120, 0.2);
+  --color-warning: #ecc94b;
+  --color-info: #63b3ed;
+
+  /* ---- Borders ---- */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+  --color-border-input: rgba(255, 255, 255, 0.1);
+  --color-border-input-hover: rgba(255, 255, 255, 0.18);
+  --color-border-card: rgba(201, 162, 75, 0.12);
+
+  /* ---- Shadows (dark) ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-accent: 0 4px 14px rgba(201, 162, 75, 0.25);
+
+  /* ---- Overlay ---- */
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* ---- Hero Backgrounds (dark mode) ---- */
+  --hero-bg-1: linear-gradient(135deg, #0d0f12 0%, #14171c 40%, #111318 100%);
+  --hero-bg-2: linear-gradient(135deg, #111318 0%, #0d0f12 40%, #14171c 100%);
+  --hero-bg-3: linear-gradient(135deg, #0d0f12 0%, #14171c 50%, #111318 100%);
+
+  /* ---- Hero Text (dark mode enhancements) ---- */
+  --hero-title-color: #ffffff;
+  --hero-subtitle-color: #d8dce4;
+  --hero-title-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  --hero-badge-bg: rgba(201, 162, 75, 0.2);
+  --hero-badge-border: rgba(201, 162, 75, 0.35);
+  --hero-btn-ghost-bg: rgba(201, 162, 75, 0.12);
+  --hero-btn-ghost-border: rgba(201, 162, 75, 0.3);
+  --hero-btn-primary-shadow: 0 4px 20px rgba(201, 162, 75, 0.3);
+  --hero-dot-color: rgba(236, 236, 228, 0.4);
+}
+
+/* ============================================================
+   LIGHT MODE — warm & premium
+   ------------------------------------------------------------
+   Full-page:    #f5f3ef  (warm off-white)
+   Surface:      #ffffff  (white)
+   Accent:       #c9a24b  (same brass — brand continuity)
+   Primary text: #1a1f27  (ink)
+   ============================================================ */
+
+[data-theme='light'] {
+  /* ---- Backgrounds ---- */
+  --color-bg-primary: #f5f3ef;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #faf9f7;
+  --color-bg-hover: rgba(20, 23, 28, 0.04);
+  --color-bg-input: #ffffff;
+  --color-bg-card: #ffffff;
+
+  /* ---- Text ---- */
+  --color-text-primary: #1a1f27;
+  --color-text-secondary: #5b6472;
+  --color-text-muted: #98a0ac;
+  --color-text-inverse: #ecece4;
+  --color-text-heading: #1a1f27;
+
+  /* ---- Accent (Brass) ---- */
+  --color-accent: #c9a24b;
+  --color-accent-hover: #d9b566;
+  --color-accent-dim: #8a7238;
+  --color-accent-soft: rgba(201, 162, 75, 0.08);
+  --color-accent-glow: rgba(201, 162, 75, 0.06);
+  --color-accent-border: rgba(201, 162, 75, 0.2);
+  --color-accent-border-hover: rgba(201, 162, 75, 0.4);
+
+  /* ---- Semantic ---- */
+  --color-danger: #e2596a;
+  --color-danger-soft: rgba(226, 89, 106, 0.06);
+  --color-danger-border: rgba(226, 89, 106, 0.15);
+  --color-success: #48bb78;
+  --color-success-soft: rgba(72, 187, 120, 0.06);
+  --color-success-border: rgba(72, 187, 120, 0.15);
+  --color-warning: #d69e2e;
+  --color-info: #3182ce;
+
+  /* ---- Borders ---- */
+  --color-border: rgba(20, 23, 28, 0.08);
+  --color-border-light: rgba(20, 23, 28, 0.04);
+  --color-border-input: rgba(20, 23, 28, 0.12);
+  --color-border-input-hover: rgba(20, 23, 28, 0.2);
+  --color-border-card: rgba(201, 162, 75, 0.15);
+
+  /* ---- Shadows (light) ---- */
+  --shadow-sm: 0 1px 2px rgba(20, 23, 28, 0.05);
+  --shadow-md: 0 4px 12px rgba(20, 23, 28, 0.08);
+  --shadow-lg: 0 8px 24px rgba(20, 23, 28, 0.12);
+  --shadow-accent: 0 4px 14px rgba(201, 162, 75, 0.2);
+
+  /* ---- Overlay ---- */
+  --color-overlay: rgba(20, 23, 28, 0.4);
+
+  /* ---- Hero Backgrounds (light mode) ---- */
+  --hero-bg-1:
+    radial-gradient(ellipse 600px 400px at 15% 45%, rgba(201, 162, 75, 0.20) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 80% 70%, rgba(201, 162, 75, 0.08) 0%, transparent 60%),
+    linear-gradient(150deg, #f5efe3 0%, #faf6ef 30%, #fefcf9 55%, #f5efe3 100%);
+  --hero-bg-2:
+    radial-gradient(ellipse 500px 400px at 75% 40%, rgba(201, 162, 75, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 350px 350px at 20% 60%, rgba(201, 162, 75, 0.06) 0%, transparent 55%),
+    linear-gradient(150deg, #f5efe3 0%, #faf6ef 35%, #fefcf9 70%, #faf6ef 100%);
+  --hero-bg-3:
+    radial-gradient(ellipse 550px 450px at 50% 50%, rgba(201, 162, 75, 0.16) 0%, transparent 65%),
+    radial-gradient(ellipse 300px 300px at 20% 20%, rgba(201, 162, 75, 0.10) 0%, transparent 50%),
+    linear-gradient(150deg, #f2eadd 0%, #faf6ef 40%, #fefcf9 70%, #f5efe3 100%);
+
+  /* ---- Hero Text (light mode - uses existing theme variables) ---- */
+  --hero-title-color: var(--color-text-heading);
+  --hero-subtitle-color: var(--color-text-secondary);
+  --hero-title-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --hero-badge-bg: var(--color-accent-soft);
+  --hero-badge-border: var(--color-accent-border);
+  --hero-btn-ghost-bg: transparent;
+  --hero-btn-ghost-border: var(--color-accent-border);
+  --hero-btn-primary-shadow: none;
+  --hero-dot-color: var(--color-text-muted);
+}
+
+/* ============================================================
+   SHARED DESIGN TOKENS (same in both modes)
+   ============================================================ */
+
+:root {
+  /* ---- Typography ---- */
+  --font-brand: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* ---- Font sizes ---- */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+
+  /* ---- Font weights ---- */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ---- Spacing (4px grid) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* ---- Transitions ---- */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* ---- Z-index scale ---- */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 500;
+  --z-modal: 600;
+  --z-toast: 700;
+
+  /* ---- Layout ---- */
+  --header-height: 68px;
+  --max-width: 1400px;
+}

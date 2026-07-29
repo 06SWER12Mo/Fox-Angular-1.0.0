@@ -1,0 +1,142 @@
+<div class="order-detail-container">
+  <div class="header">
+    <h1>Order Details</h1>
+    <button mat-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon> Back to Orders
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-spinner></mat-spinner>
+    <p>Loading order details...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+    <button mat-button color="primary" (click)="loadOrder(order?.id || 0)">Retry</button>
+  </div>
+
+  <!-- Order Details -->
+  <div *ngIf="!isLoading && order" class="order-content">
+    <!-- Order Header -->
+    <mat-card class="order-header-card">
+      <mat-card-content>
+        <div class="order-header-row">
+          <div>
+            <h2>Order #{{ order.orderNumber }}</h2>
+            <p class="order-date">Placed on {{ order.createdAt | date:'full' }}</p>
+          </div>
+          <div class="order-status-actions">
+           <app-order-status-badge [status]="order.orderStatus"></app-order-status-badge>
+            <div class="action-buttons">
+              <button 
+                *ngIf="order.trackingCode" 
+                mat-raised-button 
+                color="primary"
+                (click)="trackOrder()">
+                <mat-icon>track_changes</mat-icon> Track
+              </button>
+              <button 
+                *ngIf="canCancel()" 
+                mat-raised-button 
+                color="warn"
+                (click)="cancelOrder()">
+                <mat-icon>cancel</mat-icon> Cancel Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Order Info Grid -->
+    <div class="info-grid">
+      <!-- Shipping Address -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>local_shipping</mat-icon> Shipping Address
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p><strong>{{ order.shippingName }}</strong></p>
+          <p>{{ order.shippingStreet }}, {{ order.shippingBuilding }}</p>
+          <p>{{ order.shippingTownName }}</p>
+          <p>📞 {{ order.shippingPhone }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Payment Info -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>payment</mat-icon> Payment
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p><strong>Status:</strong> {{ order.paymentStatus }}</p>
+          
+          <p><strong>Total:</strong> {{ order.totalPrice | currency }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Order Items -->
+    <mat-card class="items-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>shopping_bag</mat-icon> Order Items
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="items-header">
+          <span class="item-product">Product</span>
+          <span class="item-price">Price</span>
+          <span class="item-qty">Qty</span>
+          <span class="item-total">Total</span>
+        </div>
+
+        <div *ngFor="let item of order.items" class="item-row">
+          <span class="item-product">
+            <span class="item-name">{{ item.productName }}</span>
+          </span>
+          <span class="item-price">{{ item.unitPrice | currency }}</span>
+          <span class="item-qty">{{ item.quantity }}</span>
+          <span class="item-total">{{ item.lineTotal | currency }}</span>
+        </div>
+
+        <div class="order-totals">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <span>{{ getSubtotal() | currency }}</span>
+          </div>
+          <div class="total-row">
+            <span>Shipping</span>
+            <span>{{ getShipping() | currency }}</span>
+          </div>
+          <div class="total-row grand-total">
+            <span>Total</span>
+            <span>{{ getTotal() | currency }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tracking Info -->
+    <mat-card *ngIf="order.trackingCode" class="tracking-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>track_changes</mat-icon> Tracking Information
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Tracking Code:</strong> {{ order.trackingCode }}</p>
+        <button mat-raised-button color="primary" (click)="trackOrder()">
+          Track Package
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

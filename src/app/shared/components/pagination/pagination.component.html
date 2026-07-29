@@ -1,0 +1,52 @@
+<div class="pagination-container">
+  <div class="pagination-info">
+    Showing {{ startIndex }} - {{ endIndex }} of {{ totalElements }} items
+  </div>
+
+  <div class="pagination-controls">
+    <div class="page-size-selector">
+      <label>Items per page:</label>
+      <select [value]="pageSize" (change)="onPageSizeChange($event)">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+
+    <div class="page-buttons">
+      <button 
+        class="page-btn page-nav" 
+        [disabled]="currentPage === 0"
+        (click)="goToPage(currentPage - 1)"
+        aria-label="Previous page"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <ng-container *ngFor="let page of pageNumbers">
+        <button 
+          *ngIf="page !== -1"
+          class="page-btn"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)"
+        >
+          {{ page + 1 }}
+        </button>
+        <span *ngIf="page === -1" class="ellipsis">…</span>
+      </ng-container>
+
+      <button 
+        class="page-btn page-nav" 
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="goToPage(currentPage + 1)"
+        aria-label="Next page"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

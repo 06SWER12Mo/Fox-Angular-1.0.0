@@ -1,0 +1,68 @@
+.back-home-btn {
+  position: fixed;
+  top: 84px;
+  left: 20px;
+  z-index: 999;
+  padding: 10px 20px 10px 16px;
+  border-radius: 999px;
+  background: var(--color-accent, #c9a24b);
+  border: none;
+  color: var(--color-text-inverse, #14171c);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(201, 162, 75, 0.35);
+  transition: all 0.25s ease;
+  animation: backBtnIn 0.3s ease;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+
+  .back-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .back-text {
+    white-space: nowrap;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(201, 162, 75, 0.5);
+    background: var(--color-accent-hover, #d9b566);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@keyframes backBtnIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .back-home-btn {
+    top: 72px;
+    left: 12px;
+    padding: 6px 12px 6px 8px;
+    font-size: 11px;
+
+    .back-icon {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}

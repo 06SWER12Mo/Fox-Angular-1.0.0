@@ -1,0 +1,102 @@
+<div class="cart-page">
+  <!-- Header -->
+  <div class="cart-header">
+    <div class="cart-header-left">
+      <h1 class="cart-title">Shopping Cart</h1>
+      <span class="cart-subtitle" *ngIf="!isLoading && !isEmpty()">
+        {{ getTotalItems() }} {{ getTotalItems() === 1 ? 'item' : 'items' }} in your cart
+      </span>
+    </div>
+    <button class="clear-btn" *ngIf="!isLoading && !isEmpty()" (click)="clearCart()" [disabled]="isUpdating">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Clear Cart
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="skeleton-header">
+      <div class="skeleton-line w-40"></div>
+      <div class="skeleton-line w-20"></div>
+    </div>
+    <div class="skeleton-layout">
+      <div class="skeleton-items">
+        <div class="skeleton-item" *ngFor="let _ of [1,2,3]">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-line w-60"></div>
+            <div class="skeleton-line w-30"></div>
+          </div>
+          <div class="skeleton-qty">
+            <div class="skeleton-line w-20"></div>
+          </div>
+          <div class="skeleton-line w-15"></div>
+        </div>
+      </div>
+      <div class="skeleton-summary">
+        <div class="skeleton-line w-50"></div>
+        <div class="skeleton-line w-70"></div>
+        <div class="skeleton-line w-60"></div>
+        <div class="skeleton-line w-80"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-state">
+    <div class="error-icon">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+    <h2>Couldn't load your cart</h2>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-primary" (click)="loadCart()">Try Again</button>
+  </div>
+
+  <!-- Empty Cart -->
+  <div *ngIf="!isLoading && !errorMessage && isEmpty()" class="empty-state">
+    <div class="empty-illustration">
+      <svg viewBox="0 0 200 200" fill="none">
+        <rect x="45" y="60" width="110" height="110" rx="12" stroke="var(--color-accent)" stroke-width="2.5" fill="var(--color-accent-soft)" opacity="0.4"/>
+        <path d="M65 90h70M65 110h50M65 130h60" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+        <path d="M70 60l15-20h30l15 20" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+        <circle cx="100" cy="35" r="4" fill="var(--color-accent)" opacity="0.2"/>
+        <circle cx="30" cy="80" r="3" fill="var(--color-accent)" opacity="0.15"/>
+        <circle cx="170" cy="100" r="3" fill="var(--color-accent)" opacity="0.12"/>
+        <circle cx="40" cy="150" r="2" fill="var(--color-accent)" opacity="0.1"/>
+        <circle cx="160" cy="50" r="2" fill="var(--color-accent)" opacity="0.15"/>
+      </svg>
+    </div>
+    <h2>Your cart is empty</h2>
+    <p>Looks like you haven't added anything yet. Browse our collection and find something you love.</p>
+    <a routerLink="/products" class="btn-primary">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Start Shopping
+    </a>
+  </div>
+
+  <!-- Cart Content -->
+  <div *ngIf="!isLoading && !errorMessage && !isEmpty()" class="cart-layout">
+    <div class="cart-items-section">
+      <div class="cart-items">
+        <app-cart-item
+          *ngFor="let item of cart?.items"
+          [item]="item"
+          [isUpdating]="isUpdating"
+          (quantityChange)="updateQuantity(item.productId, $event)"
+          (remove)="removeItem(item.productId)"
+        ></app-cart-item>
+      </div>
+
+      <a class="continue-link" routerLink="/products">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Continue Shopping
+      </a>
+    </div>
+
+    <app-cart-summary
+      [cart]="cart"
+      [isUpdating]="isUpdating"
+      (checkout)="proceedToCheckout()"
+    ></app-cart-summary>
+  </div>
+</div>

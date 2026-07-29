@@ -1,0 +1,228 @@
+<div class="product-detail-container">
+  <!-- Back Button -->
+  <button (click)="goBack()" class="back-btn">
+    
+    View Other Products
+  </button>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <span class="loading-spinner"></span>
+    <p>Loading product...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Product Content -->
+  <div *ngIf="!isLoading && product" class="product-content">
+    <!-- Main Product Info -->
+    <div class="product-main">
+      <!-- Images -->
+      <div class="product-image">
+        <app-image-gallery
+          [images]="product.images || []"
+          [defaultImage]="'assets/images/default-product.png'"
+        ></app-image-gallery>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <div class="product-header">
+          <h1>{{ product.name }}</h1>
+          <div class="product-rating">
+            <app-star-rating [rating]="getAverageRating()"></app-star-rating>
+            <span class="review-count">({{ getReviewCount() }} reviews)</span>
+          </div>
+        </div>
+
+        <div class="product-price">
+          <span class="current-price">{{ product.discountedPrice | currency }}</span>
+          <span class="original-price" *ngIf="product.discountPercentage > 0">
+            {{ product.compareAtPrice | currency }}
+          </span>
+          <span class="discount-badge" *ngIf="product.discountPercentage > 0">
+            -{{ product.discountPercentage | number:'1.0-0' }}%
+          </span>
+        </div>
+
+        <div class="product-stock" [class]="getStockStatus().color">
+          {{ getStockStatus().label }}
+        </div>
+
+        <p class="product-description">{{ product.description }}</p>
+
+        <!-- Variants -->
+        <div *ngIf="product.variants?.length" class="product-variants">
+          <label>Variants:</label>
+          <div class="variant-options">
+            <button
+              *ngFor="let variant of product.variants"
+              class="variant-btn"
+              [class.active]="selectedVariantId === variant.id"
+              (click)="selectVariant(variant.id)"
+            >
+              {{ variant.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="product-quantity">
+          <label>Quantity:</label>
+          <div class="quantity-controls">
+            <button class="qty-btn" (click)="decrementQuantity()" [disabled]="selectedQuantity <= 1" aria-label="Decrease quantity">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <span class="quantity-value">{{ selectedQuantity }}</span>
+            <button class="qty-btn" (click)="incrementQuantity()" aria-label="Increase quantity">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Add to Cart -->
+        <button
+          class="add-to-cart-btn"
+          [disabled]="isAddingToCart || product.stockQuantity === 0"
+          (click)="addToCart()"
+        >
+          <span *ngIf="isAddingToCart" class="spinner-wrapper"><span class="btn-spinner"></span></span>
+          <span *ngIf="!isAddingToCart" class="btn-content">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 3H4.5L5.4 5M5.4 5H21L18.5 13H7.5L5.4 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7.5 13L6.2 18H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+              <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+            </svg>
+            Add to Cart
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="product-tabs">
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn" [class.active]="activeTab === 'details'" (click)="activeTab = 'details'">Details</button>
+        <button class="tab-btn" [class.active]="activeTab === 'specs'" (click)="activeTab = 'specs'">Specifications</button>
+        <button class="tab-btn" [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">Reviews <span class="tab-count" *ngIf="getReviewCount() > 0">{{ getReviewCount() }}</span></button>
+      </div>
+
+      <div class="tab-panel">
+        <!-- Details Tab -->
+        <div *ngIf="activeTab === 'details'" class="tab-content">
+          <h3>Product Details</h3>
+          <p>{{ product.description }}</p>
+          <div class="product-meta">
+            <div class="meta-row">
+              <span class="label">SKU:</span>
+              <span class="value">{{ product.sku }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="label">Category:</span>
+              <span class="value">{{ product.categoryName }}</span>
+            </div>
+            <div class="meta-row" *ngIf="product.weight">
+              <span class="label">Weight:</span>
+              <span class="value">{{ product.weight }} kg</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specifications Tab -->
+        <div *ngIf="activeTab === 'specs'" class="tab-content">
+          <h3>Technical Specifications</h3>
+          <div *ngIf="product.specifications && product.specifications.length > 0" class="specs-list">
+            <div *ngFor="let spec of product.specifications" class="spec-row">
+              <span class="spec-name">{{ spec.name }}</span>
+              <span class="spec-value">{{ spec.value }} {{ spec.unit }}</span>
+            </div>
+          </div>
+          <div *ngIf="!product.specifications || product.specifications.length === 0">
+            <p class="no-data">No specifications available.</p>
+          </div>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div *ngIf="activeTab === 'reviews'" class="tab-content">
+          <div class="reviews-header">
+            <h3>Customer Reviews</h3>
+            <div class="review-summary">
+              <app-star-rating [rating]="getAverageRating()"></app-star-rating>
+              <span class="review-count">{{ getReviewCount() }} reviews</span>
+            </div>
+          </div>
+
+          <!-- Review Form -->
+          <div *ngIf="!hasUserReviewed" class="review-form-section">
+            <h4>Write a Review</h4>
+            <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+              <div class="rating-select">
+                <label>Rating:</label>
+                <app-star-rating
+                  [rating]="reviewForm.get('rating')?.value || 0"
+                  (ratingChange)="reviewForm.patchValue({ rating: $event })"
+                ></app-star-rating>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="reviewComment">Your Review</label>
+                <textarea id="reviewComment" formControlName="comment" rows="4" class="form-textarea" placeholder="Share your experience with this product..."></textarea>
+                <div class="char-count" *ngIf="reviewForm.get('comment')?.value?.length">
+                  {{ reviewForm.get('comment')?.value?.length || 0 }}/2000
+                </div>
+              </div>
+              <button class="submit-btn" type="submit" [disabled]="isSubmittingReview || reviewForm.invalid">
+                <span *ngIf="isSubmittingReview" class="spinner-wrapper"><span class="btn-spinner"></span></span>
+                <span *ngIf="!isSubmittingReview">Submit Review</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- User's Review -->
+          <div *ngIf="hasUserReviewed && userReview" class="user-review">
+            <div class="user-review-header">
+              <span class="reviewer-name">Your Review</span>
+              <button class="delete-btn" (click)="deleteReview()" aria-label="Delete Review">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            <app-star-rating [rating]="userReview.rating"></app-star-rating>
+            <p class="review-comment">{{ userReview.comment }}</p>
+            <span class="review-date">{{ userReview.createdAt | date:'medium' }}</span>
+          </div>
+
+          <!-- All Reviews -->
+          <div *ngIf="reviews.length > 0" class="reviews-list">
+            <div *ngFor="let review of reviews" class="review-item">
+              <div class="review-header">
+                <div class="reviewer-info">
+                  <span class="reviewer-avatar">{{ review.reviewerName?.[0] || 'U' }}</span>
+                  <div>
+                    <span class="reviewer-name">{{ review.reviewerName || 'Anonymous' }}</span>
+                    <span class="review-date">{{ review.createdAt | date:'medium' }}</span>
+                  </div>
+                </div>
+              </div>
+              <app-star-rating [rating]="review.rating"></app-star-rating>
+              <p class="review-comment">{{ review.comment }}</p>
+            </div>
+          </div>
+
+          <div *ngIf="reviews.length === 0 && !hasUserReviewed" class="no-reviews">
+            <p>No reviews yet. Be the first to review this product!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

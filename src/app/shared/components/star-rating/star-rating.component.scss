@@ -1,0 +1,36 @@
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+  position: relative;
+  
+  &.small {
+    font-size: 14px;
+  }
+  
+  &.medium {
+    font-size: 20px;
+  }
+  
+  &.large {
+    font-size: 28px;
+  }
+}
+
+.star {
+  position: relative;
+  display: inline-block;
+  color: #e2e8f0;
+}
+
+.star-filled {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  color: #f6ad55;
+  white-space: nowrap;
+}
+
+.star-empty {
+  color: #e2e8f0;
+}

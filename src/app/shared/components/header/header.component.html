@@ -1,0 +1,198 @@
+<header class="header">
+  <nav class="navbar">
+    <!-- Left: Menu + Logo -->
+    <div class="nav-left">
+      <button class="menu-btn" (click)="toggleNavMenu()" [attr.aria-label]="'Navigation menu'" [class.active]="isNavMenuOpen">
+        <svg viewBox="0 0 24 24" fill="none" class="menu-icon">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="nav-brand">
+        <a routerLink="/">
+          <span class="logo">🛒</span>
+          <span class="brand-name">FOX</span>
+        </a>
+      </div>
+
+      <!-- Nav Dropdown -->
+      <div class="nav-dropdown" [class.open]="isNavMenuOpen" (mouseleave)="isNavMenuOpen = false">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeNavMenu()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="1.8"/></svg>
+          Home
+        </a>
+        <a routerLink="/products" routerLinkActive="active" (click)="closeNavMenu()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="1.8"/></svg>
+          Products
+        </a>
+        <a routerLink="/categories" routerLinkActive="active" (click)="closeNavMenu()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 7h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.8"/></svg>
+          Categories
+        </a>
+        <a *appHasRole="['ADMIN', 'MANAGER']" routerLink="/admin" routerLinkActive="active" (click)="closeNavMenu()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          Admin
+        </a>
+      </div>
+    </div>
+
+    <!-- Center: Search Bar -->
+    <div class="nav-center">
+      <div class="search-bar" [class.focused]="isSearchOpen">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+          <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search products, categories..."
+          [ngModel]="searchQuery"
+          (ngModelChange)="onSearchInput($event)"
+          (focus)="onSearchFocus()"
+          (blur)="closeSearch()"
+          (keyup.enter)="submitSearch()"
+        />
+        <button class="search-clear" *ngIf="searchQuery" (click)="searchQuery = ''; searchResults = {products:[], categories:[]}">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="search-submit" (click)="submitSearch()">
+          Search
+        </button>
+
+        <!-- Search Results Dropdown -->
+        <div class="search-results" *ngIf="isSearchOpen && searchQuery">
+          <div class="search-loading" *ngIf="isSearching">
+            <div class="mini-spinner"></div>
+            <span>Searching...</span>
+          </div>
+
+          <ng-container *ngIf="!isSearching">
+            <!-- Products -->
+            <div class="results-section" *ngIf="searchResults.products.length > 0">
+              <div class="results-label">Products</div>
+              <a class="result-item" *ngFor="let p of searchResults.products.slice(0, 4)" (mousedown)="goToProduct(p.id)">
+                <img [src]="getImageUrl(p.primaryImageUrl)" alt="" class="result-img" />
+                <div class="result-info">
+                  <span class="result-name">{{ p.name }}</span>
+                  <span class="result-price">{{ p.price | currency }}</span>
+                </div>
+              </a>
+            </div>
+
+            <!-- Categories -->
+            <div class="results-section" *ngIf="searchResults.categories.length > 0">
+              <div class="results-label">Categories</div>
+              <a class="result-item category-item" *ngFor="let c of searchResults.categories.slice(0, 4)" (mousedown)="goToCategory(c.id)">
+                <svg viewBox="0 0 24 24" fill="none" class="result-cat-icon"><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2M4 7h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.8"/></svg>
+                <span class="result-name">{{ c.name }}</span>
+              </a>
+            </div>
+
+            <!-- No results -->
+            <div class="results-empty" *ngIf="searchResults.products.length === 0 && searchResults.categories.length === 0">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span>No results found for "{{ searchQuery }}"</span>
+            </div>
+
+            <!-- View all -->
+            <div class="results-footer" *ngIf="searchResults.products.length > 0 || searchResults.categories.length > 0">
+              <a class="view-all-link" (mousedown)="goToSearchResults()">
+                View all results →
+              </a>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="nav-right">
+      <!-- Cart -->
+      <a routerLink="/cart" class="cart-link" matTooltip="Shopping Cart">
+        <svg class="cart-icon" viewBox="0 0 24 24" fill="none">
+          <path d="M3 3H4.5L5.4 5M5.4 5H21L18.5 13H7.5L5.4 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7.5 13L6.2 18H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+          <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+        </svg>
+        <span class="cart-badge" *ngIf="(cartItemCount$ | async) as count">{{ count }}</span>
+      </a>
+
+      <!-- User Menu -->
+      <div *ngIf="isAuthenticated; else loginBtn" class="user-menu"
+        (mouseenter)="isUserMenuOpen = true"
+        (mouseleave)="isUserMenuOpen = false"
+      >
+        <button class="user-btn">
+          <span class="avatar" *ngIf="!user?.profilePictureUrl || avatarImgError">{{ getInitials() }}</span>
+          <img *ngIf="user?.profilePictureUrl && !avatarImgError" [src]="getImageUrl(user!.profilePictureUrl)" alt="" class="avatar-img" (error)="onAvatarImgError()">
+          <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" [class.open]="isUserMenuOpen">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="user-dropdown" [class.open]="isUserMenuOpen">
+          <div class="dropdown-header">
+            <span class="dropdown-name">{{ user?.firstName || user?.username }}</span>
+            <span class="dropdown-email">{{ user?.email }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" routerLink="/auth/profile" (click)="isUserMenuOpen = false">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+            Profile
+          </a>
+          <a class="dropdown-item" routerLink="/orders" (click)="isUserMenuOpen = false">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 3h18v18H3V3z" stroke="currentColor" stroke-width="1.8"/><path d="M8 12h8M8 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            My Orders
+          </a>
+          <a class="dropdown-item" routerLink="/locations" (click)="isUserMenuOpen = false">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+            Addresses
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item logout" (click)="logout(); isUserMenuOpen = false">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>
+            Logout
+          </a>
+        </div>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="'Switch to ' + (currentTheme === 'dark' ? 'light' : 'dark') + ' mode'">
+        <svg *ngIf="currentTheme === 'dark'" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="theme-icon">
+          <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <svg *ngIf="currentTheme === 'light'" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="theme-icon">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <ng-template #loginBtn>
+        <button mat-raised-button color="primary" routerLink="/auth/login" class="login-btn">
+          Sign In
+        </button>
+      </ng-template>
+
+      <!-- Mobile Toggle -->
+      <button class="mobile-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
+        <mat-icon>{{ isMenuOpen ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav" [class.open]="isMenuOpen">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">Home</a>
+    <a routerLink="/products" routerLinkActive="active" (click)="closeMenu()">Products</a>
+    <a routerLink="/categories" routerLinkActive="active" (click)="closeMenu()">Categories</a>
+    <a *appHasRole="['ADMIN', 'MANAGER']" routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">Admin</a>
+    <a routerLink="/cart" routerLinkActive="active" (click)="closeMenu()">
+      Cart <span class="cart-badge" *ngIf="(cartItemCount$ | async) as count">{{ count }}</span>
+    </a>
+    <a *ngIf="!isAuthenticated" routerLink="/auth/login" (click)="closeMenu()">Sign In</a>
+    <a *ngIf="isAuthenticated" routerLink="/auth/profile" (click)="closeMenu()">Profile</a>
+    <a *ngIf="isAuthenticated" routerLink="/orders" (click)="closeMenu()">My Orders</a>
+    <a *ngIf="isAuthenticated" (click)="logout(); closeMenu()" class="logout-link">Logout</a>
+  </div>
+</header>

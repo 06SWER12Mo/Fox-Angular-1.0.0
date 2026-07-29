@@ -1,0 +1,101 @@
+<div class="order-container">
+  <div class="order-header">
+    <h1>My Orders</h1>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filter-form">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="">All Orders</mat-option>
+            <mat-option *ngFor="let status of statusOptions" [value]="status">
+              {{ getStatusLabel(status) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Search</mat-label>
+          <input matInput formControlName="search" placeholder="Order number or product...">
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-spinner></mat-spinner>
+    <p>Loading your orders...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+    <button mat-button color="primary" (click)="loadOrders()">Retry</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && orders.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">receipt</mat-icon>
+    <h2>No Orders Yet</h2>
+    <p>You haven't placed any orders yet. Start shopping!</p>
+    <button mat-raised-button color="primary" routerLink="/products">
+      Start Shopping
+    </button>
+  </div>
+
+  <!-- Order List -->
+  <div *ngIf="!isLoading && orders.length > 0" class="order-list">
+    <mat-card *ngFor="let order of orders" class="order-card" (click)="viewOrder(order.id)">
+      <mat-card-content>
+        <div class="order-header-row">
+          <div class="order-info">
+            <span class="order-number">#{{ order.orderNumber }}</span>
+            <span class="order-date">{{ order.createdAt | date:'medium' }}</span>
+          </div>
+          <div class="order-status">
+            <app-order-status-badge [status]="order.orderStatus"></app-order-status-badge>
+          </div>
+        </div>
+
+        <div class="order-details">
+          <div class="order-summary">
+            <span class="order-items">{{ order.itemCount }} {{ order.itemCount === 1 ? 'item' : 'items' }}</span>
+            <span class="order-total">{{ order.totalPrice | currency }}</span>
+          </div>
+          <div class="order-actions">
+            <button mat-button color="primary" (click)="$event.stopPropagation(); viewOrder(order.id)">
+              <mat-icon>visibility</mat-icon> View Details
+            </button>
+            <button 
+              *ngIf="order.trackingCode" 
+              mat-button 
+              (click)="$event.stopPropagation(); trackOrder(order.trackingCode)">
+              <mat-icon>track_changes</mat-icon> Track
+            </button>
+            <button 
+              *ngIf="canCancel(order.orderStatus)" 
+              mat-button 
+              color="warn"
+              (click)="$event.stopPropagation(); cancelOrder(order.id)">
+              <mat-icon>cancel</mat-icon> Cancel
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Pagination -->
+    <mat-paginator
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>

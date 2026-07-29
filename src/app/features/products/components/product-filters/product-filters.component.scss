@@ -1,0 +1,229 @@
+// ============================================================
+// Palette matches header.component.scss so the filter sidebar
+// reads as part of the same "ink & brass" storefront, not a
+// separate default-Material panel.
+// ------------------------------------------------------------
+$ink: #14171c;
+$brass: #c9a24b;
+$brass-dim: #8a7238;
+$brass-soft: rgba(201, 162, 75, 0.12);
+$border: rgba(201, 162, 75, 0.22);
+$text: #1a1f27;
+$text-muted: #5b6472;
+$muted: #98a0ac;
+$radius: 10px;
+
+:host {
+  // Material (MDC) reads these custom properties from any ancestor —
+  // no ::ng-deep needed. Recolors focused inputs/checkboxes to brass
+  // without touching global Material theme files.
+  --mdc-outlined-text-field-focus-outline-color: #{$brass};
+  --mdc-outlined-text-field-focus-label-text-color: #{$brass};
+  --mdc-outlined-text-field-caret-color: #{$brass};
+  --mat-select-focused-arrow-color: #{$brass};
+  --mdc-checkbox-selected-icon-color: #{$brass};
+  --mdc-checkbox-selected-hover-icon-color: #{$brass-dim};
+  --mdc-checkbox-selected-focus-icon-color: #{$brass};
+  --mdc-checkbox-selected-pressed-icon-color: #{$brass-dim};
+  --mdc-checkbox-selected-checkmark-color: #{$ink};
+  --mat-option-selected-state-label-text-color: #{$brass-dim};
+}
+
+.filters-card {
+  border-radius: 12px;
+  padding: 0 0 8px 0;
+  border: 1px solid $border;
+  box-shadow: 0 1px 3px rgba(20, 23, 28, 0.05);
+  overflow: hidden;
+
+  mat-card-header {
+    padding: 16px 16px 14px 16px;
+    position: relative;
+
+    // Same brass gradient seam used under the header — a small
+    // repeated motif that ties this card back to the nav bar.
+    &::after {
+      content: '';
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 0;
+      height: 2px;
+      background: linear-gradient(90deg, $brass 0%, rgba(201, 162, 75, 0.15) 100%);
+      border-radius: 2px;
+    }
+  }
+
+  mat-card-content {
+    padding: 20px 16px 4px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 19px;
+  font-weight: 600;
+  color: $text;
+}
+
+.active-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: $brass;
+  color: $ink;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-weight: 600;
+    color: $text-muted;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .half-width {
+    flex: 1;
+    width: 100%;
+
+    // Removes the reserved hint/error space under each field so the
+    // two inputs and the dash between them sit on one clean row,
+    // instead of leaving a mismatched gap under the fields.
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+
+    ::ng-deep .mdc-text-field {
+      padding-right: 8px;
+    }
+  }
+
+  .currency-prefix {
+    display: inline-flex;
+    align-items: center;
+    padding-left: 12px;
+    margin-right: 2px;
+    color: $brass-dim;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .price-separator {
+    color: $muted;
+    font-weight: 600;
+    font-size: 15px;
+    align-self: center;
+    // Nudges the dash up to the visual center of the input box itself,
+    // now that there's no hint space below to account for.
+    transform: translateY(-10px);
+  }
+}
+
+.full-width {
+  width: 100%;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  background: transparent;
+  color: $brass-dim;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover:not(:disabled) {
+    background: $brass;
+    border-color: $brass;
+    color: $ink;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 992px) {
+  .filters-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    mat-card-header {
+      grid-column: 1 / -1;
+    }
+
+    mat-card-content {
+      grid-column: 1 / -1;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+  }
+
+  .filter-group:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .clear-btn {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-card form {
+    display: flex;
+    flex-direction: column;
+  }
+}

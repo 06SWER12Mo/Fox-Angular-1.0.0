@@ -1,0 +1,62 @@
+<div class="cart-item" [class.updating]="isUpdating">
+  <div class="item-overlay" *ngIf="isUpdating">
+    <div class="item-spinner"></div>
+  </div>
+  
+  <!-- Product Image -->
+  <a [routerLink]="getProductUrl()" class="item-image">
+    <img 
+      [src]="getImageUrl()" 
+      [alt]="item.productName"
+      loading="lazy"
+      (load)="onImageLoad()"
+      (error)="onImageError($event)"
+      [class.loaded]="imageLoaded"
+    >
+  </a>
+
+  <!-- Product Details -->
+  <div class="item-details">
+    <a [routerLink]="getProductUrl()" class="item-name">
+      {{ item.productName }}
+    </a>
+    <span class="item-price">{{ item.price | currency }}</span>
+  </div>
+
+  <!-- Quantity Controls -->
+  <div class="item-quantity">
+    <button 
+      class="qty-btn"
+      (click)="decrement()"
+      [disabled]="isUpdating || item.quantity <= 1"
+      aria-label="Decrease quantity"
+    >
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <span class="qty-value">{{ item.quantity }}</span>
+    <button 
+      class="qty-btn"
+      (click)="increment()"
+      [disabled]="isUpdating"
+      aria-label="Increase quantity"
+    >
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <!-- Subtotal -->
+  <div class="item-subtotal">
+    <span class="subtotal-label">Subtotal</span>
+    <span class="subtotal-value">{{ item.subtotal | currency }}</span>
+  </div>
+
+  <!-- Remove Button -->
+  <button 
+    class="remove-btn"
+    (click)="onRemove()"
+    [disabled]="isUpdating"
+    aria-label="Remove item"
+  >
+    <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+</div>

@@ -1,0 +1,242 @@
+// ============================================================
+// FOOTER — ink/brass design system (matching Header)
+// ------------------------------------------------------------
+// --ink        #14171C   footer background
+// --ink-soft   #1F232B   hover / card surfaces
+// --brass      #C9A24B   primary accent
+// --brass-dim  #8A7238   accent at rest
+// --ash        #A9AFBB   secondary text
+// --bone       #ECEAE4   primary text on dark
+// ============================================================
+
+$ink: #14171c;
+$ink-soft: #1f232b;
+$brass: #c9a24b;
+$brass-dim: #8a7238;
+$ash: #a9afbb;
+$bone: #ecece4;
+
+.footer {
+  background: $ink;
+  color: $ash;
+  position: relative;
+
+  // Brass gradient seam at the top (mirrors header's bottom border)
+  &::before {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      $brass 20%,
+      $brass 80%,
+      transparent 100%
+    );
+    opacity: 0.6;
+  }
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 56px 24px 0;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  gap: 40px;
+}
+
+/* ============================================================
+   BRAND SECTION
+   ============================================================ */
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+
+  .footer-logo {
+    font-size: 18px;
+    line-height: 1;
+    color: $brass;
+  }
+
+  .footer-brand-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: 0.01em;
+    color: $bone;
+  }
+}
+
+.footer-tagline {
+  color: $ash;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+  max-width: 260px;
+}
+
+/* ============================================================
+   SOCIAL LINKS
+   ============================================================ */
+
+.social-links {
+  display: flex;
+  gap: 10px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: $ash;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: $brass;
+    color: $ink;
+    border-color: $brass;
+    transform: translateY(-2px);
+  }
+}
+
+/* ============================================================
+   SECTION HEADINGS & LINKS
+   ============================================================ */
+
+.footer-heading {
+  color: $bone;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    margin-bottom: 12px;
+    color: $ash;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.5;
+
+    a {
+      color: $ash;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 1px;
+        background: $brass;
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.25s ease;
+      }
+
+      &:hover {
+        color: $bone;
+
+        &::after {
+          transform: scaleX(1);
+          transform-origin: left;
+        }
+      }
+    }
+
+    svg {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: $brass-dim;
+    }
+  }
+}
+
+.footer-contact li {
+  svg {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    color: $brass-dim;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover svg {
+    opacity: 1;
+    color: $brass;
+  }
+}
+
+/* ============================================================
+   BOTTOM BAR
+   ============================================================ */
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 20px 24px;
+  text-align: center;
+  margin-top: 48px;
+
+  p {
+    color: rgba(169, 175, 187, 0.5);
+    font-size: 13px;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 992px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+
+  .footer-brand-section {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 40px 20px 0;
+  }
+
+  .footer-bottom {
+    margin-top: 32px;
+    padding: 16px 20px;
+  }
+}

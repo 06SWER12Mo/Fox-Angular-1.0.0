@@ -1,0 +1,41 @@
+.price-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  
+  &.small {
+    .current-price { font-size: 16px; }
+    .original-price { font-size: 12px; }
+    .discount-badge { font-size: 11px; padding: 2px 8px; }
+  }
+  
+  &.medium {
+    .current-price { font-size: 20px; }
+    .original-price { font-size: 14px; }
+    .discount-badge { font-size: 12px; padding: 4px 10px; }
+  }
+  
+  &.large {
+    .current-price { font-size: 28px; }
+    .original-price { font-size: 18px; }
+    .discount-badge { font-size: 14px; padding: 6px 12px; }
+  }
+}
+
+.current-price {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.original-price {
+  color: #a0aec0;
+  text-decoration: line-through;
+}
+
+.discount-badge {
+  background: #e53e3e;
+  color: white;
+  border-radius: 20px;
+  font-weight: 600;
+}

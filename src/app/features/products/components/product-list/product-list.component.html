@@ -1,0 +1,68 @@
+<div class="product-container">
+  <div class="product-header">
+    <h1>{{ categoryId ? 'Category Products' : 'All Products' }}</h1>
+    <div class="header-actions">
+      <app-product-search (search)="onSearch($event)"></app-product-search>
+    </div>
+  </div>
+
+  <div class="product-layout">
+    <!-- Filters Sidebar -->
+    <aside class="product-filters">
+      <app-product-filters
+        [filterForm]="filterForm"
+        [currentSort]="currentSort"
+        [sortOptions]="sortOptions"
+        (sortChange)="onSortChange($event)"
+        (clearFilters)="clearFilters()"
+      ></app-product-filters>
+    </aside>
+
+    <!-- Product Grid -->
+    <main class="product-grid">
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="loading-state">
+        <mat-spinner></mat-spinner>
+        <p>Loading products...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+        <button mat-button color="primary" (click)="loadProducts()">Retry</button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && products.length === 0" class="empty-state">
+
+        <h2>No Products Found</h2>
+        <p>Try adjusting your filters or search terms.</p>
+        <button mat-raised-button color="primary" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Products -->
+      <div *ngIf="!isLoading && products.length > 0" class="products-grid">
+        <app-product-card
+          *ngFor="let product of products"
+          [product]="product"
+          (addToCart)="addToCart($event)"
+        ></app-product-card>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="!isLoading && products.length > 0" class="pagination-container">
+        <app-pagination
+          [currentPage]="currentPage"
+          [totalPages]="Math.ceil(totalElements / pageSize)"
+          [pageSize]="pageSize"
+          [totalElements]="totalElements"
+          [pageSizeOptions]="[10, 20, 50]"
+          (pageChange)="onPageChange({ pageIndex: $event, pageSize: pageSize })"
+          (pageSizeChange)="onPageChange({ pageIndex: 0, pageSize: $event })"
+        ></app-pagination>
+      </div>
+    </main>
+  </div>
+</div>

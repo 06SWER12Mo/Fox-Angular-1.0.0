@@ -1,0 +1,196 @@
+.address-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// No Addresses State
+.no-addresses {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f7fafc;
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #a0aec0;
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: #718096;
+    margin: 4px 0;
+    font-size: 15px;
+  }
+
+  .hint {
+    font-size: 13px;
+    color: #a0aec0;
+    margin-bottom: 16px;
+  }
+
+  button {
+    height: 44px;
+    padding: 0 24px;
+  }
+}
+
+// Address Card
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  position: relative;
+
+  &:hover {
+    border-color: #a0aec0;
+    background: #f7fafc;
+  }
+
+  &.selected {
+    border-color: #667eea;
+    background: #ebf4ff;
+    box-shadow: 0 0 0 1px #667eea;
+
+    .address-radio ::ng-deep .mat-radio-outer-circle {
+      border-color: #667eea;
+    }
+
+    .address-radio ::ng-deep .mat-radio-inner-circle {
+      background-color: #667eea;
+    }
+  }
+}
+
+// Radio Button
+.address-radio {
+  padding-top: 4px;
+  flex-shrink: 0;
+
+  ::ng-deep .mat-radio-label {
+    margin-bottom: 0;
+  }
+}
+
+// Address Details
+.address-details {
+  flex: 1;
+  min-width: 0;
+
+  .address-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+
+    .address-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .address-badge {
+      display: inline-block;
+      
+      ::ng-deep .mat-chip {
+        font-size: 11px;
+        padding: 2px 12px;
+        min-height: 24px;
+      }
+    }
+  }
+
+  .address-line {
+    color: #4a5568;
+    font-size: 14px;
+    line-height: 1.6;
+
+    &.town {
+      font-weight: 500;
+      color: #2d3748;
+    }
+  }
+
+  .address-phone {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    color: #718096;
+    font-size: 13px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Edit Button
+.edit-btn {
+  flex-shrink: 0;
+  color: #a0aec0;
+  margin-top: -4px;
+
+  &:hover {
+    color: #667eea;
+  }
+
+  mat-icon {
+    font-size: 20px;
+  }
+}
+
+// Add Address Button
+.add-address-btn {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+
+  button {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .address-card {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+  }
+
+  .edit-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  .address-radio {
+    width: 100%;
+  }
+
+  .address-details {
+    width: calc(100% - 40px);
+  }
+
+  .no-addresses {
+    padding: 30px 16px;
+  }
+}

@@ -1,0 +1,40 @@
+<div class="order-summary">
+  <h3>Order Summary</h3>
+
+  <!-- Items -->
+  <div class="summary-items">
+    <div *ngFor="let item of items" class="summary-item">
+      <div class="item-info">
+        <span class="item-name">{{ item.productName }}</span>
+        <span class="item-quantity">×{{ item.quantity }}</span>
+      </div>
+      <span class="item-price">{{ item.subtotal | currency }}</span>
+    </div>
+  </div>
+
+  <div class="summary-divider"></div>
+
+  <!-- Totals -->
+  <div class="summary-row">
+    <span>Subtotal ({{ getTotalItems() }} {{ getTotalItems() === 1 ? 'item' : 'items' }})</span>
+    <span>{{ subtotal | currency }}</span>
+  </div>
+
+  <div class="summary-row">
+    <span>Shipping</span>
+    <span *ngIf="shipping === 0" class="free">Free</span>
+    <span *ngIf="shipping > 0">{{ shipping | currency }}</span>
+  </div>
+
+  <div class="summary-row">
+    <span>Tax (7%)</span>
+    <span>{{ tax | currency }}</span>
+  </div>
+
+  <div class="summary-divider"></div>
+
+  <div class="summary-total">
+    <span>Total</span>
+    <span class="total-price">{{ total | currency }}</span>
+  </div>
+</div>

@@ -1,0 +1,386 @@
+<div class="profile-page">
+  <!-- ==================== PROFILE HEADER WITH AVATAR ==================== -->
+  <div class="profile-header">
+    <div class="profile-header-bg" aria-hidden="true">
+      <div class="header-glow"></div>
+    </div>
+    <div class="profile-header-content">
+      <div class="avatar-section">
+        <div class="avatar-wrapper"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          [class.is-dragging]="isDragOver"
+        >
+          <div class="avatar-display" *ngIf="!isUploadingAvatar">
+            <ng-container *ngIf="getAvatarUrl(); else initialsBlock">
+              <img [src]="getAvatarUrl()" alt="" class="avatar-image" (error)="onAvatarError()" (load)="onAvatarLoad()">
+            </ng-container>
+            <ng-template #initialsBlock>
+              <div class="avatar-initials">{{ getInitials() }}</div>
+            </ng-template>
+          </div>
+          <div class="avatar-uploading" *ngIf="isUploadingAvatar">
+            <div class="upload-spinner"></div>
+          </div>
+          <div class="avatar-overlay">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>{{ getAvatarUrl() ? 'Change' : 'Upload' }}</span>
+          </div>
+          <input type="file" accept="image/*" class="avatar-input" (change)="onFileSelected($event)">
+        </div>
+        <button class="avatar-remove-btn" *ngIf="getAvatarUrl() && !isUploadingAvatar" (click)="removeAvatar()" title="Remove avatar">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="profile-info">
+        <h1>{{ user?.firstName || 'User' }} {{ user?.lastName }}</h1>
+        <p class="profile-email">{{ user?.email }}</p>
+        <div class="profile-badges">
+          <span class="badge role-badge" [class.badge-admin]="user?.role === 'ADMIN'" [class.badge-manager]="user?.role === 'MANAGER'">{{ user?.role | titlecase }}</span>
+          <span class="badge verify-badge" [class.verified]="user?.emailVerified" [class.unverified]="!user?.emailVerified">
+            {{ user?.emailVerified ? '✓ Verified' : '✗ Unverified' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST MESSAGES ==================== -->
+  <div *ngIf="successMessage" class="toast success" (click)="successMessage = ''">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
+    <span>{{ successMessage }}</span>
+  </div>
+  <div *ngIf="errorMessage" class="toast error" (click)="errorMessage = ''">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- ==================== LOADING SKELETON ==================== -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="skeleton-stats">
+      <div class="skeleton-stat" *ngFor="let _ of [1,2,3,4]"><div class="skeleton-line w-60"></div><div class="skeleton-line w-40"></div></div>
+    </div>
+    <div class="skeleton-header-card">
+      <div class="skeleton-avatar"></div>
+      <div class="skeleton-info"><div class="skeleton-line w-50"></div><div class="skeleton-line w-30"></div></div>
+    </div>
+    <div class="skeleton-card"><div class="skeleton-line w-40"></div><div class="skeleton-grid"><div class="skeleton-line w-90"></div><div class="skeleton-line w-90"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton-line w-40"></div><div class="skeleton-grid"><div class="skeleton-line w-90"></div><div class="skeleton-line w-90"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton-line w-30"></div><div class="skeleton-line w-80"></div></div>
+  </div>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="profile-body" *ngIf="!isLoading">
+
+    <!-- ===== SECTION 1: STATS OVERVIEW ===== -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <div class="stat-value">{{ memberSince }}</div>
+        <div class="stat-label">Member Since</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <div class="stat-value">{{ lastLogin }}</div>
+        <div class="stat-label">Last Login</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="1.8"/></svg></div>
+        <div class="stat-value">{{ orderCount }}</div>
+        <div class="stat-label">Orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="stat-value">{{ '0' }}</div>
+        <div class="stat-label">Reviews</div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 2: PROFILE INFORMATION ===== -->
+    <div class="profile-card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" class="card-icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+        <h2>Profile Information</h2>
+        <button type="button" class="btn-save" [disabled]="profileForm.invalid || isSavingProfile" (click)="updateProfile()">
+          <svg *ngIf="isSavingProfile" class="btn-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4"/></svg>
+          <span>{{ isSavingProfile ? 'Saving...' : 'Save Changes' }}</span>
+        </button>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label" for="firstName">First Name</label>
+              <div class="input-wrapper">
+                <input id="firstName" type="text" formControlName="firstName" placeholder="John" class="form-input">
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="lastName">Last Name</label>
+              <div class="input-wrapper">
+                <input id="lastName" type="text" formControlName="lastName" placeholder="Doe" class="form-input">
+              </div>
+            </div>
+            <div class="form-field" [class.has-error]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+              <label class="form-label" for="username">Username <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input id="username" type="text" formControlName="username" placeholder="johndoe" class="form-input">
+              </div>
+              <div class="field-error" *ngIf="profileForm.get('username')?.hasError('required')">Username is required</div>
+              <div class="field-error" *ngIf="profileForm.get('username')?.hasError('minlength')">At least 3 characters</div>
+            </div>
+            <div class="form-field" [class.has-error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+              <label class="form-label" for="email">Email <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input id="email" type="email" formControlName="email" placeholder="john@example.com" class="form-input">
+              </div>
+              <div class="field-error" *ngIf="profileForm.get('email')?.hasError('required')">Email is required</div>
+              <div class="field-error" *ngIf="profileForm.get('email')?.hasError('email')">Invalid email address</div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="phoneNumber">Phone Number</label>
+              <div class="input-wrapper">
+                <input id="phoneNumber" type="tel" formControlName="phoneNumber" placeholder="+1 (555) 000-0000" class="form-input">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 3: EMAIL VERIFICATION ===== -->
+    <div class="profile-card" *ngIf="!user?.emailVerified">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" class="card-icon"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h2>Email Verification</h2>
+      </div>
+      <div class="card-body">
+        <div class="verify-content">
+          <p class="verify-text">Your email <strong>{{ user?.email }}</strong> has not been verified yet. Verify it to unlock all features including order notifications and password recovery.</p>
+          <button type="button" class="btn btn-accent" [disabled]="isSendingVerification" (click)="sendVerificationEmail()">
+            <svg *ngIf="isSendingVerification" class="btn-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4"/></svg>
+            <svg *ngIf="!isSendingVerification" viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8" fill="none"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+            <span>{{ isSendingVerification ? 'Sending...' : 'Send Verification Email' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verified email card (alternate) -->
+    <div class="profile-card" *ngIf="user?.emailVerified">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" class="card-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h2>Email Verified</h2>
+      </div>
+      <div class="card-body">
+        <div class="verify-content verified">
+          <svg viewBox="0 0 24 24" fill="none" class="verified-icon"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
+          <div>
+            <p class="verify-text"><strong>{{ user?.email }}</strong> is verified.</p>
+            <p class="verify-sub">You'll receive order confirmations and updates at this address.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 4: PASSWORD CHANGE ===== -->
+    <div class="profile-card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" class="card-icon"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <h2>Change Password</h2>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="form-grid form-grid-1">
+            <div class="form-field" [class.has-error]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched">
+              <label class="form-label" for="currentPassword">Current Password</label>
+              <div class="input-wrapper input-pass">
+                <input [type]="hideCurrentPassword ? 'password' : 'text'" id="currentPassword" formControlName="currentPassword" placeholder="Enter current password" class="form-input">
+                <button type="button" class="toggle-pass" (click)="hideCurrentPassword = !hideCurrentPassword">
+                  <svg *ngIf="hideCurrentPassword" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+                  <svg *ngIf="!hideCurrentPassword" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="field-error" *ngIf="passwordForm.get('currentPassword')?.hasError('required')">Current password is required</div>
+            </div>
+            <div class="form-field form-field-row" [class.has-error]="passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched">
+              <div class="form-field-inner">
+                <label class="form-label" for="newPassword">New Password</label>
+                <div class="input-wrapper input-pass">
+                  <input [type]="hideNewPassword ? 'password' : 'text'" id="newPassword" formControlName="newPassword" placeholder="Min. 6 characters" class="form-input">
+                  <button type="button" class="toggle-pass" (click)="hideNewPassword = !hideNewPassword">
+                    <svg *ngIf="hideNewPassword" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+                    <svg *ngIf="!hideNewPassword" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="form-field-inner">
+                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                <div class="input-wrapper input-pass">
+                  <input [type]="hideConfirmPassword ? 'password' : 'text'" id="confirmPassword" formControlName="confirmPassword" placeholder="Repeat new password" class="form-input">
+                  <button type="button" class="toggle-pass" (click)="hideConfirmPassword = !hideConfirmPassword">
+                    <svg *ngIf="hideConfirmPassword" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+                    <svg *ngIf="!hideConfirmPassword" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="field-error" *ngIf="passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched">Passwords do not match</div>
+            <div class="field-error" *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">At least 6 characters</div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-accent" [disabled]="passwordForm.invalid || isChangingPassword">
+              <svg *ngIf="isChangingPassword" class="btn-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4"/></svg>
+              <span>{{ isChangingPassword ? 'Changing...' : 'Update Password' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 5: ADDRESSES ===== -->
+    <div class="profile-card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" class="card-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+        <h2>Saved Addresses</h2>
+        <button type="button" class="btn btn-sm" (click)="openAddressForm()" *ngIf="!showAddressForm">
+          <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add Address
+        </button>
+      </div>
+      <div class="card-body">
+        <!-- Address Form (inline) -->
+        <div class="address-form-wrapper" *ngIf="showAddressForm">
+          <h3 class="address-form-title">{{ editingAddressId ? 'Edit Address' : 'New Address' }}</h3>
+          <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
+            <div class="form-grid">
+              <div class="form-field" [class.has-error]="addressForm.get('addressLine1')?.invalid && addressForm.get('addressLine1')?.touched">
+                <label class="form-label">Address Line <span class="required">*</span></label>
+                <input type="text" formControlName="addressLine1" placeholder="123 Main Street" class="form-input">
+              </div>
+              <div class="form-field" [class.has-error]="addressForm.get('street')?.invalid && addressForm.get('street')?.touched">
+                <label class="form-label">Street <span class="required">*</span></label>
+                <input type="text" formControlName="street" placeholder="Downtown" class="form-input">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Building</label>
+                <input type="text" formControlName="building" placeholder="Building A" class="form-input">
+              </div>
+              <div class="form-field form-field-row">
+                <div class="form-field-inner">
+                  <label class="form-label">Floor</label>
+                  <input type="text" formControlName="floor" placeholder="3rd" class="form-input">
+                </div>
+                <div class="form-field-inner">
+                  <label class="form-label">Apartment</label>
+                  <input type="text" formControlName="apartment" placeholder="301" class="form-input">
+                </div>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Landmark</label>
+                <input type="text" formControlName="landmark" placeholder="Near the park" class="form-input">
+              </div>
+              <div class="form-field form-field-row">
+                <div class="form-field-inner">
+                  <label class="form-label">Recipient Name</label>
+                  <input type="text" formControlName="recipientName" placeholder="John Doe" class="form-input">
+                </div>
+                <div class="form-field-inner">
+                  <label class="form-label">Recipient Phone</label>
+                  <input type="tel" formControlName="recipientPhone" placeholder="+1 555 0000" class="form-input">
+                </div>
+              </div>
+              <div class="form-field form-field-row">
+                <div class="form-field-inner">
+                  <label class="form-label">Address Type</label>
+                  <select formControlName="addressType" class="form-input">
+                    <option value="home">🏠 Home</option>
+                    <option value="work">🏢 Work</option>
+                    <option value="other">📍 Other</option>
+                  </select>
+                </div>
+                <div class="form-field-inner checkbox-field">
+                  <label class="checkbox-label">
+                    <input type="checkbox" formControlName="isDefault">
+                    <span class="checkbox-custom"></span>
+                    <span>Set as default</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" (click)="closeAddressForm()" [disabled]="isSavingAddress">Cancel</button>
+              <button type="submit" class="btn btn-accent" [disabled]="addressForm.invalid || isSavingAddress">
+                <svg *ngIf="isSavingAddress" class="btn-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4"/></svg>
+                <span>{{ isSavingAddress ? 'Saving...' : (editingAddressId ? 'Update' : 'Save') }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Address List -->
+        <div *ngIf="isLoadingAddresses" class="addr-loading"><div class="addr-spinner"></div><span>Loading addresses...</span></div>
+
+        <div *ngIf="!isLoadingAddresses && addresses.length === 0 && !showAddressForm" class="addr-empty">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+          <p>No saved addresses yet</p>
+          <button type="button" class="btn btn-accent btn-sm" (click)="openAddressForm()">Add Your First Address</button>
+        </div>
+
+        <div class="address-list" *ngIf="!isLoadingAddresses && addresses.length > 0">
+          <div class="address-item" *ngFor="let addr of addresses">
+            <div class="addr-badge" *ngIf="addr.isDefault">Default</div>
+            <div class="addr-main">
+              <div class="addr-type-icon">{{ getAddressTypeIcon(addr.addressType) }}</div>
+              <div class="addr-details">
+                <div class="addr-line1">{{ addr.addressLine1 }}, {{ addr.street }}</div>
+                <div class="addr-line2" *ngIf="addr.building || addr.townName">
+                  {{ addr.building }}{{ addr.building && addr.townName ? ', ' : '' }}{{ addr.townName }}{{ addr.townName && addr.bigAreaName ? ', ' : '' }}{{ addr.bigAreaName }}
+                </div>
+                <div class="addr-extra" *ngIf="addr.recipientName || addr.recipientPhone">
+                  <span class="addr-tag" *ngIf="addr.recipientName">{{ addr.recipientName }}</span>
+                  <span class="addr-tag" *ngIf="addr.recipientPhone">{{ addr.recipientPhone }}</span>
+                  <span class="addr-tag addr-type-tag">{{ addr.addressType | titlecase }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="addr-actions">
+              <button type="button" class="addr-action-btn" title="Edit" (click)="openAddressForm(addr)">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="addr-action-btn" title="Set default" (click)="setDefaultAddress(addr.id)" *ngIf="!addr.isDefault">
+                <svg viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="addr-action-btn addr-action-danger" title="Delete" (click)="deleteAddress(addr.id)">
+                <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 6: DANGER ZONE ===== -->
+    <div class="profile-card danger-card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" class="card-icon"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <h2>Danger Zone</h2>
+      </div>
+      <div class="card-body">
+        <div class="danger-content">
+          <div class="danger-text">
+            <h3>Delete Your Account</h3>
+            <p>Permanently delete your account and all associated data. This action cannot be undone. All your orders, reviews, and personal information will be lost.</p>
+          </div>
+          <button type="button" class="btn btn-danger" [disabled]="isDeletingAccount" (click)="deleteAccount()">
+            <svg *ngIf="isDeletingAccount" class="btn-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4"/></svg>
+            <span>{{ isDeletingAccount ? 'Deleting...' : 'Delete Account' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

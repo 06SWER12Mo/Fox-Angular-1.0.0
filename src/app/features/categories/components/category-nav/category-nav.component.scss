@@ -1,0 +1,247 @@
+.category-nav {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.mobile-toggle {
+  display: none;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  cursor: pointer;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    &:last-child {
+      margin-left: auto;
+      transition: transform 0.3s;
+
+      &.rotated {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+.categories {
+  padding: 8px 0;
+
+  &.mobile-open {
+    display: block;
+  }
+}
+
+.category-item {
+  border-bottom: 1px solid #f7fafc;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.active {
+    .category-link {
+      color: #667eea;
+      background: #ebf4ff;
+    }
+  }
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+
+  .category-link {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 8px;
+
+    &:hover {
+      background: #f7fafc;
+      color: #667eea;
+    }
+
+    .category-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #f7fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .category-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .category-count {
+      margin-left: auto;
+      font-size: 12px;
+      color: #a0aec0;
+      background: #f7fafc;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+  }
+
+  .expand-btn {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #a0aec0;
+    transition: transform 0.3s;
+
+    &.expanded {
+      transform: rotate(180deg);
+    }
+
+    &:hover {
+      color: #667eea;
+    }
+
+    mat-icon {
+      font-size: 20px;
+    }
+  }
+}
+
+.subcategories {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+
+  &.open {
+    max-height: 500px;
+  }
+
+  .subcategory-item {
+    border-bottom: 1px solid #f7fafc;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.active {
+      .subcategory-link {
+        color: #667eea;
+        background: #ebf4ff;
+      }
+    }
+  }
+
+  .subcategory-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px 8px 52px;
+    text-decoration: none;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 8px;
+
+    &:hover {
+      background: #f7fafc;
+      color: #667eea;
+    }
+
+    .subcategory-name {
+      font-size: 14px;
+    }
+
+    .subcategory-count {
+      font-size: 12px;
+      color: #a0aec0;
+      background: #f7fafc;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+  }
+}
+
+.loading-categories {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  color: #e53e3e;
+  font-size: 14px;
+
+  button {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-nav {
+    border-radius: 8px;
+  }
+
+  .mobile-toggle {
+    display: flex;
+  }
+
+  .categories {
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+
+    &.mobile-open {
+      display: block;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+  }
+
+  .category-header .category-link {
+    padding: 12px 16px;
+  }
+
+  .subcategories .subcategory-link {
+    padding-left: 40px;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-toggle {
+    display: none;
+  }
+
+  .categories {
+    display: block !important;
+    max-height: none !important;
+  }
+}

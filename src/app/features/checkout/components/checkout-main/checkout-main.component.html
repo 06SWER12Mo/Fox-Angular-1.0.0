@@ -1,0 +1,121 @@
+<div class="checkout-container">
+  <div class="checkout-header">
+    <h1>Checkout</h1>
+    <p>Complete your order</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Checkout Content -->
+  <div *ngIf="!isLoading && cart?.items?.length" class="checkout-content">
+    <!-- Steps -->
+    <div class="checkout-steps">
+      <div class="step" [class.active]="isStepActive(1)" [class.complete]="isStepComplete(1)">
+        <span class="step-number">1</span>
+        <span class="step-label">Delivery Address</span>
+      </div>
+      <div class="step-line" [class.active]="isStepComplete(1)"></div>
+      <div class="step" [class.active]="isStepActive(2)" [class.complete]="isStepComplete(2)">
+        <span class="step-number">2</span>
+        <span class="step-label">Payment</span>
+      </div>
+      <div class="step-line" [class.active]="isStepComplete(2)"></div>
+      <div class="step" [class.active]="isStepActive(3)">
+        <span class="step-number">3</span>
+        <span class="step-label">Confirm</span>
+      </div>
+    </div>
+
+    <div class="checkout-grid">
+      <!-- Left Column: Forms -->
+      <div class="checkout-forms">
+        <!-- Step 1: Address -->
+        <div *ngIf="isStepActive(1)" class="step-content">
+          <h2>Select Delivery Address</h2>
+          <app-address-selector
+  [addresses]="addresses"
+  [selectedAddressId]="selectedAddressId"
+  (addressSelected)="onAddressSelected($event)"
+></app-address-selector>
+          
+          <div class="step-actions">
+            <button mat-button (click)="goToStep(2)" [disabled]="!selectedAddressId">
+              Next: Payment
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Payment -->
+        <div *ngIf="isStepActive(2)" class="step-content">
+          <h2>Select Payment Method</h2>
+          <app-payment-form
+            [selectedMethod]="selectedPaymentMethod"
+            (methodSelected)="onPaymentMethodSelected($event)"
+          ></app-payment-form>
+          
+          <div class="step-actions">
+            <button mat-button (click)="goToStep(1)">
+              <mat-icon>arrow_back</mat-icon>
+              Back to Address
+            </button>
+            <button mat-button (click)="goToStep(3)" [disabled]="!selectedPaymentMethod">
+              Next: Confirm
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Confirm -->
+        <div *ngIf="isStepActive(3)" class="step-content">
+          <h2>Confirm Order</h2>
+          <div class="confirm-details">
+            <div class="confirm-row">
+              <span class="label">Delivery Address:</span>
+              <span class="value">{{ getSelectedAddress()?.fullAddress }}</span>
+            </div>
+            <div class="confirm-row">
+              <span class="label">Payment Method:</span>
+              <span class="value">{{ getPaymentMethodLabel() }}</span>
+            </div>
+          </div>
+          
+          <div class="step-actions">
+            <button mat-button (click)="goToStep(2)">
+              <mat-icon>arrow_back</mat-icon>
+              Back to Payment
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="placeOrder()"
+              [disabled]="isPlacingOrder"
+            >
+              <mat-spinner diameter="20" *ngIf="isPlacingOrder"></mat-spinner>
+              <span *ngIf="!isPlacingOrder">Place Order</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Summary -->
+      <div class="checkout-summary">
+        <app-order-summary
+          [subtotal]="getSubtotal()"
+          [shipping]="getShipping()"
+          [tax]="getTax()"
+          [total]="getTotal()"
+          [items]="cart?.items || []"
+        ></app-order-summary>
+      </div>
+    </div>
+  </div>
+</div>

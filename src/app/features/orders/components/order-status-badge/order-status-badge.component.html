@@ -1,0 +1,7 @@
+<span class="status-badge" 
+      [style.background-color]="getStatusColor()"
+      [class.delivered]="isDelivered()"
+      [class.cancelled]="isCancelled()">
+  <mat-icon>{{ getStatusIcon() }}</mat-icon>
+  {{ getStatusLabel() }}
+</span>

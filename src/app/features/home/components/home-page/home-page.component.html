@@ -1,0 +1,474 @@
+<div class="home-page">
+  <!-- ==================== HERO SECTION ==================== -->
+  <section class="hero">
+    <div class="hero-slides">
+      <!-- Slide 1 -->
+      <div class="hero-slide" [class.active]="currentSlide === 0">
+        <div class="hero-bg hero-bg-1"></div>
+        <div class="hero-content">
+          <span class="hero-badge">Welcome to FOX Store</span>
+          <h1 class="hero-title">Wish ...<br/>Get All You Need </h1>
+          <p class="hero-subtitle">Best products for the best prices — delivered across Palestine</p>
+          <div class="hero-actions">
+            <a routerLink="/products" class="btn-primary">Browse All Products</a>
+            <a routerLink="/categories" class="btn-ghost">Explore Categories</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <!-- Shopping bag -->
+          <svg class="visual-bag" viewBox="0 0 200 200" fill="none">
+            <path d="M60 80V60a40 40 0 0 1 80 0v20" stroke="var(--color-accent)" stroke-width="3" opacity="0.6"/>
+            <rect x="45" y="80" width="110" height="90" rx="8" stroke="var(--color-accent)" stroke-width="3" fill="var(--color-accent-soft)" opacity="0.5"/>
+            <path d="M70 110h60M70 130h50M70 150h40" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
+            <circle cx="100" cy="55" r="6" fill="var(--color-accent)" opacity="0.3"/>
+          </svg>
+          <!-- Floating product box 1 -->
+          <svg class="visual-box box-1" viewBox="0 0 80 80" fill="none">
+            <rect x="5" y="20" width="70" height="55" rx="6" stroke="var(--color-accent)" stroke-width="2" fill="var(--color-accent-soft)" opacity="0.35"/>
+            <rect x="5" y="20" width="70" height="12" rx="3" fill="var(--color-accent)" opacity="0.15"/>
+            <path d="M40 10v20M30 20h20" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+          </svg>
+          <!-- Floating product box 2 -->
+          <svg class="visual-box box-2" viewBox="0 0 60 60" fill="none">
+            <rect x="3" y="15" width="54" height="42" rx="5" stroke="var(--color-accent)" stroke-width="1.5" fill="var(--color-accent-soft)" opacity="0.3"/>
+            <rect x="3" y="15" width="54" height="9" rx="3" fill="var(--color-accent)" opacity="0.12"/>
+            <path d="M30 8v14" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+            <path d="M23 8h14" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+          </svg>
+          <!-- Floating price tag -->
+          <svg class="visual-tag" viewBox="0 0 40 40" fill="none">
+            <path d="M3 20L20 3l17 17-17 17-17-17z" stroke="var(--color-accent)" stroke-width="1.5" fill="var(--color-accent-soft)" opacity="0.3"/>
+            <circle cx="20" cy="20" r="4" stroke="var(--color-accent)" stroke-width="1.5" opacity="0.4"/>
+          </svg>
+          <!-- Decorative dots -->
+          <div class="visual-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Slide 2 -->
+      <div class="hero-slide" [class.active]="currentSlide === 1">
+        <div class="hero-bg hero-bg-2"></div>
+        <div class="hero-content">
+          <span class="hero-badge">Summer 2026</span>
+          <h1 class="hero-title">New Season,<br/>Fresh Styles</h1>
+          <p class="hero-subtitle">Get ready for summer with our handpicked essentials collection</p>
+          <div class="hero-actions">
+            <a routerLink="/products" class="btn-primary">Shop the Collection</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <!-- Shopping bag (slightly different pose) -->
+          <svg class="visual-bag" viewBox="0 0 200 200" fill="none">
+            <path d="M55 85V65a35 35 0 0 1 70 0v20" stroke="var(--color-accent)" stroke-width="3" opacity="0.5"/>
+            <rect x="40" y="85" width="100" height="85" rx="8" stroke="var(--color-accent)" stroke-width="3" fill="var(--color-accent-soft)" opacity="0.4"/>
+            <circle cx="90" cy="50" r="5" fill="var(--color-accent)" opacity="0.25"/>
+            <circle cx="90" cy="115" r="12" stroke="var(--color-accent)" stroke-width="2.5" opacity="0.35"/>
+            <path d="M85 115h10M90 110v10" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
+          </svg>
+          <!-- Star sparkles -->
+          <svg class="visual-star star-1" viewBox="0 0 40 40" fill="none">
+            <path d="M20 5l4 11h12l-9 7 3 12-10-7-10 7 3-12-9-7h12L20 5z" fill="var(--color-accent)" opacity="0.2"/>
+          </svg>
+          <svg class="visual-star star-2" viewBox="0 0 30 30" fill="none">
+            <path d="M15 3l3 9h10l-7 5 2 10-8-6-8 6 2-10-7-5h10L15 3z" fill="var(--color-accent)" opacity="0.15"/>
+          </svg>
+          <!-- Small gift box -->
+          <svg class="visual-box box-3" viewBox="0 0 70 70" fill="none">
+            <rect x="5" y="18" width="60" height="47" rx="5" stroke="var(--color-accent)" stroke-width="2" fill="var(--color-accent-soft)" opacity="0.3"/>
+            <path d="M35 10v16M26 10h18" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+            <path d="M35 34v20M22 44h26" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+          </svg>
+          <!-- Decorative dots -->
+          <div class="visual-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Slide 3 -->
+      <div class="hero-slide" [class.active]="currentSlide === 2">
+        <div class="hero-bg hero-bg-3"></div>
+        <div class="hero-content">
+          <span class="hero-badge">Free Delivery</span>
+          <h1 class="hero-title">Free Shipping<br/>Over ₪200</h1>
+          <p class="hero-subtitle">Enjoy complimentary delivery on all orders above ₪200. Limited time.</p>
+          <div class="hero-actions">
+            <a routerLink="/products" class="btn-primary">Start Shopping</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <!-- Delivery truck/package -->
+          <svg class="visual-bag" viewBox="0 0 200 200" fill="none">
+            <rect x="20" y="90" width="130" height="55" rx="6" stroke="var(--color-accent)" stroke-width="3" fill="var(--color-accent-soft)" opacity="0.4"/>
+            <path d="M90 90V60c0-8 6-15 14-15h25c8 0 14 7 14 15v30" stroke="var(--color-accent)" stroke-width="3" opacity="0.5"/>
+            <circle cx="55" cy="155" r="14" stroke="var(--color-accent)" stroke-width="3" opacity="0.5"/>
+            <circle cx="145" cy="155" r="14" stroke="var(--color-accent)" stroke-width="3" opacity="0.5"/>
+            <path d="M40 120l15 15 30-25" stroke="var(--color-accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+          </svg>
+          <!-- Floating coin stack -->
+          <svg class="visual-box coin-1" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="16" stroke="var(--color-accent)" stroke-width="2" fill="var(--color-accent-soft)" opacity="0.3"/>
+            <text x="20" y="25" text-anchor="middle" fill="var(--color-accent)" font-size="12" font-weight="bold" opacity="0.4">₪</text>
+          </svg>
+          <svg class="visual-box coin-2" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="16" stroke="var(--color-accent)" stroke-width="2" fill="var(--color-accent-soft)" opacity="0.25"/>
+            <text x="20" y="25" text-anchor="middle" fill="var(--color-accent)" font-size="12" font-weight="bold" opacity="0.35">₪</text>
+          </svg>
+          <!-- Floating package -->
+          <svg class="visual-box box-4" viewBox="0 0 60 60" fill="none">
+            <rect x="5" y="15" width="50" height="40" rx="4" stroke="var(--color-accent)" stroke-width="1.5" fill="var(--color-accent-soft)" opacity="0.3"/>
+            <path d="M30 8v10" stroke="var(--color-accent)" stroke-width="1.5" opacity="0.25"/>
+            <path d="M25 8h10" stroke="var(--color-accent)" stroke-width="1.5" opacity="0.25"/>
+            <path d="M15 30l10 6 15-10" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+          </svg>
+          <!-- Decorative dots -->
+          <div class="visual-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dots -->
+    <div class="hero-dots">
+      <button *ngFor="let dot of [0,1,2]; let i = index"
+        class="hero-dot"
+        [class.active]="currentSlide === i"
+        (click)="goToSlide(i)"
+        [attr.aria-label]="'Slide ' + (i + 1)">
+      </button>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading amazing products...</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && data">
+    <!-- ==================== CATEGORIES SECTION ==================== -->
+    <section class="section categories-section" *ngIf="data.categories.length > 0">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Categories</span>
+            <h2 class="section-title">Shop by Category</h2>
+          </div>
+          <a routerLink="/categories" class="section-link">View All Categories →</a>
+        </div>
+        <div class="categories-grid">
+          <div
+            class="category-card"
+            *ngFor="let category of data.categories; trackBy: trackByCategoryId"
+            (click)="onCategoryClick(category.id)"
+          >
+            <div class="category-card-image">
+              <img
+                [src]="getImageUrl(category.imageUrl)"
+                [alt]="category.name"
+                loading="lazy"
+              />
+              <div class="category-card-overlay"></div>
+            </div>
+            <div class="category-card-content">
+              <h3 class="category-name">{{ category.name }}</h3>
+              <span class="category-count" *ngIf="category.subCategoryCount > 0">
+                {{ category.subCategoryCount }} subcategories
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FEATURED PRODUCTS SECTION ==================== -->
+    <section class="section products-section" *ngIf="data.featuredProducts.length > 0">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Featured</span>
+            <h2 class="section-title">Featured Products</h2>
+          </div>
+          <a routerLink="/products" class="section-link">View All →</a>
+        </div>
+        <div class="products-grid">
+          <div class="product-card-wrapper" *ngFor="let product of data.featuredProducts; trackBy: trackByProductId">
+            <div class="product-card">
+              <div class="product-image">
+                <a [routerLink]="['/products', product.id]">
+                  <img [src]="getImageUrl(product.primaryImageUrl)" [alt]="product.name" loading="lazy" />
+                </a>
+                <span class="discount-badge" *ngIf="hasDiscount(product)">-{{ product.discountPercentage }}%</span>
+              </div>
+              <div class="product-info">
+                <span class="product-category">{{ product.categoryName }}</span>
+                <a [routerLink]="['/products', product.id]" class="product-name">{{ product.name }}</a>
+                <div class="product-rating">
+                  <div class="stars">
+                    <span *ngFor="let star of [1,2,3,4,5]" class="star" [class.filled]="star <= Math.round(product.averageRating)">
+                      ★
+                    </span>
+                  </div>
+                  <span class="review-count">({{ product.totalReviews }})</span>
+                </div>
+                <div class="product-footer">
+                  <div class="product-pricing">
+                    <span class="current-price">{{ product.price | currency }}</span>
+                    <span class="original-price" *ngIf="hasDiscount(product)">{{ product.compareAtPrice | currency }}</span>
+                  </div>
+                  <button class="add-cart-btn" (click)="addToCart(product.id)" [title]="'Add ' + product.name + ' to cart'">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M3 3H4.5L5.4 5M5.4 5H21L18.5 13H7.5L5.4 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M7.5 13L6.2 18H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+                      <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== NEW ARRIVALS SECTION ==================== -->
+    <section class="section alt-section" *ngIf="data.newArrivals.length > 0">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Just In</span>
+            <h2 class="section-title">New Arrivals</h2>
+          </div>
+          <a routerLink="/products" class="section-link">View All →</a>
+        </div>
+        <div class="products-grid">
+          <div class="product-card-wrapper" *ngFor="let product of data.newArrivals; trackBy: trackByProductId">
+            <div class="product-card">
+              <div class="product-image">
+                <a [routerLink]="['/products', product.id]">
+                  <img [src]="getImageUrl(product.primaryImageUrl)" [alt]="product.name" loading="lazy" />
+                </a>
+                <span class="badge new-badge">New</span>
+                <span class="discount-badge" *ngIf="hasDiscount(product)">-{{ product.discountPercentage }}%</span>
+              </div>
+              <div class="product-info">
+                <span class="product-category">{{ product.categoryName }}</span>
+                <a [routerLink]="['/products', product.id]" class="product-name">{{ product.name }}</a>
+                <div class="product-rating">
+                  <div class="stars">
+                    <span *ngFor="let star of [1,2,3,4,5]" class="star" [class.filled]="star <= Math.round(product.averageRating)">
+                      ★
+                    </span>
+                  </div>
+                  <span class="review-count">({{ product.totalReviews }})</span>
+                </div>
+                <div class="product-footer">
+                  <div class="product-pricing">
+                    <span class="current-price">{{ product.price | currency }}</span>
+                    <span class="original-price" *ngIf="hasDiscount(product)">{{ product.compareAtPrice | currency }}</span>
+                  </div>
+                  <button class="add-cart-btn" (click)="addToCart(product.id)">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M3 3H4.5L5.4 5M5.4 5H21L18.5 13H7.5L5.4 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M7.5 13L6.2 18H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+                      <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BEST SELLERS SECTION ==================== -->
+    <section class="section products-section" *ngIf="data.bestSellers.length > 0">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Popular</span>
+            <h2 class="section-title">Best Sellers</h2>
+          </div>
+          <a routerLink="/products" class="section-link">View All →</a>
+        </div>
+        <div class="products-grid">
+          <div class="product-card-wrapper" *ngFor="let product of data.bestSellers; trackBy: trackByProductId">
+            <div class="product-card">
+              <div class="product-image">
+                <a [routerLink]="['/products', product.id]">
+                  <img [src]="getImageUrl(product.primaryImageUrl)" [alt]="product.name" loading="lazy" />
+                </a>
+                <span class="badge best-badge">Best Seller</span>
+                <span class="discount-badge" *ngIf="hasDiscount(product)">-{{ product.discountPercentage }}%</span>
+              </div>
+              <div class="product-info">
+                <span class="product-category">{{ product.categoryName }}</span>
+                <a [routerLink]="['/products', product.id]" class="product-name">{{ product.name }}</a>
+                <div class="product-rating">
+                  <div class="stars">
+                    <span *ngFor="let star of [1,2,3,4,5]" class="star" [class.filled]="star <= Math.round(product.averageRating)">
+                      ★
+                    </span>
+                  </div>
+                  <span class="review-count">({{ product.totalReviews }})</span>
+                </div>
+                <div class="product-footer">
+                  <div class="product-pricing">
+                    <span class="current-price">{{ product.price | currency }}</span>
+                    <span class="original-price" *ngIf="hasDiscount(product)">{{ product.compareAtPrice | currency }}</span>
+                  </div>
+                  <button class="add-cart-btn" (click)="addToCart(product.id)">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M3 3H4.5L5.4 5M5.4 5H21L18.5 13H7.5L5.4 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M7.5 13L6.2 18H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+                      <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== STATS SECTION ==================== -->
+    <section class="section stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M12 22V12" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M12 12L3 7" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M21 7L12 12" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </div>
+            <span class="stat-number">{{ animatedStats.totalProducts }}+</span>
+            <span class="stat-label">Products</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M4 7h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8 12h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M8 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="stat-number">{{ animatedStats.totalCategories }}+</span>
+            <span class="stat-label">Categories</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M3 12h2l2-5 3 10 3-8 2 5 2-2 4 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="stat-number">{{ animatedStats.totalOrders }}+</span>
+            <span class="stat-label">Orders Delivered</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="stat-number">{{ animatedStats.happyCustomers }}+</span>
+            <span class="stat-label">Happy Customers</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FEATURES / TRUST SECTION ==================== -->
+    <section class="section features-section">
+      <div class="container">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </div>
+            <h3>Secure Shopping</h3>
+            <p>Your data is protected with industry-standard encryption</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Fast Delivery</h3>
+            <p>Free shipping on orders over ₪200. Delivery within 2-5 business days</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </div>
+            <h3>Easy Returns</h3>
+            <p>30-day return policy. No questions asked, full refund guaranteed</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M21 12a9 9 0 1 1-9-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M21 3v6h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>24/7 Support</h3>
+            <p>Our team is here to help you anytime, day or night</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== CTA BANNER ==================== -->
+    <section class="section cta-section">
+      <div class="container">
+        <div class="cta-banner">
+          <div class="cta-content">
+            <h2>Ready to Start Shopping?</h2>
+            <p>Join thousands of satisfied customers and discover amazing products at unbeatable prices.</p>
+            <div class="cta-buttons">
+              <a routerLink="/products" class="cta-primary large">Browse All Products</a>
+              <a *ngIf="!isAuthenticated" routerLink="/auth/register" class="cta-outline">Create Account</a>
+              <a *ngIf="isAuthenticated" routerLink="/auth/profile" class="cta-outline">My Profile</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && !data" class="error-state">
+    <div class="error-content">
+      <h2>Oops! Something went wrong</h2>
+      <p>We couldn't load the page data. Please try again.</p>
+      <button class="cta-primary" (click)="loadHomePage()">Retry</button>
+    </div>
+  </div>
+</div>

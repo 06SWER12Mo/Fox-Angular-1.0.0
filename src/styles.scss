@@ -1,0 +1,111 @@
+/* ============================================================
+   GLOBAL STYLES — Online Store
+   ------------------------------------------------------------
+   The theme system lives in assets/styles/_theme.scss.
+   All colors/spacing flow from CSS custom properties.
+   ============================================================ */
+
+// Material prebuilt theme — kept for remaining Material components (dialogs, menus, snackbars)
+// TODO: Remove once all components are refactored to custom HTML/SCSS
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+// Theme system — defines all CSS custom properties for dark & light
+@import 'assets/styles/theme';
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  transition: background var(--transition-base), color var(--transition-base);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* ============================================================
+   SCROLLBAR — matches the theme
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: var(--radius-full);
+
+  &:hover {
+    background: var(--color-text-secondary);
+  }
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   DARK/LIGHT MODE TRANSITION
+   Smooth transition when toggling themes
+   ============================================================ */
+
+:root {
+  transition: background var(--transition-slow), color var(--transition-slow);
+}
