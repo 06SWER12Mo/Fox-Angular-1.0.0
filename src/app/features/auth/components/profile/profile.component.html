@@ -52,6 +52,10 @@
     <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
     <span>{{ successMessage }}</span>
   </div>
+  <div *ngIf="infoMessage" class="toast info" (click)="infoMessage = ''">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16v-4M12 8h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span>{{ infoMessage }}</span>
+  </div>
   <div *ngIf="errorMessage" class="toast error" (click)="errorMessage = ''">
     <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     <span>{{ errorMessage }}</span>
@@ -158,12 +162,33 @@
       </div>
       <div class="card-body">
         <div class="verify-content">
-          <p class="verify-text">Your email <strong>{{ user?.email }}</strong> has not been verified yet. Verify it to unlock all features including order notifications and password recovery.</p>
-          <button type="button" class="btn btn-accent" [disabled]="isSendingVerification" (click)="sendVerificationEmail()">
-            <svg *ngIf="isSendingVerification" class="btn-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4"/></svg>
-            <svg *ngIf="!isSendingVerification" viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8" fill="none"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
-            <span>{{ isSendingVerification ? 'Sending...' : 'Send Verification Email' }}</span>
-          </button>
+          <p class="verify-text">Your email <strong>{{ user?.email }}</strong> has not been verified yet. Ask for its verification to become trusted for contact and interactivity via your email as contact, and good customer.</p>
+
+          <!-- Verification Requested State -->
+          <div *ngIf="user?.verificationRequested" class="verify-requested-banner">
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16v-4M12 8h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>You asked for verification. Fox will review your email as soon as possible.</span>
+          </div>
+
+          <div class="verify-actions">
+            <!-- Request Verification Button -->
+            <button type="button" class="btn btn-accent" 
+              [disabled]="isSendingVerification || user?.verificationRequested" 
+              (click)="sendVerificationEmail()"
+              *ngIf="!user?.verificationRequested">
+              <svg *ngIf="isSendingVerification" class="btn-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4"/></svg>
+              <svg *ngIf="!isSendingVerification" viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8" fill="none"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+              <span>{{ isSendingVerification ? 'Sending...' : 'Send Verification Request' }}</span>
+            </button>
+
+            <!-- Cancel Verification Button -->
+            <button type="button" class="btn btn-ghost btn-sm" 
+              [disabled]="isSendingVerification" 
+              (click)="cancelVerificationRequest()"
+              *ngIf="user?.verificationRequested">
+              Cancel Request
+            </button>
+          </div>
         </div>
       </div>
     </div>

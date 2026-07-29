@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationService } from '../../../../core/services/api/location.service';
-import { DeliveryAddress } from '../../../../core/models/location.model';
+import { DeliveryAddress, Town } from '../../../../core/models/location.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-address-form',
@@ -10,7 +12,7 @@ import { DeliveryAddress } from '../../../../core/models/location.model';
   styleUrls: ['./address-form.component.scss'],
   standalone: false
 })
-export class AddressFormComponent implements OnInit {
+export class AddressFormComponent implements OnInit, OnDestroy {
   addressForm!: FormGroup;
   isEditMode = false;
   addressId?: number;
@@ -18,6 +20,16 @@ export class AddressFormComponent implements OnInit {
   isSaving = false;
   errorMessage = '';
   successMessage = '';
+
+  // Town search
+  towns: Town[] = [];
+  filteredTowns: Town[] = [];
+  selectedTownId: number | null = null;
+  isSearching = false;
+  townSearchQuery = '';
+  townDropdownOpen = false;
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -28,6 +40,7 @@ export class AddressFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.initTownSearch();
 
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -52,8 +65,86 @@ export class AddressFormComponent implements OnInit {
       isDefault: [false],
       addressType: ['home'],
       additionalInstructions: ['', [Validators.maxLength(500)]],
-      townId: [null]
+      townId: [null, Validators.required]
     });
+  }
+
+  // ========== Town Search ==========
+
+  private initTownSearch(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$),
+      switchMap(query => {
+        this.isSearching = true;
+        return this.locationService.searchTownsLight(query.trim());
+      })
+    ).subscribe({
+      next: (data: any) => {
+        // Limit to 5 suggestions for cleaner UX
+        const results = Array.isArray(data) ? data : data?.data || [];
+        this.towns = results.slice(0, 5);
+        this.filteredTowns = [...this.towns];
+        this.isSearching = false;
+        if (this.towns.length > 0) {
+          this.townDropdownOpen = true;
+        }
+      },
+      error: (err) => {
+        console.error('Town search failed:', err);
+        this.isSearching = false;
+      }
+    });
+  }
+
+  onTownSearchInput(query: string): void {
+    this.townSearchQuery = query;
+    this.selectedTownId = null;
+    this.addressForm.patchValue({ townId: null });
+    if (!query || query.trim().length < 2) {
+      this.towns = [];
+      this.filteredTowns = [];
+      this.townDropdownOpen = false;
+      return;
+    }
+    this.searchSubject.next(query);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onTownInputFocus(): void {
+    if (this.filteredTowns.length > 0) {
+      this.townDropdownOpen = true;
+    }
+  }
+
+  selectTown(town: Town): void {
+    this.selectedTownId = town.id;
+    this.townSearchQuery = town.name;
+    this.townDropdownOpen = false;
+    this.addressForm.patchValue({ townId: town.id });
+  }
+
+  closeTownDropdown(): void {
+    setTimeout(() => {
+      this.townDropdownOpen = false;
+      if (this.selectedTownId) {
+        const town = this.towns.find(t => t.id === this.selectedTownId);
+        if (town) this.townSearchQuery = town.name;
+      }
+    }, 200);
+  }
+
+  clearTownSelection(): void {
+    this.selectedTownId = null;
+    this.townSearchQuery = '';
+    this.towns = [];
+    this.filteredTowns = [];
+    this.addressForm.patchValue({ townId: null });
   }
 
   loadAddress(id: number): void {
@@ -79,6 +170,8 @@ export class AddressFormComponent implements OnInit {
             additionalInstructions: address.additionalInstructions,
             townId: address.townId
           });
+          this.selectedTownId = address.townId;
+          this.townSearchQuery = address.townName || '';
         }
         this.isLoading = false;
       },

@@ -46,6 +46,8 @@ import { PriceDisplayComponent } from './components/price-display/price-display.
 import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
+import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
+import { FloatingCartComponent } from './components/floating-cart/floating-cart.component';
 
 const MATERIAL_MODULES = [
   MatToolbarModule,
@@ -84,7 +86,9 @@ const COMPONENTS = [
   PriceDisplayComponent,
   ImageGalleryComponent,
   ConfirmationDialogComponent,
-  PaginationComponent
+  PaginationComponent,
+  AuthModalComponent,
+  FloatingCartComponent
 ];
 
 @NgModule({
@@ -109,6 +113,8 @@ const COMPONENTS = [
     FormsModule,
     ...MATERIAL_MODULES,
     ...COMPONENTS,
+    FloatingCartComponent,
+    AuthModalComponent,
     CurrencyPipe,
     TruncatePipe,
     StatusColorPipe,

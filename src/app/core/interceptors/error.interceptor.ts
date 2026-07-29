@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { TokenService } from '../services/token.service';
+import { AuthModalService } from '../services/auth-modal.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 
   constructor(
-    private router: Router,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private authModalService: AuthModalService
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -34,9 +34,8 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 401:
               errorMessage = 'Session expired. Please login again.';
               this.tokenService.clearAll();
-              this.router.navigate(['/auth/login'], { 
-                queryParams: { returnUrl: this.router.url }
-              });
+              // Open the auth modal popup instead of redirecting to the old full-page login
+              this.authModalService.open('login').subscribe();
               break;
             case 403:
               errorMessage = error.error?.message || 'You do not have permission to access this resource';

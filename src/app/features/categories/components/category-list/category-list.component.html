@@ -1,10 +1,32 @@
 <div class="category-page">
-  <div class="container">
-    <div class="page-header">
-      <h1>Shop by Category</h1>
-      <p>Browse our curated categories to find exactly what you need</p>
+  <!-- Store Banner -->
+  <div class="category-banner">
+    <div class="banner-bg">
+      <div class="banner-glow glow-1"></div>
+      <div class="banner-glow glow-2"></div>
+      <div class="banner-glow glow-3"></div>
     </div>
+    <div class="banner-content">
+      <span class="banner-badge">Explore Our Store</span>
+      <h1 class="banner-title">Shop by Category</h1>
+      <p class="banner-subtitle">Browse our curated collection of categories to find exactly what you're looking for</p>
+      <div class="banner-stats" *ngIf="!isLoading">
+        <div class="banner-stat">
+          <span class="stat-value">{{ categories.length }}</span>
+          <span class="stat-label">Categories</span>
+        </div>
+      </div>
+    </div>
+    <div class="banner-decoration">
+      <svg viewBox="0 0 200 200" fill="none" class="deco-svg">
+        <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-width="1" opacity="0.08"/>
+        <circle cx="100" cy="100" r="60" stroke="currentColor" stroke-width="1" opacity="0.06"/>
+        <circle cx="100" cy="100" r="40" stroke="currentColor" stroke-width="1" opacity="0.04"/>
+      </svg>
+    </div>
+  </div>
 
+  <div class="container">
     <!-- Loading -->
     <div *ngIf="isLoading" class="loading-state">
       <div class="spinner"></div>

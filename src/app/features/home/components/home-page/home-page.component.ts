@@ -7,6 +7,8 @@ import { HomePageData, ProductSummary } from '../../models/home.model';
 import { Category } from '../../../../core/models/category.model';
 import { CartService } from '../../../../core/services/api/cart.service';
 import { TokenService } from '../../../../core/services/token.service';
+import { AuthModalService } from '../../../../core/services/auth-modal.service';
+import { AuthModalMode } from '../../../../shared/components/auth-modal/auth-modal.component';
 
 @Component({
   selector: 'app-home-page',
@@ -33,7 +35,8 @@ export class HomePageComponent implements OnInit, OnDestroy {
     private router: Router,
     private cartService: CartService,
     private cdr: ChangeDetectorRef,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private authModalService: AuthModalService
   ) {}
 
   ngOnInit(): void {
@@ -92,7 +95,35 @@ export class HomePageComponent implements OnInit, OnDestroy {
     this.router.navigate(['/products/category', categoryId]);
   }
 
+  openAuthModal(mode: AuthModalMode = 'login'): void {
+    this.authModalService.open(mode).subscribe(result => {
+      if (result?.success) {
+        // Full page reload to ensure all components reinitialize with auth state
+        window.location.reload();
+      }
+    });
+  }
+
   addToCart(productId: number): void {
+    if (!this.tokenService.isAuthenticated()) {
+      this.authModalService.open('login').subscribe(result => {
+        if (result?.success) {
+          // After successful login, proceed to add to cart, then reload to apply auth state
+          this.cartService.addToCart({ productId, quantity: 1 }).subscribe({
+            next: () => {
+              console.log('Product added to cart');
+              window.location.reload();
+            },
+            error: (error) => {
+              console.error('Error adding to cart:', error);
+              window.location.reload();
+            }
+          });
+        }
+      });
+      return;
+    }
+
     this.cartService.addToCart({ productId, quantity: 1 }).subscribe({
       next: () => console.log('Product added to cart'),
       error: (error) => console.error('Error adding to cart:', error)

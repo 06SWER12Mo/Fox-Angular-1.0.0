@@ -454,7 +454,7 @@
             <p>Join thousands of satisfied customers and discover amazing products at unbeatable prices.</p>
             <div class="cta-buttons">
               <a routerLink="/products" class="cta-primary large">Browse All Products</a>
-              <a *ngIf="!isAuthenticated" routerLink="/auth/register" class="cta-outline">Create Account</a>
+              <a *ngIf="!isAuthenticated" class="cta-outline" (click)="openAuthModal('register')">Create Account</a>
               <a *ngIf="isAuthenticated" routerLink="/auth/profile" class="cta-outline">My Profile</a>
             </div>
           </div>

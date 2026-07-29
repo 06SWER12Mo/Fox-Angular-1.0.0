@@ -1,215 +1,367 @@
-// ============================================================
-// Palette matches header.component.scss so the filter sidebar
-// reads as part of the same "ink & brass" storefront, not a
-// separate default-Material panel.
-// ------------------------------------------------------------
-$ink: #14171c;
-$brass: #c9a24b;
-$brass-dim: #8a7238;
-$brass-soft: rgba(201, 162, 75, 0.12);
-$border: rgba(201, 162, 75, 0.22);
-$text: #1a1f27;
-$text-muted: #5b6472;
-$muted: #98a0ac;
-$radius: 10px;
-
-:host {
-  // Material (MDC) reads these custom properties from any ancestor —
-  // no ::ng-deep needed. Recolors focused inputs/checkboxes to brass
-  // without touching global Material theme files.
-  --mdc-outlined-text-field-focus-outline-color: #{$brass};
-  --mdc-outlined-text-field-focus-label-text-color: #{$brass};
-  --mdc-outlined-text-field-caret-color: #{$brass};
-  --mat-select-focused-arrow-color: #{$brass};
-  --mdc-checkbox-selected-icon-color: #{$brass};
-  --mdc-checkbox-selected-hover-icon-color: #{$brass-dim};
-  --mdc-checkbox-selected-focus-icon-color: #{$brass};
-  --mdc-checkbox-selected-pressed-icon-color: #{$brass-dim};
-  --mdc-checkbox-selected-checkmark-color: #{$ink};
-  --mat-option-selected-state-label-text-color: #{$brass-dim};
-}
+/* ============================================================
+   FILTERS SIDEBAR — ink & brass, theme-aligned
+   ============================================================ */
 
 .filters-card {
-  border-radius: 12px;
-  padding: 0 0 8px 0;
-  border: 1px solid $border;
-  box-shadow: 0 1px 3px rgba(20, 23, 28, 0.05);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-xl);
+  padding: 0;
   overflow: hidden;
-
-  mat-card-header {
-    padding: 16px 16px 14px 16px;
-    position: relative;
-
-    // Same brass gradient seam used under the header — a small
-    // repeated motif that ties this card back to the nav bar.
-    &::after {
-      content: '';
-      position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 0;
-      height: 2px;
-      background: linear-gradient(90deg, $brass 0%, rgba(201, 162, 75, 0.15) 100%);
-      border-radius: 2px;
-    }
-  }
-
-  mat-card-content {
-    padding: 20px 16px 4px;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-  }
+  box-shadow: var(--shadow-sm);
 }
 
-.title-row {
+/* ---- Header ---- */
+.filters-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Fraunces', Georgia, serif;
-  font-style: italic;
-  font-size: 19px;
-  font-weight: 600;
-  color: $text;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--color-border-card);
+}
+
+.filters-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: 0.02em;
+
+  .filters-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-accent, #c9a24b);
+    flex-shrink: 0;
+  }
 }
 
 .active-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 21px;
-  height: 21px;
-  padding: 0 6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
   border-radius: 999px;
-  background: $brass;
-  color: $ink;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-style: normal;
-  font-size: 12px;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-size: 11px;
   font-weight: 700;
+  margin-left: auto;
+  animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---- Body (scrollable) ---- */
+.filters-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
 
-  label {
-    font-weight: 600;
-    color: $text-muted;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.group-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #98a0ac);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  svg {
+    color: var(--color-accent-dim, #8a7238);
+    flex-shrink: 0;
   }
 }
 
-.price-inputs {
+.filter-divider {
+  height: 1px;
+  background: var(--color-border-light);
+  margin: 2px 0;
+}
+
+/* ---- Category Chips ---- */
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.category-chip {
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.3;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--color-accent-border-hover);
+    color: var(--color-accent);
+  }
+
+  &.active {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+}
+
+/* ---- Sort Chips ---- */
+.sort-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sort-chip {
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.3;
+
+  &:hover {
+    border-color: var(--color-accent-border-hover);
+    color: var(--color-accent);
+  }
+
+  &.active {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+}
+
+/* ---- Price Inputs ---- */
+.price-sliders {
   display: flex;
   align-items: center;
   gap: 10px;
-
-  .half-width {
-    flex: 1;
-    width: 100%;
-
-    // Removes the reserved hint/error space under each field so the
-    // two inputs and the dash between them sit on one clean row,
-    // instead of leaving a mismatched gap under the fields.
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-      display: none;
-    }
-
-    ::ng-deep .mdc-text-field {
-      padding-right: 8px;
-    }
-  }
-
-  .currency-prefix {
-    display: inline-flex;
-    align-items: center;
-    padding-left: 12px;
-    margin-right: 2px;
-    color: $brass-dim;
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .price-separator {
-    color: $muted;
-    font-weight: 600;
-    font-size: 15px;
-    align-self: center;
-    // Nudges the dash up to the visual center of the input box itself,
-    // now that there's no hint space below to account for.
-    transform: translateY(-10px);
-  }
 }
 
-.full-width {
+.price-field {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-tag {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-accent-dim, #8a7238);
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.price-input {
   width: 100%;
+  padding: 9px 8px 9px 26px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-border-input);
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 
-  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-    display: none;
+  &::placeholder {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  &:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-glow);
+  }
+
+  &.has-value {
+    border-color: var(--color-accent-border);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+.price-bar {
+  flex: 0 0 28px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  position: relative;
+  overflow: hidden;
+
+  .bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent));
+    transition: width 0.3s ease;
   }
 }
 
+/* ---- Toggles ---- */
+.toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 5px 6px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--color-accent-soft, rgba(201, 162, 75, 0.04));
+  }
+}
+
+.toggle-input {
+  display: none;
+}
+
+.toggle-track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  transition: background var(--transition-base), border-color var(--transition-base);
+  flex-shrink: 0;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background var(--transition-base);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.toggle-input:checked + .toggle-track {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+
+  .toggle-thumb {
+    transform: translateX(14px);
+    background: var(--color-accent);
+  }
+}
+
+.toggle-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+/* ---- Clear Button ---- */
 .clear-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   width: 100%;
-  height: 44px;
-  border: 1.5px solid $border;
-  border-radius: $radius;
+  height: 42px;
+  border: 1.5px solid var(--color-border-input);
+  border-radius: var(--radius-lg);
   background: transparent;
-  color: $brass-dim;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  color: var(--color-accent-dim);
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+  transition: all var(--transition-fast);
+  margin-top: 2px;
 
   svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   &:hover:not(:disabled) {
-    background: $brass;
-    border-color: $brass;
-    color: $ink;
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-text-inverse);
     transform: translateY(-1px);
+    box-shadow: var(--shadow-accent);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 
   &:disabled {
-    opacity: 0.4;
+    opacity: 0.3;
     cursor: not-allowed;
   }
 }
 
+/* ---- Animations ---- */
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Responsive ---- */
 @media (max-width: 992px) {
-  .filters-card {
+  .filters-body {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
 
-    mat-card-header {
-      grid-column: 1 / -1;
-    }
-
-    mat-card-content {
-      grid-column: 1 / -1;
-    }
-
-    form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      align-items: start;
-    }
+  .filter-divider {
+    display: none;
   }
 
   .filter-group:last-child {
@@ -222,7 +374,7 @@ $radius: 10px;
 }
 
 @media (max-width: 768px) {
-  .filters-card form {
+  .filters-body {
     display: flex;
     flex-direction: column;
   }

@@ -8,53 +8,49 @@
         loading="lazy"
         (error)="onImageError($event)"
         (load)="onImageLoad()"
-        width="100%"
-        height="100%"
       >
     </a>
     
-    <!-- Discount Badge -->
+    <!-- Badges -->
     <span class="discount-badge" *ngIf="hasDiscount()">
       -{{ getDiscountPercentage() }}%
     </span>
-
-    <!-- Out of Stock Badge -->
-    <span class="out-of-stock-badge" *ngIf="isOutOfStock()">
-      Out of Stock
-    </span>
+    <span class="badge new-badge" *ngIf="!hasDiscount() && product.soldCount > 100">Popular</span>
+    <span class="out-of-stock-badge" *ngIf="isOutOfStock()">Out of Stock</span>
   </div>
 
   <!-- Content -->
   <div class="product-card-content">
-    <a [routerLink]="['/products', product.id]" class="product-title">
-      {{ product.name }}
-    </a>
+    <span class="product-category" *ngIf="product.categoryName">{{ product.categoryName }}</span>
     
-    <p class="product-description">{{ product.shortDescription | truncate:60 }}</p>
+    <a [routerLink]="['/products', product.id]" class="product-name">{{ product.name }}</a>
 
     <!-- Rating -->
     <div class="product-rating">
-      <app-star-rating [rating]="product.averageRating"></app-star-rating>
+      <div class="stars">
+        <span *ngFor="let star of [1,2,3,4,5]" class="star" [class.filled]="star <= Math.round(product.averageRating)">★</span>
+      </div>
       <span class="review-count">({{ product.totalReviews }})</span>
     </div>
 
-    <!-- Price -->
-    <div class="product-price">
-      <span class="current-price">{{ product.price | currency }}</span>
-      <span class="original-price" *ngIf="hasDiscount()">
-        {{ product.compareAtPrice | currency }}
-      </span>
+    <!-- Footer with Price + Cart -->
+    <div class="product-footer">
+      <div class="product-pricing">
+        <span class="current-price">{{ product.price | currency }}</span>
+        <span class="original-price" *ngIf="hasDiscount()">{{ product.compareAtPrice | currency }}</span>
+      </div>
+      <button 
+        *ngIf="showAddToCart && !isOutOfStock()"
+        class="add-cart-btn"
+        (click)="onAddToCart()"
+        [title]="'Add ' + product.name + ' to cart'">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 3H4.5L5.4 5M5.4 5H21L18.5 13H7.5L5.4 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7.5 13L6.2 18H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="9" cy="21" r="1.4" fill="currentColor"/>
+          <circle cx="17" cy="21" r="1.4" fill="currentColor"/>
+        </svg>
+      </button>
     </div>
-
-    <!-- Add to Cart Button -->
-    <button 
-      *ngIf="showAddToCart && !isOutOfStock()"
-      mat-raised-button 
-      color="primary" 
-      class="add-to-cart-btn"
-      (click)="onAddToCart()"
-    >
-      Add to Cart
-    </button>
   </div>
 </div>

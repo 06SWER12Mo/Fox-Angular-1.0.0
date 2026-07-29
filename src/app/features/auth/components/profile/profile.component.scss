@@ -129,6 +129,11 @@
   animation: tin 0.25s ease; cursor: pointer;
   svg { width: 18px; height: 18px; flex-shrink: 0; }
   &.success { background: var(--color-success-soft); border: 1px solid var(--color-success-border); color: var(--color-success); }
+  &.info {
+    background: rgba(236, 201, 75, 0.12);
+    border: 1px solid rgba(236, 201, 75, 0.3);
+    color: var(--color-warning);
+  }
   &.error { background: var(--color-danger-soft); border: 1px solid var(--color-danger-border); color: var(--color-danger); }
 }
 @keyframes tin { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
@@ -315,12 +320,36 @@ select.form-input { appearance: none; cursor: pointer; }
 
 // ==================== VERIFICATION CARD ====================
 .verify-content {
-  display: flex; align-items: flex-start; gap: 16px;
+  display: flex; flex-direction: column; gap: 12px;
   .verify-text { margin: 0 0 6px; font-size: 14px; color: var(--color-text-secondary); line-height: 1.5; }
   .verify-sub { margin: 0; font-size: 13px; color: var(--color-text-muted); }
   &.verified {
+    flex-direction: row;
+    align-items: flex-start;
     .verified-icon { width: 40px; height: 40px; flex-shrink: 0; color: var(--color-success); }
   }
+}
+.verify-requested-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: rgba(236, 201, 75, 0.10);
+  border: 1px solid rgba(236, 201, 75, 0.25);
+  border-radius: var(--radius-md);
+  color: var(--color-warning);
+  font-size: 13px;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease;
+  svg { flex-shrink: 0; }
+}
+.verify-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 // ==================== ADDRESSES ====================

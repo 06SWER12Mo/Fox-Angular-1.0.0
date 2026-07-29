@@ -109,3 +109,84 @@ select {
 :root {
   transition: background var(--transition-slow), color var(--transition-slow);
 }
+
+/* ============================================================
+   AUTH MODAL DIALOG — global panel & backdrop styles
+   ----------------------------------------------------------
+   MatDialog renders the panel OUTSIDE the component tree,
+   so these styles must be global.
+   ============================================================ */
+
+/* --- Panel container (the actual dialog box) --- */
+.auth-modal-panel {
+  background: transparent !important;
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(201, 162, 75, 0.08);
+  overflow: hidden;
+}
+
+/* Override Angular Material's default white background on the inner container */
+.auth-modal-panel .mat-mdc-dialog-surface,
+.auth-modal-panel .mat-mdc-dialog-container,
+.auth-modal-panel .mdc-dialog__surface {
+  background: transparent !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+/* Remove any default Material surface background */
+.auth-modal-panel .mat-mdc-dialog-surface::before,
+.auth-modal-panel .mat-mdc-dialog-container::before {
+  display: none !important;
+}
+
+/* --- Backdrop --- */
+.auth-modal-backdrop {
+  background: var(--color-overlay) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Light mode backdrop refinement */
+[data-theme='light'] .auth-modal-backdrop {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+/* ============================================================
+   CONFIRMATION DIALOG — global panel & surface overrides
+   ----------------------------------------------------------
+   MatDialog renders the panel OUTSIDE the component tree,
+   so these styles must be global to prevent the default white
+   Material surface from showing behind our custom dark dialog.
+   ============================================================ */
+
+.confirmation-dialog-panel {
+  background: transparent !important;
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(201, 162, 75, 0.08);
+  overflow: hidden;
+}
+
+.confirmation-dialog-panel .mat-mdc-dialog-surface,
+.confirmation-dialog-panel .mat-mdc-dialog-container,
+.confirmation-dialog-panel .mdc-dialog__surface {
+  background: transparent !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+.confirmation-dialog-panel .mat-mdc-dialog-surface::before,
+.confirmation-dialog-panel .mat-mdc-dialog-container::before {
+  display: none !important;
+}
+
+[data-theme='light'] .confirmation-dialog-panel {
+  box-shadow:
+    0 12px 40px rgba(20, 23, 28, 0.15),
+    0 0 0 1px rgba(201, 162, 75, 0.10);
+}

@@ -1,16 +1,114 @@
-<div class="payment-form">
-  <div *ngFor="let method of paymentMethods" class="payment-card"
-       [class.selected]="isSelected(method.value)"
-       (click)="selectMethod(method.value)">
-    <div class="payment-radio">
-      <mat-radio-button [checked]="isSelected(method.value)"></mat-radio-button>
-    </div>
-    <div class="payment-details">
-      <mat-icon class="payment-icon">{{ getPaymentMethodIcon(method.value) }}</mat-icon>
-      <div class="payment-info">
-        <div class="payment-name">{{ method.label }}</div>
-        <div class="payment-description">{{ method.description }}</div>
+<div class="payment-section">
+  <!-- Method Cards -->
+  <div class="payment-methods">
+    <div
+      *ngFor="let method of paymentMethods"
+      class="payment-card"
+      [class.selected]="isSelected(method.value)"
+      (click)="selectMethod(method.value)"
+    >
+      <div class="payment-radio">
+        <div class="radio-outer" [class.checked]="isSelected(method.value)">
+          <div class="radio-inner" *ngIf="isSelected(method.value)"></div>
+        </div>
       </div>
+      <div class="payment-icon-wrap">
+        <ng-container [ngSwitch]="method.value">
+          <svg *ngSwitchCase="'CREDIT_CARD'" viewBox="0 0 24 24" fill="none" width="28" height="28">
+            <rect x="1" y="4" width="22" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M1 10h22" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M5 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <svg *ngSwitchCase="'PAYPAL'" viewBox="0 0 24 24" fill="none" width="28" height="28">
+            <path d="M7 22l1-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M7 15l1-7h5a4 4 0 013.5 2.5c.5 1.2.3 2.5-.5 3.5s-2 1.5-3.5 1.5H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 22l1-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <svg *ngSwitchCase="'BANK_TRANSFER'" viewBox="0 0 24 24" fill="none" width="28" height="28">
+            <path d="M3 21h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M12 3L3 7v3h18V7l-9-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M12 10v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </ng-container>
+      </div>
+      <div class="payment-info">
+        <span class="payment-name">{{ method.label }}</span>
+        <span class="payment-desc">{{ method.description }}</span>
+      </div>
+      <svg *ngIf="isSelected(method.value)" viewBox="0 0 24 24" fill="none" width="20" height="20" class="payment-check">
+        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.1"/>
+        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Credit Card Fields -->
+  <div *ngIf="selectedMethod === PaymentMethod.CREDIT_CARD" class="payment-fields">
+    <div class="pf-row">
+      <div class="pf-group pf-full">
+        <label class="pf-label">Card Number</label>
+        <input
+          type="text"
+          class="pf-input"
+          placeholder="1234-5678-9012-3456"
+          [formControl]="paymentForm.get('cardNumber')!"
+          (input)="formatCardNumber()"
+          maxlength="19"
+        >
+        <p *ngIf="paymentForm.get('cardNumber')?.touched && paymentForm.get('cardNumber')?.invalid" class="pf-error">Enter a valid 16-digit card number</p>
+      </div>
+    </div>
+    <div class="pf-row pf-row-3">
+      <div class="pf-group">
+        <label class="pf-label">Cardholder Name</label>
+        <input type="text" class="pf-input" placeholder="John Doe" [formControl]="paymentForm.get('cardName')!">
+      </div>
+      <div class="pf-group">
+        <label class="pf-label">Expiry</label>
+        <input
+          type="text"
+          class="pf-input"
+          placeholder="MM/YY"
+          [formControl]="paymentForm.get('cardExpiry')!"
+          (input)="formatExpiry()"
+          maxlength="5"
+        >
+        <p *ngIf="paymentForm.get('cardExpiry')?.touched && paymentForm.get('cardExpiry')?.invalid" class="pf-error">Use MM/YY format</p>
+      </div>
+      <div class="pf-group">
+        <label class="pf-label">CVV</label>
+        <input
+          type="text"
+          class="pf-input"
+          placeholder="123"
+          [formControl]="paymentForm.get('cardCvv')!"
+          maxlength="4"
+        >
+        <p *ngIf="paymentForm.get('cardCvv')?.touched && paymentForm.get('cardCvv')?.invalid" class="pf-error">Enter 3-4 digits</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PayPal Fields -->
+  <div *ngIf="selectedMethod === PaymentMethod.PAYPAL" class="payment-fields">
+    <div class="pf-row">
+      <div class="pf-group pf-full">
+        <label class="pf-label">PayPal Email</label>
+        <input type="email" class="pf-input" placeholder="your@email.com" [formControl]="paymentForm.get('paypalEmail')!">
+        <p *ngIf="paymentForm.get('paypalEmail')?.touched && paymentForm.get('paypalEmail')?.invalid" class="pf-error">Enter a valid email address</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bank transfer notice -->
+  <div *ngIf="selectedMethod === PaymentMethod.BANK_TRANSFER" class="payment-fields">
+    <div class="bank-notice">
+      <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M12 16v-4M12 8h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p>After placing your order, you will receive our bank details to complete the transfer. Your order will be processed once the payment is confirmed.</p>
     </div>
   </div>
 </div>

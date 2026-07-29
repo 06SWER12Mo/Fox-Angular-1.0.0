@@ -1,85 +1,161 @@
-.order-summary {
-  background: white;
-  border-radius: 12px;
+/* ============================================================
+   ORDER SUMMARY SIDEBAR — ink & brass
+   ============================================================ */
+
+.order-summary-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-xl);
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-card);
+
+  svg { color: var(--color-accent); flex-shrink: 0; }
 
   h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d3748;
-    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-heading);
+    margin: 0;
+    letter-spacing: -0.01em;
   }
 }
 
+/* ---- Items ---- */
 .summary-items {
-  max-height: 300px;
+  max-height: 240px;
   overflow-y: auto;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-  .summary-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #f7fafc;
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-light);
 
-    &:last-child {
-      border-bottom: none;
-    }
+  &:last-child { border-bottom: none; }
+}
 
-    .item-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .item-name {
-        font-size: 14px;
-        color: #4a5568;
-      }
-
-      .item-quantity {
-        font-size: 13px;
-        color: #a0aec0;
-      }
-    }
-
-    .item-price {
-      font-size: 14px;
-      font-weight: 500;
-      color: #2d3748;
-    }
+.item-info {
+  .item-name {
+    font-size: 13px;
+    color: var(--color-text-primary);
+    font-weight: 500;
   }
 }
 
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.item-qty {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.item-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ---- Divider ---- */
 .summary-divider {
   height: 1px;
-  background: #e2e8f0;
+  background: var(--color-border-card);
   margin: 12px 0;
+}
+
+/* ---- Totals ---- */
+.summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  color: #4a5568;
-  font-size: 15px;
+  align-items: center;
+  padding: 4px 0;
+}
 
-  .free {
-    color: #48bb78;
+.row-label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.row-count {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.row-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+
+  &.free {
+    color: var(--color-success);
     font-weight: 600;
   }
 }
 
+/* ---- Total ---- */
 .summary-total {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #2d3748;
+  align-items: center;
+  padding: 16px 0 0;
+  margin-top: 12px;
+  border-top: 1px solid var(--color-border-card);
+}
 
-  .total-price {
-    color: #667eea;
+.total-label {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.total-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+/* ---- Footer ---- */
+.summary-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 11px;
+  color: var(--color-text-muted);
+
+  svg { color: var(--color-accent-dim); flex-shrink: 0; }
+}
+
+@media (max-width: 992px) {
+  .order-summary-card {
+    border-radius: var(--radius-lg);
   }
 }

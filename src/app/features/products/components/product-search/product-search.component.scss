@@ -1,156 +1,173 @@
-// Matches header.component.scss / product-filters.component.scss —
-// same ink/brass palette, so the whole product page reads as one
-// considered system instead of separate default-styled widgets.
-$ink: #14171c;
-$brass: #c9a24b;
-$brass-dim: #8a7238;
-$border: rgba(201, 162, 75, 0.25);
-$border-hover: rgba(201, 162, 75, 0.4);
-$text: #1a1f27;
-$muted: #8a94a3;
-$bg-field: #ffffff;
-$radius: 9px;
+/* ============================================================
+   SEARCH BAR — button outside input container
+   ============================================================ */
 
-.search-form {
+.search-bar-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
-  
-  min-width: 320px;
+  width: 550px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.search-field {
-  position: relative;
+.search-container {
   flex: 1;
-  width: 270px;
-  display: flex;
-  align-items: center;
-  // Sized to sit comfortably inline next to a page <h1>, rather than
-  // the previous 52px bar which read as oversized in that context.
-  height: 40px;
-  background: $bg-field;
-  border: 1.5px solid $border;
-  border-radius: $radius;
-  padding: 0 12px;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-accent-border, rgba(201, 162, 75, 0.12));
+  background: var(--color-bg-card, #1f232b);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  backdrop-filter: blur(8px);
 
   &:hover {
-    border-color: $border-hover;
+    border-color: var(--color-accent-border, rgba(201, 162, 75, 0.25));
   }
 
   &.focused {
-    border-color: $brass;
-    box-shadow: 0 0 0 3px rgba($brass, 0.15);
+    border-color: var(--color-accent, #c9a24b);
+    box-shadow: 
+      0 0 0 3px var(--color-accent-soft, rgba(201, 162, 75, 0.08)),
+      0 4px 20px rgba(0, 0, 0, 0.12);
   }
 
-  &__icon {
-    width: 17px;
-    height: 17px;
-    flex-shrink: 0;
-    color: $brass-dim;
-    margin-right: 8px;
-  }
-
-  &__input {
-    flex: 1;
-    min-width: 0;
-    height: 100%;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 13.5px;
-    color: $text;
-
-    &::placeholder {
-      color: $muted;
-    }
-  }
-
-  &__clear {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    flex-shrink: 0;
-    margin-left: 4px;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
-    color: $muted;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-
-    svg {
-      width: 13px;
-      height: 13px;
-    }
-
-    &:hover {
-      background: rgba($brass, 0.14);
-      color: $brass-dim;
-    }
+  &.has-value {
+    border-color: var(--color-accent-border, rgba(201, 162, 75, 0.25));
   }
 }
 
-.search-btn {
-  display: inline-flex;
+.search-form-inner {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  height: 40px;
-  padding: 0 18px;
+  gap: 0;
+  height: 50px;
+  padding: 0 4px 0 16px;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-accent-dim, #8a7238);
+  margin-right: 10px;
+  transition: color 0.2s ease;
+
+  .focused & {
+    color: var(--color-accent, #c9a24b);
+  }
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-text-primary, #ecece4);
+  letter-spacing: 0.01em;
+
+  &::placeholder {
+    color: var(--color-text-muted, #5b6472);
+    font-weight: 400;
+    font-size: 14px;
+  }
+}
+
+/* ---- Clear button ---- */
+.search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
   border: none;
-  border-radius: $radius;
-  background: $brass;
-  color: $ink;
-  font-size: 13.5px;
-  font-weight: 700;
-  letter-spacing: 0.1px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-muted, #5b6472);
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: all 0.15s ease;
+  margin-right: 2px;
 
   svg {
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
   }
 
   &:hover {
-    background: #d9b566;
+    background: var(--color-accent-soft, rgba(201, 162, 75, 0.08));
+    color: var(--color-accent, #c9a24b);
+  }
+}
+
+/* ---- Submit button (outside the search container) ---- */
+.search-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 20px;
+  height: 50px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, 
+    var(--color-accent) 0%, 
+    var(--color-accent-hover) 100%
+  );
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(201, 162, 75, 0.3);
   }
 
   &:active {
     transform: translateY(0);
+    box-shadow: none;
   }
 }
 
+/* ---- Responsive ---- */
 @media (max-width: 768px) {
-  .search-form {
+  .search-bar-row {
     flex-direction: column;
-    align-items: stretch;
-    max-width: none;
   }
 
-  .search-field,
-  .search-btn {
+  .search-form-inner {
+    height: 46px;
+    padding: 0 4px 0 12px;
+  }
+
+  .search-input {
+    font-size: 14px;
+  }
+
+  .search-container {
+    max-width: 100%;
+  }
+
+  .search-submit {
     width: 100%;
-  }
-
-  .search-btn {
     justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
-  .search-btn span {
-    display: none;
-  }
-
-  .search-btn {
-    width: 40px;
-    padding: 0;
-    justify-content: center;
+  .search-submit svg {
+    width: 16px;
+    height: 16px;
   }
 }

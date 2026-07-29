@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/api/auth.service';
 import { TokenService } from '../../../../core/services/token.service';
 
@@ -21,13 +20,13 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     if (this.tokenService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      window.location.href = '/auth/profile';
       return;
     }
 
@@ -70,8 +69,10 @@ export class RegisterComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         console.log('Registration successful!');
-        this.router.navigate(['/dashboard']);
+        // Full page reload to ensure all components reinitialize with auth state
+        window.location.href = '/auth/profile';
       },
       error: (error) => {
         this.isLoading = false;

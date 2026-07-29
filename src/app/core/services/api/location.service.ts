@@ -113,6 +113,12 @@ export class LocationService {
     return this.http.get<Town[]>(`${this.apiUrl}/towns/search`, { params });
   }
 
+  /** Lightweight town search — returns only id, name, bigAreaName, zipCode. No entity lazy-loading issues. */
+  searchTownsLight(keyword: string): Observable<any[]> {
+    const params = new HttpParams().set('keyword', keyword);
+    return this.http.get<any[]>(`${this.apiUrl}/towns/search-light`, { params });
+  }
+
   countDeliveryAddressesByTown(id: number): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/towns/${id}/address-count`);
   }

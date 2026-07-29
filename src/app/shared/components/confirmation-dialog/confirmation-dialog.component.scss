@@ -1,15 +1,174 @@
-mat-dialog-content {
-  min-width: 300px;
-  padding: 16px 0;
-  
-  p {
-    margin: 0;
-    color: #4a5568;
-    font-size: 16px;
+/* ============================================================
+   CONFIRMATION DIALOG — dark ink & brass theme
+   ============================================================ */
+
+.confirm-dialog {
+  background: var(--color-bg-card, #1f232b);
+  border: 1px solid var(--color-accent-border, rgba(201, 162, 75, 0.12));
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  min-width: 360px;
+  max-width: 420px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(201, 162, 75, 0.06);
+}
+
+/* ---- Header ---- */
+.confirm-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 24px 0;
+}
+
+.confirm-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-accent-soft, rgba(201, 162, 75, 0.1));
+
+  svg {
+    width: 22px;
+    height: 22px;
+    color: var(--color-accent, #c9a24b);
+  }
+
+  &.danger {
+    background: var(--color-danger-soft, rgba(226, 89, 106, 0.08));
+
+    svg {
+      color: var(--color-danger, #e2596a);
+    }
   }
 }
 
-mat-dialog-actions {
-  padding: 16px 0 0 0;
-  gap: 8px;
+.confirm-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-heading, #ecece4);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Body ---- */
+.confirm-body {
+  padding: 16px 24px 0;
+}
+
+.confirm-message {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-secondary, #a9afbb);
+  margin: 0;
+}
+
+/* ---- Actions ---- */
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: inherit;
+  min-width: 80px;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary, #a9afbb);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+
+  &:hover {
+    background: var(--color-bg-hover, rgba(255, 255, 255, 0.04));
+    color: var(--color-text-primary, #ecece4);
+    border-color: var(--color-border-input-hover, rgba(255, 255, 255, 0.18));
+  }
+}
+
+.btn-accent {
+  background: var(--color-accent, #c9a24b);
+  color: var(--color-text-inverse, #1a1f27);
+
+  &:hover {
+    background: var(--color-accent-hover, #d9b566);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-accent, 0 4px 14px rgba(201, 162, 75, 0.25));
+  }
+}
+
+.btn-danger {
+  background: var(--color-danger, #e2596a);
+  color: #ffffff;
+
+  &:hover {
+    background: #d44a5b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(226, 89, 106, 0.25);
+  }
+}
+
+/* ============================================================
+   LIGHT MODE
+   ============================================================ */
+
+[data-theme='light'] .confirm-dialog {
+  box-shadow:
+    0 12px 40px rgba(20, 23, 28, 0.12),
+    0 0 0 1px rgba(201, 162, 75, 0.1);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .confirm-dialog {
+    min-width: 0;
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .confirm-header {
+    padding: 20px 20px 0;
+  }
+
+  .confirm-body {
+    padding: 12px 20px 0;
+  }
+
+  .confirm-actions {
+    padding: 16px 20px 20px;
+    flex-direction: column-reverse;
+    gap: 8px;
+
+    .btn {
+      width: 100%;
+      padding: 12px 20px;
+    }
+  }
 }

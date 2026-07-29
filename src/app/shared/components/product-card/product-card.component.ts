@@ -12,6 +12,8 @@ export class ProductCardComponent {
   @Input() showAddToCart = true;
   @Output() addToCart = new EventEmitter<number>();
 
+  Math = Math;
+
   // ✅ Use a default image immediately
   imageLoaded = false;
   imageError = false;

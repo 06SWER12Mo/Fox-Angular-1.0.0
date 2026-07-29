@@ -1,120 +1,207 @@
-<div class="checkout-container">
-  <div class="checkout-header">
-    <h1>Checkout</h1>
-    <p>Complete your order</p>
+<div class="checkout-page">
+  <div class="checkout-banner">
+    <div class="banner-bg">
+      <div class="banner-glow glow-1"></div>
+      <div class="banner-glow glow-2"></div>
+    </div>
+    <div class="banner-content">
+      <span class="banner-badge">Secure Checkout</span>
+      <h1 class="banner-title">Complete Your Order</h1>
+      <p class="banner-subtitle">Review your items and choose how you'd like to pay</p>
+    </div>
   </div>
 
-  <!-- Error Message -->
-  <div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
-  </div>
-
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="loading-state">
-    <mat-spinner></mat-spinner>
-  </div>
-
-  <!-- Checkout Content -->
-  <div *ngIf="!isLoading && cart?.items?.length" class="checkout-content">
-    <!-- Steps -->
-    <div class="checkout-steps">
-      <div class="step" [class.active]="isStepActive(1)" [class.complete]="isStepComplete(1)">
-        <span class="step-number">1</span>
-        <span class="step-label">Delivery Address</span>
-      </div>
-      <div class="step-line" [class.active]="isStepComplete(1)"></div>
-      <div class="step" [class.active]="isStepActive(2)" [class.complete]="isStepComplete(2)">
-        <span class="step-number">2</span>
-        <span class="step-label">Payment</span>
-      </div>
-      <div class="step-line" [class.active]="isStepComplete(2)"></div>
-      <div class="step" [class.active]="isStepActive(3)">
-        <span class="step-number">3</span>
-        <span class="step-label">Confirm</span>
-      </div>
+  <div class="checkout-container">
+    <!-- Messages -->
+    <div *ngIf="successMessage" class="checkout-toast success">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>{{ successMessage }}</span>
+    </div>
+    <div *ngIf="errorMessage" class="checkout-toast error">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M12 8v4M12 16h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>{{ errorMessage }}</span>
     </div>
 
-    <div class="checkout-grid">
-      <!-- Left Column: Forms -->
-      <div class="checkout-forms">
-        <!-- Step 1: Address -->
-        <div *ngIf="isStepActive(1)" class="step-content">
-          <h2>Select Delivery Address</h2>
-          <app-address-selector
-  [addresses]="addresses"
-  [selectedAddressId]="selectedAddressId"
-  (addressSelected)="onAddressSelected($event)"
-></app-address-selector>
-          
-          <div class="step-actions">
-            <button mat-button (click)="goToStep(2)" [disabled]="!selectedAddressId">
-              Next: Payment
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Preparing checkout...</p>
+    </div>
+
+    <!-- Checkout Content -->
+    <div *ngIf="!isLoading && cart?.items?.length" class="checkout-content">
+      <!-- Steps Progress -->
+      <div class="checkout-steps">
+        <div class="step" [class.active]="isStepActive(1)" [class.complete]="isStepComplete(1)">
+          <div class="step-indicator">
+            <svg *ngIf="isStepComplete(1)" viewBox="0 0 24 24" fill="none" width="16" height="16">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span *ngIf="!isStepComplete(1)">1</span>
+          </div>
+          <div class="step-info">
+            <span class="step-label">Delivery</span>
+            <span class="step-desc">Address</span>
           </div>
         </div>
-
-        <!-- Step 2: Payment -->
-        <div *ngIf="isStepActive(2)" class="step-content">
-          <h2>Select Payment Method</h2>
-          <app-payment-form
-            [selectedMethod]="selectedPaymentMethod"
-            (methodSelected)="onPaymentMethodSelected($event)"
-          ></app-payment-form>
-          
-          <div class="step-actions">
-            <button mat-button (click)="goToStep(1)">
-              <mat-icon>arrow_back</mat-icon>
-              Back to Address
-            </button>
-            <button mat-button (click)="goToStep(3)" [disabled]="!selectedPaymentMethod">
-              Next: Confirm
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
+        <div class="step-connector" [class.active]="isStepComplete(1)"></div>
+        <div class="step" [class.active]="isStepActive(2)" [class.complete]="isStepComplete(2)">
+          <div class="step-indicator">
+            <svg *ngIf="isStepComplete(2)" viewBox="0 0 24 24" fill="none" width="16" height="16">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span *ngIf="!isStepComplete(2)">2</span>
+          </div>
+          <div class="step-info">
+            <span class="step-label">Payment</span>
+            <span class="step-desc">Method</span>
           </div>
         </div>
-
-        <!-- Step 3: Confirm -->
-        <div *ngIf="isStepActive(3)" class="step-content">
-          <h2>Confirm Order</h2>
-          <div class="confirm-details">
-            <div class="confirm-row">
-              <span class="label">Delivery Address:</span>
-              <span class="value">{{ getSelectedAddress()?.fullAddress }}</span>
-            </div>
-            <div class="confirm-row">
-              <span class="label">Payment Method:</span>
-              <span class="value">{{ getPaymentMethodLabel() }}</span>
-            </div>
+        <div class="step-connector" [class.active]="isStepComplete(2)"></div>
+        <div class="step" [class.active]="isStepActive(3)" [class.complete]="isStepComplete(3)">
+          <div class="step-indicator">
+            <span>3</span>
           </div>
-          
-          <div class="step-actions">
-            <button mat-button (click)="goToStep(2)">
-              <mat-icon>arrow_back</mat-icon>
-              Back to Payment
-            </button>
-            <button 
-              mat-raised-button 
-              color="primary" 
-              (click)="placeOrder()"
-              [disabled]="isPlacingOrder"
-            >
-              <mat-spinner diameter="20" *ngIf="isPlacingOrder"></mat-spinner>
-              <span *ngIf="!isPlacingOrder">Place Order</span>
-            </button>
+          <div class="step-info">
+            <span class="step-label">Confirmation</span>
+            <span class="step-desc">Review &amp; Place</span>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Order Summary -->
-      <div class="checkout-summary">
-        <app-order-summary
-          [subtotal]="getSubtotal()"
-          [shipping]="getShipping()"
-          [tax]="getTax()"
-          [total]="getTotal()"
-          [items]="cart?.items || []"
-        ></app-order-summary>
+      <div class="checkout-grid">
+        <!-- Left Column: Forms -->
+        <div class="checkout-forms">
+          <!-- Step 1: Address -->
+          <div *ngIf="isStepActive(1)" class="step-card">
+            <div class="step-card-header">
+              <svg viewBox="0 0 24 24" fill="none" width="20" height="20" class="step-card-icon">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+              <h2>Delivery Address</h2>
+            </div>
+            <app-address-selector
+              [addresses]="addresses"
+              [selectedAddressId]="selectedAddressId"
+              (addressSelected)="onAddressSelected($event)"
+            ></app-address-selector>
+
+            <div class="step-actions">
+              <button class="btn btn-primary" (click)="goToStep(2)" [disabled]="!selectedAddressId">
+                <span>Continue to Payment</span>
+                <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Payment -->
+          <div *ngIf="isStepActive(2)" class="step-card">
+            <div class="step-card-header">
+              <svg viewBox="0 0 24 24" fill="none" width="20" height="20" class="step-card-icon">
+                <rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M1 10h22M5 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <h2>Payment Method</h2>
+            </div>
+            <app-payment-form
+              [selectedMethod]="selectedPaymentMethod"
+              (methodSelected)="onPaymentMethodSelected($event)"
+            ></app-payment-form>
+
+            <div class="step-actions">
+              <button class="btn btn-ghost" (click)="goToStep(1)">
+                <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Back to Address</span>
+              </button>
+              <button class="btn btn-primary" (click)="goToStep(3)" [disabled]="!selectedPaymentMethod">
+                <span>Review Order</span>
+                <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Confirm -->
+          <div *ngIf="isStepActive(3)" class="step-card">
+            <div class="step-card-header">
+              <svg viewBox="0 0 24 24" fill="none" width="20" height="20" class="step-card-icon">
+                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+              <h2>Confirm Your Order</h2>
+            </div>
+
+            <div class="confirm-card">
+              <div class="confirm-section">
+                <div class="confirm-section-header">
+                  <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8"/>
+                    <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                  <span>Delivery Address</span>
+                </div>
+                <p class="confirm-value">{{ getSelectedAddress()?.fullAddress }}</p>
+              </div>
+              <div class="confirm-divider"></div>
+              <div class="confirm-section">
+                <div class="confirm-section-header">
+                  <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                    <rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M1 10h22" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                  <span>Payment Method</span>
+                </div>
+                <p class="confirm-value">{{ getPaymentMethodLabel() }}</p>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button class="btn btn-ghost" (click)="goToStep(2)">
+                <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Back to Payment</span>
+              </button>
+              <button
+                class="btn btn-accent place-order-btn"
+                (click)="placeOrder()"
+                [disabled]="isPlacingOrder"
+              >
+                <div class="btn-spinner" *ngIf="isPlacingOrder">
+                  <div class="spinner-dot"></div>
+                  <div class="spinner-dot"></div>
+                  <div class="spinner-dot"></div>
+                </div>
+                <span *ngIf="!isPlacingOrder">
+                  Place Order — {{ getTotal() | currency }}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Order Summary -->
+        <div class="checkout-summary">
+          <app-order-summary
+            [subtotal]="getSubtotal()"
+            [shipping]="getShipping()"
+            [tax]="getTax()"
+            [total]="getTotal()"
+            [items]="cart?.items || []"
+          ></app-order-summary>
+        </div>
       </div>
     </div>
   </div>

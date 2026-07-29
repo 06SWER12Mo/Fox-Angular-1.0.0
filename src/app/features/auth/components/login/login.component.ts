@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/api/auth.service';
 import { TokenService } from '../../../../core/services/token.service';
 
@@ -14,7 +14,7 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   isLoading = false;
   submitted = false;
-  returnUrl: string = '/dashboard';
+  returnUrl: string = '/auth/profile';
   hidePassword = true;
   errorMessage: string = '';
 
@@ -23,14 +23,14 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
     private route: ActivatedRoute,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     if (this.tokenService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      window.location.href = '/auth/profile';
       return;
     }
 
@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
       rememberMe: [false]
     });
 
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/auth/profile';
   }
 
   onSubmit(): void {
@@ -57,8 +57,10 @@ export class LoginComponent implements OnInit {
     this.authService.login({ usernameOrEmail, password }).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         console.log('Login successful!');
-        this.router.navigate([this.returnUrl]);
+        // Full page reload to ensure all components reinitialize with auth state
+        window.location.href = this.returnUrl;
       },
       error: (error) => {
         this.isLoading = false;

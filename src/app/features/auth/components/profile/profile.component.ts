@@ -8,7 +8,6 @@ import { AuthService } from '../../../../core/services/api/auth.service';
 import { TokenService } from '../../../../core/services/token.service';
 import { User } from '../../../../core/models/user.model';
 import { DeliveryAddress, DeliveryAddressRequest } from '../../../../core/models/location.model';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -43,6 +42,7 @@ export class ProfileComponent implements OnInit {
   // Messages
   successMessage = '';
   errorMessage = '';
+  infoMessage = '';
 
   // Forms
   profileForm!: FormGroup;
@@ -61,7 +61,6 @@ export class ProfileComponent implements OnInit {
     private locationService: LocationService,
     private authService: AuthService,
     private tokenService: TokenService,
-    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -181,7 +180,7 @@ export class ProfileComponent implements OnInit {
         this.passwordForm.reset();
         setTimeout(() => {
           this.authService.logout().subscribe(() => {
-            this.router.navigate(['/auth/login']);
+            window.location.href = '/';
           });
         }, 2000);
       },
@@ -376,18 +375,45 @@ export class ProfileComponent implements OnInit {
     this.isSendingVerification = true;
     this.successMessage = '';
     this.errorMessage = '';
-    this.userService.updateCurrentUser({ email: this.user.email }).pipe(
+    this.userService.requestEmailVerification().pipe(
       finalize(() => {
         this.isSendingVerification = false;
         this.cdr.detectChanges();
       })
     ).subscribe({
       next: () => {
-        this.successMessage = 'Verification email sent! Check your inbox.';
-        setTimeout(() => this.successMessage = '', 4000);
+        // Update local state immediately
+        if (this.user) {
+          this.user.verificationRequested = true;
+        }
+        this.successMessage = ''; // Clear any old success
+        this.infoMessage = 'You asked for verification. Fox will review your email as soon as possible.';
+        setTimeout(() => this.infoMessage = '', 6000);
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to send verification email';
+        this.errorMessage = err.error?.message || 'Failed to send verification request';
+      }
+    });
+  }
+
+  cancelVerificationRequest(): void {
+    this.isSendingVerification = true;
+    this.errorMessage = '';
+    this.userService.cancelEmailVerification().pipe(
+      finalize(() => {
+        this.isSendingVerification = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: () => {
+        if (this.user) {
+          this.user.verificationRequested = false;
+        }
+        this.infoMessage = 'Verification request cancelled.';
+        setTimeout(() => this.infoMessage = '', 4000);
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Failed to cancel verification request';
       }
     });
   }
@@ -523,7 +549,7 @@ export class ProfileComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.tokenService.clearAll();
-        this.router.navigate(['/auth/register']);
+        window.location.href = '/';
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Failed to delete account';

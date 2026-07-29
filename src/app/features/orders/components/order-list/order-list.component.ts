@@ -1,9 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
 import { OrderService } from '../../../../core/services/api/order.service';
-import { OrderSummary  } from '../../../../core/models/order.model';
+import { OrderSummary } from '../../../../core/models/order.model';
 import { OrderStatus } from '../../../../core/models/enums.model';
 import { PageResponse } from '../../../../core/models/common.model';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -25,8 +23,9 @@ export class OrderListComponent implements OnInit {
   filterForm!: FormGroup;
   statusOptions = Object.values(OrderStatus);
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  filtersExpanded = true;
+  cancelOrderToConfirm: OrderSummary | null = null;
+  isCancelling = false;
 
   constructor(
     private orderService: OrderService,
@@ -51,46 +50,36 @@ export class OrderListComponent implements OnInit {
     });
   }
 
-  loadOrders(): void {
-    this.isLoading = true;
-    const status = this.filterForm.get('status')?.value;
-    const search = this.filterForm.get('search')?.value;
-
-    // If status filter is applied
-    if (status) {
-      this.orderService.getMyOrdersByStatus(status, this.currentPage, this.pageSize).subscribe({
-        next: (response: any) => {
-          const page: PageResponse<OrderSummary> = response?.data || response;
-          this.orders = page.content || [];
-          this.totalElements = page.totalElements || 0;
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = error?.error?.message || 'Failed to load orders';
-          console.error('Error loading orders:', error);
-        }
-      });
-    } else {
-      this.orderService.getMyOrders(this.currentPage, this.pageSize).subscribe({
-        next: (response: any) => {
-          const page: PageResponse<OrderSummary> = response?.data || response;
-          this.orders = page.content || [];
-          this.totalElements = page.totalElements || 0;
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = error?.error?.message || 'Failed to load orders';
-          console.error('Error loading orders:', error);
-        }
-      });
-    }
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalElements / this.pageSize));
   }
 
-  onPageChange(event: any): void {
-    this.currentPage = event.pageIndex;
-    this.pageSize = event.pageSize;
+  loadOrders(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    const status = this.filterForm.get('status')?.value;
+
+    const obs$ = status
+      ? this.orderService.getMyOrdersByStatus(status, this.currentPage, this.pageSize)
+      : this.orderService.getMyOrders(this.currentPage, this.pageSize);
+
+    obs$.subscribe({
+      next: (response: any) => {
+        const page: PageResponse<OrderSummary> = response?.data || response;
+        this.orders = page.content || [];
+        this.totalElements = page.totalElements || 0;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error?.error?.message || 'Failed to load orders';
+        console.error('Error loading orders:', error);
+      }
+    });
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = page;
     this.loadOrders();
   }
 
@@ -99,22 +88,41 @@ export class OrderListComponent implements OnInit {
   }
 
   trackOrder(trackingCode: string): void {
-    if (trackingCode) {
-      this.router.navigate(['/orders/track', trackingCode]);
-    }
+    this.router.navigate(['/orders/track', trackingCode]);
   }
 
-  cancelOrder(orderId: number): void {
-    if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(orderId).subscribe({
-        next: () => {
-          this.loadOrders();
-        },
-        error: (error) => {
-          console.error('Error cancelling order:', error);
-        }
-      });
-    }
+  openCancelConfirm(order: OrderSummary): void {
+    this.cancelOrderToConfirm = order;
+  }
+
+  confirmCancel(): void {
+    if (!this.cancelOrderToConfirm) return;
+    this.isCancelling = true;
+    this.orderService.cancelOrder(this.cancelOrderToConfirm.id).subscribe({
+      next: () => {
+        this.isCancelling = false;
+        this.cancelOrderToConfirm = null;
+        this.loadOrders();
+      },
+      error: (error) => {
+        this.isCancelling = false;
+        this.errorMessage = error?.error?.message || 'Failed to cancel order';
+        console.error('Error cancelling order:', error);
+      }
+    });
+  }
+
+  hasActiveFilter(): boolean {
+    return !!this.filterForm.get('status')?.value || !!this.filterForm.get('search')?.value;
+  }
+
+  clearFilters(): void {
+    this.filterForm.patchValue({ status: '', search: '' });
+  }
+
+  canCancel(status: string | OrderStatus): boolean {
+    const s = typeof status === 'string' ? status : status;
+    return s === 'PENDING_PAYMENT' || s === 'PAID' || s === 'READY_FOR_SHIPPING';
   }
 
   getStatusLabel(status: OrderStatus): string {
@@ -129,24 +137,4 @@ export class OrderListComponent implements OnInit {
     };
     return labels[status] || status;
   }
-
-  getStatusColor(status: OrderStatus): string {
-    const colors: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING_PAYMENT]: 'warning',
-      [OrderStatus.PAID]: 'primary',
-      [OrderStatus.READY_FOR_SHIPPING]: 'accent',
-      [OrderStatus.ASSIGNED_TO_BATCH]: 'accent',
-      [OrderStatus.SHIPPED]: 'primary',
-      [OrderStatus.DELIVERED]: 'success',
-      [OrderStatus.CANCELLED]: 'danger'
-    };
-    return colors[status] || 'default';
-  }
-
-  canCancel(status: string | OrderStatus): boolean {
-  const statusStr = typeof status === 'string' ? status : status;
-  return statusStr === 'PENDING_PAYMENT' || 
-         statusStr === 'PAID' || 
-         statusStr === 'READY_FOR_SHIPPING';
-}
 }

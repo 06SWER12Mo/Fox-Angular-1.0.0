@@ -1,0 +1,164 @@
+<div class="auth-modal">
+  <!-- ============ HEADER ============ -->
+  <div class="modal-header">
+    <button class="close-btn" (click)="close()" aria-label="Close" title="Close">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="modal-brand">
+      <span class="brand-icon">✦</span>
+    </div>
+  </div>
+
+  <!-- ============ ERROR MESSAGE ============ -->
+  <div class="error-message" *ngIf="errorMessage">
+    <span class="error-icon">!</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- ============ LOGIN FORM ============ -->
+  <form *ngIf="mode === 'login'" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" class="auth-form">
+    <h2 class="form-title">Welcome back</h2>
+    <p class="form-subtitle">Sign in to your account to continue</p>
+
+    <div class="form-field" [class.has-error]="submitted && lf['usernameOrEmail'].errors">
+      <label class="form-label" for="modal-username">Username or Email</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        <input id="modal-username" type="text" formControlName="usernameOrEmail" placeholder="Enter your email or username" class="form-input" autocomplete="username" />
+      </div>
+      <div class="field-error" *ngIf="submitted && lf['usernameOrEmail'].errors?.['required']">Username or email is required</div>
+    </div>
+
+    <div class="form-field" [class.has-error]="submitted && lf['password'].errors">
+      <label class="form-label" for="modal-password">Password</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input id="modal-password" [type]="hideLoginPassword ? 'password' : 'text'" formControlName="password" placeholder="Enter your password" class="form-input" autocomplete="current-password" />
+        <button type="button" class="password-toggle" (click)="hideLoginPassword = !hideLoginPassword" [attr.aria-label]="hideLoginPassword ? 'Show password' : 'Hide password'">
+          <svg viewBox="0 0 24 24" fill="none" *ngIf="hideLoginPassword"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" *ngIf="!hideLoginPassword"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="field-error" *ngIf="submitted && lf['password'].errors?.['required']">Password is required</div>
+      <div class="field-error" *ngIf="submitted && lf['password'].errors?.['minlength']">Password must be at least 6 characters</div>
+    </div>
+
+    <div class="form-options">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="rememberMe" class="checkbox-input" />
+        <span class="checkbox-custom">
+          <svg viewBox="0 0 12 12" fill="none" class="check-icon"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="checkbox-text">Remember me</span>
+      </label>
+      <a routerLink="/auth/forgot-password" class="forgot-link" (click)="close()">Forgot password?</a>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="isLoading">
+      <span *ngIf="!isLoading">Sign In</span>
+      <span *ngIf="isLoading" class="spinner-wrapper"><span class="spinner"></span></span>
+    </button>
+
+    <div class="mode-switch">
+      <span class="mode-switch-text">Don't have an account?</span>
+      <button type="button" class="mode-switch-link" (click)="switchMode('register')">Create one</button>
+    </div>
+  </form>
+
+  <!-- ============ REGISTER FORM ============ -->
+  <form *ngIf="mode === 'register'" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" class="auth-form">
+    <h2 class="form-title">Create account</h2>
+    <p class="form-subtitle">Join us and start shopping today</p>
+
+    <div class="name-row">
+      <div class="form-field half">
+        <label class="form-label" for="modal-firstName">First Name</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+          <input id="modal-firstName" type="text" formControlName="firstName" placeholder="John" class="form-input" autocomplete="given-name" />
+        </div>
+      </div>
+      <div class="form-field half">
+        <label class="form-label" for="modal-lastName">Last Name</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+          <input id="modal-lastName" type="text" formControlName="lastName" placeholder="Doe" class="form-input" autocomplete="family-name" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="submitted && rf['username'].errors">
+      <label class="form-label" for="modal-reg-username">Username</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+        <input id="modal-reg-username" type="text" formControlName="username" placeholder="johndoe" class="form-input" autocomplete="username" />
+      </div>
+      <div class="field-error" *ngIf="submitted && rf['username'].hasError('required')">Username is required</div>
+      <div class="field-error" *ngIf="submitted && rf['username'].hasError('minlength')">At least 3 characters</div>
+    </div>
+
+    <div class="form-field" [class.has-error]="submitted && rf['email'].errors">
+      <label class="form-label" for="modal-email">Email</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <input id="modal-email" type="email" formControlName="email" placeholder="john@example.com" class="form-input" autocomplete="email" />
+      </div>
+      <div class="field-error" *ngIf="submitted && rf['email'].hasError('required')">Email is required</div>
+      <div class="field-error" *ngIf="submitted && rf['email'].hasError('email')">Please enter a valid email</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="modal-phone">Phone (optional)</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input id="modal-phone" type="tel" formControlName="phoneNumber" placeholder="+1 234 567 890" class="form-input" autocomplete="tel" />
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="submitted && rf['password'].errors">
+      <label class="form-label" for="modal-reg-password">Password</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input id="modal-reg-password" [type]="hideRegisterPassword ? 'password' : 'text'" formControlName="password" placeholder="Create a password" class="form-input" autocomplete="new-password" />
+        <button type="button" class="password-toggle" (click)="hideRegisterPassword = !hideRegisterPassword" [attr.aria-label]="hideRegisterPassword ? 'Show password' : 'Hide password'">
+          <svg viewBox="0 0 24 24" fill="none" *ngIf="hideRegisterPassword"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" *ngIf="!hideRegisterPassword"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="field-error" *ngIf="submitted && rf['password'].hasError('required')">Password is required</div>
+      <div class="field-error" *ngIf="submitted && rf['password'].hasError('minlength')">At least 6 characters</div>
+    </div>
+
+    <div class="form-field" [class.has-error]="submitted && (rf['confirmPassword'].errors || registerForm.hasError('mismatch'))">
+      <label class="form-label" for="modal-confirm-password">Confirm Password</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input id="modal-confirm-password" [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Re-enter password" class="form-input" autocomplete="new-password" />
+        <button type="button" class="password-toggle" (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="hideConfirmPassword ? 'Show password' : 'Hide password'">
+          <svg viewBox="0 0 24 24" fill="none" *ngIf="hideConfirmPassword"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" *ngIf="!hideConfirmPassword"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="field-error" *ngIf="submitted && rf['confirmPassword'].hasError('required')">Please confirm your password</div>
+      <div class="field-error" *ngIf="submitted && registerForm.hasError('mismatch')">Passwords do not match</div>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="isLoading">
+      <span *ngIf="!isLoading">Create Account</span>
+      <span *ngIf="isLoading" class="spinner-wrapper"><span class="spinner"></span></span>
+    </button>
+
+    <div class="mode-switch">
+      <span class="mode-switch-text">Already have an account?</span>
+      <button type="button" class="mode-switch-link" (click)="switchMode('login')">Sign in</button>
+    </div>
+  </form>
+</div>

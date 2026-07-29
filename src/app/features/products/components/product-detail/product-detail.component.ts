@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../core/services/api/product.service';
 import { CartService } from '../../../../core/services/api/cart.service';
 import { ReviewService } from '../../../../core/services/api/review.service';
+import { AuthModalService } from '../../../../core/services/auth-modal.service';
+import { TokenService } from '../../../../core/services/token.service';
 import { Product } from '../../../../core/models/product.model';
 import { Review } from '../../../../core/models/review.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -34,7 +36,10 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     private cartService: CartService,
     private reviewService: ReviewService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authModalService: AuthModalService,
+    private tokenService: TokenService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -61,10 +66,12 @@ export class ProductDetailComponent implements OnInit {
       next: (response: any) => {
         this.product = response?.data || response;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = error?.error?.message || 'Failed to load product';
+        this.cdr.detectChanges();
         console.error('Error loading product:', error);
       }
     });
@@ -74,6 +81,7 @@ export class ProductDetailComponent implements OnInit {
     this.reviewService.getProductReviews(productId).subscribe({
       next: (response: any) => {
         this.reviews = response?.data || response || [];
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error loading reviews:', error);
@@ -92,6 +100,7 @@ export class ProductDetailComponent implements OnInit {
             comment: this.userReview.comment
           });
         }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.hasUserReviewed = false;
@@ -103,6 +112,22 @@ export class ProductDetailComponent implements OnInit {
   addToCart(): void {
     if (!this.product) return;
 
+    if (!this.tokenService.isAuthenticated()) {
+      this.authModalService.open('login').subscribe(result => {
+        if (result?.success) {
+          // After successful login, add to cart then reload to apply auth state
+          this.performAddToCart(() => window.location.reload());
+        }
+      });
+      return;
+    }
+
+    this.performAddToCart();
+  }
+
+  private performAddToCart(onComplete?: () => void): void {
+    if (!this.product) return;
+
     this.isAddingToCart = true;
     const productId = this.selectedVariantId || this.product.id;
     const quantity = this.selectedQuantity;
@@ -110,12 +135,13 @@ export class ProductDetailComponent implements OnInit {
     this.cartService.addToCart({ productId, quantity }).subscribe({
       next: () => {
         this.isAddingToCart = false;
-        // Show success notification
         console.log('Product added to cart');
+        onComplete?.();
       },
       error: (error) => {
         this.isAddingToCart = false;
         console.error('Error adding to cart:', error);
+        onComplete?.();
       }
     });
   }

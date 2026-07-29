@@ -3,13 +3,13 @@ import {
   CanActivate, 
   CanActivateChild, 
   CanLoad, 
-  Router, 
   UrlTree,
   Route,
   UrlSegment
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { TokenService } from '../services/token.service';
+import { AuthModalService } from '../services/auth-modal.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
   
   constructor(
     private tokenService: TokenService,
-    private router: Router
+    private authModalService: AuthModalService
   ) {}
 
   canActivate(): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -41,8 +41,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
       return true;
     }
     
-    return this.router.createUrlTree(['/auth/login'], {
-      queryParams: { returnUrl: window.location.pathname }
-    });
+    // Open the auth modal popup instead of redirecting to the old full-page login
+    this.authModalService.open('login').subscribe();
+    return false;
   }
 }

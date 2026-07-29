@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CartService } from '../../../../core/services/api/cart.service';
 import { OrderService } from '../../../../core/services/api/order.service';
-import { PaymentService } from '../../../../core/services/api/payment.service';
 import { LocationService } from '../../../../core/services/api/location.service';
 import { Cart } from '../../../../core/models/cart.model';
 import { DeliveryAddress } from '../../../../core/models/location.model';
@@ -35,7 +34,7 @@ export class CheckoutMainComponent implements OnInit {
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
-    private paymentService: PaymentService,
+
     private locationService: LocationService,
     private fb: FormBuilder,
     private router: Router
@@ -144,10 +143,9 @@ export class CheckoutMainComponent implements OnInit {
       cartId: this.cart.id
     };
 
-    // ✅ Step 1: Place Order
+    // Place order — backend handles payment internally
     this.orderService.placeOrder(request).subscribe({
       next: (orderResponse: any) => {
-        // ✅ Safely get order ID
         const orderId = orderResponse?.data?.id || orderResponse?.id;
         
         if (!orderId) {
@@ -156,24 +154,13 @@ export class CheckoutMainComponent implements OnInit {
           return;
         }
 
-        // ✅ Step 2: Process Payment
-        this.paymentService.processPayment({
-          orderId: orderId,
-          paymentMethod: this.selectedPaymentMethod!
-        }).subscribe({
-          next: (paymentResponse: any) => {
-            this.isPlacingOrder = false;
-            this.successMessage = 'Order placed successfully!';
-            setTimeout(() => {
-              this.router.navigate(['/orders']);
-            }, 1500);
-          },
-          error: (paymentError) => {
-            this.isPlacingOrder = false;
-            this.errorMessage = paymentError?.error?.message || 'Payment failed. Please try again.';
-            console.error('Payment error:', paymentError);
-          }
-        });
+        // Show success and navigate to orders page
+        this.isPlacingOrder = false;
+        this.successMessage = 'Order placed successfully!';
+        this.cartService.refreshCartCount();
+        setTimeout(() => {
+          this.router.navigate(['/orders']);
+        }, 1200);
       },
       error: (orderError) => {
         this.isPlacingOrder = false;

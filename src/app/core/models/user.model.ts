@@ -10,6 +10,7 @@ export interface User {
   profilePictureUrl: string;
   enabled: boolean;
   emailVerified: boolean;
+  verificationRequested: boolean;
   role: 'USER' | 'MANAGER' | 'ADMIN';
   lastLogin: string;
   createdAt: string;

@@ -1,179 +1,247 @@
+/* ============================================================
+   ADDRESS SELECTOR — ink & brass theme
+   ============================================================ */
+
 .address-selector {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-// No Addresses State
-.no-addresses {
+/* ---- Empty State ---- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 40px 20px;
-  background: #f7fafc;
-  border-radius: 12px;
-  border: 2px dashed #e2e8f0;
+  padding: 48px 20px;
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--color-border);
+  background: var(--color-bg-elevated);
+  gap: 8px;
+}
 
-  .empty-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: #a0aec0;
-    margin-bottom: 12px;
-  }
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent-soft);
+  margin-bottom: 4px;
 
-  p {
-    color: #718096;
-    margin: 4px 0;
-    font-size: 15px;
-  }
+  svg { color: var(--color-accent-dim); }
+}
 
-  .hint {
-    font-size: 13px;
-    color: #a0aec0;
-    margin-bottom: 16px;
-  }
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
 
-  button {
-    height: 44px;
-    padding: 0 24px;
+.empty-hint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+  color: var(--color-text-inverse);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-accent);
   }
 }
 
-// Address Card
+/* ---- Address Card ---- */
 .address-card {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 16px 20px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: white;
-  position: relative;
+  transition: all var(--transition-fast);
+  background: var(--color-bg-elevated);
 
   &:hover {
-    border-color: #a0aec0;
-    background: #f7fafc;
+    border-color: var(--color-accent-border-hover);
+    background: var(--color-accent-soft);
   }
 
   &.selected {
-    border-color: #667eea;
-    background: #ebf4ff;
-    box-shadow: 0 0 0 1px #667eea;
-
-    .address-radio ::ng-deep .mat-radio-outer-circle {
-      border-color: #667eea;
-    }
-
-    .address-radio ::ng-deep .mat-radio-inner-circle {
-      background-color: #667eea;
-    }
+    border-color: var(--color-accent);
+    background: var(--color-accent-glow);
+    box-shadow: 0 0 0 1px var(--color-accent-border);
   }
 }
 
-// Radio Button
+/* ---- Custom Radio ---- */
 .address-radio {
-  padding-top: 4px;
+  padding-top: 2px;
   flex-shrink: 0;
+}
 
-  ::ng-deep .mat-radio-label {
-    margin-bottom: 0;
+.radio-outer {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+
+  &.checked {
+    border-color: var(--color-accent);
   }
 }
 
-// Address Details
+.radio-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  animation: popRadio 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popRadio {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+/* ---- Details ---- */
 .address-details {
   flex: 1;
   min-width: 0;
-
-  .address-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 4px;
-
-    .address-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: #2d3748;
-    }
-
-    .address-badge {
-      display: inline-block;
-      
-      ::ng-deep .mat-chip {
-        font-size: 11px;
-        padding: 2px 12px;
-        min-height: 24px;
-      }
-    }
-  }
-
-  .address-line {
-    color: #4a5568;
-    font-size: 14px;
-    line-height: 1.6;
-
-    &.town {
-      font-weight: 500;
-      color: #2d3748;
-    }
-  }
-
-  .address-phone {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 4px;
-    color: #718096;
-    font-size: 13px;
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-  }
 }
 
-// Edit Button
+.address-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.address-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.default-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent-border);
+}
+
+.address-street {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.address-town {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 2px 0 0;
+}
+
+.address-phone {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+
+  svg { flex-shrink: 0; }
+}
+
+/* ---- Edit Button ---- */
 .edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
-  color: #a0aec0;
-  margin-top: -4px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
 
   &:hover {
-    color: #667eea;
-  }
-
-  mat-icon {
-    font-size: 20px;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
   }
 }
 
-// Add Address Button
-.add-address-btn {
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 1px solid #e2e8f0;
+/* ---- Add Button ---- */
+.add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  margin-top: 4px;
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
 
-  button {
-    width: 100%;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-weight: 500;
+  svg { color: var(--color-accent-dim); }
+
+  &:hover {
+    border-color: var(--color-accent-border);
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+
+    svg { color: var(--color-accent); }
   }
 }
 
-// Responsive
 @media (max-width: 600px) {
   .address-card {
-    flex-wrap: wrap;
-    padding: 14px 16px;
+    padding: 14px;
   }
 
   .edit-btn {
@@ -182,15 +250,7 @@
     right: 8px;
   }
 
-  .address-radio {
-    width: 100%;
-  }
-
-  .address-details {
-    width: calc(100% - 40px);
-  }
-
-  .no-addresses {
-    padding: 30px 16px;
+  .empty-state {
+    padding: 32px 16px;
   }
 }

@@ -32,18 +32,20 @@
   }
 
   .clear-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: transparent;
-    border: 1px solid var(--color-border);
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(226, 89, 106, 0.08);
+    border: 1px solid rgba(226, 89, 106, 0.15);
     border-radius: var(--radius-md);
-    color: var(--color-text-muted);
+    color: var(--color-danger, #e2596a);
     font-size: 13px;
-    font-weight: var(--weight-medium);
+    font-weight: var(--weight-semibold, 600);
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
     svg {
       width: 16px;
@@ -51,9 +53,14 @@
     }
 
     &:hover:not(:disabled) {
-      border-color: var(--color-danger-border);
-      color: var(--color-danger);
-      background: var(--color-danger-soft);
+      background: rgba(226, 89, 106, 0.15);
+      border-color: rgba(226, 89, 106, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(226, 89, 106, 0.15);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0) scale(0.97);
     }
 
     &:disabled {

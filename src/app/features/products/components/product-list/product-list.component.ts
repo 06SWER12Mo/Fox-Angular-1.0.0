@@ -2,6 +2,10 @@ import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../core/services/api/product.service';
 import { CartService } from '../../../../core/services/api/cart.service';
+import { AuthModalService } from '../../../../core/services/auth-modal.service';
+import { TokenService } from '../../../../core/services/token.service';
+import { CategoryService } from '../../../../core/services/api/category.service';
+import { Category } from '../../../../core/models/category.model';
 import { Product } from '../../../../core/models/product.model';
 import { PageResponse } from '../../../../core/models/common.model';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -42,6 +46,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   // FIX: stable field created once, instead of a getSortOptions() method
   // called (and returning a brand-new array) on every change detection cycle.
+  categories: Category[] = [];
+  selectedCategoryId: number | null = null;
+
   sortOptions: { value: string; label: string }[] = [
     { value: 'createdAt_DESC', label: 'Newest' },
     { value: 'createdAt_ASC', label: 'Oldest' },
@@ -58,7 +65,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
     private router: Router,
     private fb: FormBuilder,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authModalService: AuthModalService,
+    private tokenService: TokenService,
+    private categoryService: CategoryService
   ) {}
 
   // FIX: getter instead of a getCurrentSort() method call in the template.
@@ -69,11 +79,26 @@ export class ProductListComponent implements OnInit, OnDestroy {
     return `${sortBy}_${sortDirection}`;
   }
 
+  loadCategories(): void {
+    this.categoryService.getActiveRootCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (err) => console.error('Failed to load categories:', err)
+    });
+  }
+
+  onCategorySelect(categoryId: number | null): void {
+    this.selectedCategoryId = categoryId;
+    this.categoryId = categoryId;
+    this.currentPage = 0;
+    this.loadProducts();
+  }
+
   onSearch(keyword: string): void {
-    // Patch the shared filter form so that the debounced valueChanges
-    // subscription picks up the change — but don't emit here because
-    // we'll call loadProducts() ourselves right now (no debounce).
-    this.filterForm.patchValue({ keyword }, { emitEvent: false });
+    // Trim keyword for consistent search quality
+    const trimmed = (keyword || '').trim();
+    this.filterForm.patchValue({ keyword: trimmed }, { emitEvent: false });
     this.currentPage = 0;
     this.loadProducts();
   }
@@ -94,6 +119,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
     if (queryParams['search']) {
       this.filterForm.patchValue({ keyword: queryParams['search'] }, { emitEvent: false });
     }
+
+    // Load categories for the filter dropdown
+    this.loadCategories();
 
     // Kick off the very first product load right away.
     this.loadProducts();
@@ -133,12 +161,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
       onSale: [null]
     });
 
-    // Subscribe to filter changes — debounced to avoid rapid-fire API calls.
-    // distinctUntilChanged with a deep-comparator prevents reloading when the
-    // form is patched back to the same values it already has.
+    // Subscribe to filter changes — small debounce (350ms) so that
+    // typing in price inputs doesn't fire an API call per keystroke,
+    // while click-based toggles/sort still feel nearly instant.
     const filterSub = this.filterForm.valueChanges
       .pipe(
-        debounceTime(500),
+        debounceTime(350),
         distinctUntilChanged(formValuesEqual)
       )
       .subscribe(() => {
@@ -165,6 +193,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   private handleProductsError(error: any, fallbackMessage: string): void {
     this.isLoading = false;
     this.errorMessage = error?.error?.message || fallbackMessage;
+    this.cdr.detectChanges();
     console.error('Error loading products:', error);
   }
 
@@ -175,10 +204,15 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
     const filters = this.filterForm?.value;
 
-    // If category is selected, use category endpoint
-    if (this.categoryId) {
+    // Trim keyword early so all branches can use it
+    const keyword = filters?.keyword?.trim() || undefined;
+
+    // If category is selected without additional filters, use the simple category endpoint
+    const hasPriceFilter = filters?.minPrice || filters?.maxPrice;
+    const hasToggleFilter = filters?.inStock === true || filters?.onSale === true;
+    if (this.categoryId && !keyword && !hasPriceFilter && !hasToggleFilter) {
       this.productService.getActiveProductsByCategory(this.categoryId, this.currentPage, this.pageSize).pipe(
-        finalize(() => this.isLoading = false)
+        finalize(() => { this.isLoading = false; this.cdr.detectChanges(); })
       ).subscribe({
         next: (response) => this.handleProductsResponse(response),
         error: (error) => this.handleProductsError(error, 'Failed to load products')
@@ -187,9 +221,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
     }
 
     // If keyword search, use search endpoint
-    if (filters?.keyword?.trim()) {
-      this.productService.searchProducts(filters.keyword, this.currentPage, this.pageSize).pipe(
-        finalize(() => this.isLoading = false)
+    if (keyword) {
+      this.productService.searchProducts(keyword, this.currentPage, this.pageSize).pipe(
+        finalize(() => { this.isLoading = false; this.cdr.detectChanges(); })
       ).subscribe({
         next: (response) => this.handleProductsResponse(response),
         error: (error) => this.handleProductsError(error, 'Failed to search products')
@@ -198,11 +232,23 @@ export class ProductListComponent implements OnInit, OnDestroy {
     }
 
     // Otherwise, use advanced search
+    // Price range: only send if min <= max, and parse properly
+    // Note: 0 is a valid price (free products), so check explicitly for non-empty
+    const rawMin = filters?.minPrice !== '' && filters?.minPrice != null ? parseFloat(filters.minPrice) : undefined;
+    const rawMax = filters?.maxPrice !== '' && filters?.maxPrice != null ? parseFloat(filters.maxPrice) : undefined;
+    let minPrice = rawMin;
+    let maxPrice = rawMax;
+    if (rawMin !== undefined && rawMax !== undefined && rawMin > rawMax) {
+      // Swap if inverted so the API always receives a valid range
+      minPrice = rawMax;
+      maxPrice = rawMin;
+    }
+
     const searchRequest = {
       categoryId: this.categoryId || undefined,
-      keyword: filters?.keyword || undefined,
-      minPrice: filters?.minPrice ? parseFloat(filters.minPrice) : undefined,
-      maxPrice: filters?.maxPrice ? parseFloat(filters.maxPrice) : undefined,
+      keyword,
+      minPrice,
+      maxPrice,
       inStock: filters?.inStock ?? null,
       onSale: filters?.onSale ?? null,
       sortBy: filters?.sortBy || 'createdAt',
@@ -212,7 +258,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     };
 
     this.productService.advancedSearch(searchRequest).pipe(
-      finalize(() => this.isLoading = false)
+      finalize(() => { this.isLoading = false; this.cdr.detectChanges(); })
     ).subscribe({
       next: (response) => this.handleProductsResponse(response),
       error: (error) => this.handleProductsError(error, 'Failed to load products')
@@ -226,9 +272,27 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   addToCart(productId: number): void {
+    if (!this.tokenService.isAuthenticated()) {
+      this.authModalService.open('login').subscribe(result => {
+        if (result?.success) {
+          // After successful login, proceed to add to cart, then reload to apply auth state
+          this.cartService.addToCart({ productId, quantity: 1 }).subscribe({
+            next: () => {
+              console.log('Product added to cart');
+              window.location.reload();
+            },
+            error: (error) => {
+              console.error('Error adding to cart:', error);
+              window.location.reload();
+            }
+          });
+        }
+      });
+      return;
+    }
+
     this.cartService.addToCart({ productId, quantity: 1 }).subscribe({
       next: () => {
-        // Show success notification (you can add a toast service)
         console.log('Product added to cart');
       },
       error: (error) => {
@@ -247,6 +311,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
       sortBy: 'createdAt',
       sortDirection: 'DESC'
     }, { emitEvent: false });
+    this.selectedCategoryId = null;
+    this.categoryId = null;
     this.currentPage = 0;
     this.loadProducts();
   }

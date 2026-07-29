@@ -1,10 +1,31 @@
-<h2 mat-dialog-title>{{ data.title }}</h2>
-<mat-dialog-content>
-  <p>{{ data.message }}</p>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">{{ data.cancelText }}</button>
-  <button mat-raised-button [color]="data.confirmColor" (click)="onConfirm()">
-    {{ data.confirmText }}
-  </button>
-</mat-dialog-actions>
+<div class="confirm-dialog">
+  <div class="confirm-header">
+    <div class="confirm-icon" [class.danger]="data.confirmColor === 'warn'">
+      <svg viewBox="0 0 24 24" fill="none" *ngIf="data.confirmColor === 'warn'" aria-hidden="true">
+        <path d="M12 3a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1z" fill="currentColor"/>
+        <circle cx="12" cy="20" r="1.2" fill="currentColor"/>
+      </svg>
+      <svg viewBox="0 0 24 24" fill="none" *ngIf="data.confirmColor !== 'warn'" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M12 8v4M12 16h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2 class="confirm-title">{{ data.title }}</h2>
+  </div>
+
+  <div class="confirm-body">
+    <p class="confirm-message">{{ data.message }}</p>
+  </div>
+
+  <div class="confirm-actions">
+    <button class="btn btn-ghost" (click)="onCancel()">{{ data.cancelText }}</button>
+    <button 
+      class="btn" 
+      [class.btn-danger]="data.confirmColor === 'warn'" 
+      [class.btn-accent]="data.confirmColor !== 'warn'"
+      (click)="onConfirm()"
+    >
+      {{ data.confirmText }}
+    </button>
+  </div>
+</div>

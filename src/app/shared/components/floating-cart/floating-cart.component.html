@@ -1,0 +1,17 @@
+<div class="floating-cart" *ngIf="isVisible && cartItemCount > 0" [class.bump]="justIncreased">
+  <a routerLink="/cart" class="floating-cart-link">
+    <div class="cart-icon-wrapper">
+      <svg class="cart-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M3 6h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="cart-badge">{{ cartItemCount }}</span>
+    </div>
+    <div class="cart-info">
+      <span class="cart-label">Cart</span>
+      <span class="cart-count">{{ cartItemCount }} {{ cartItemCount === 1 ? 'item' : 'items' }}</span>
+    </div>
+    <span class="view-cart-btn">View Cart</span>
+  </a>
+</div>

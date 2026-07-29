@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, filter, finalize } from 'rxjs/operators';
+import { AuthModalService } from '../../../core/services/auth-modal.service';
 import { AuthService } from '../../../core/services/api/auth.service';
 import { CartService } from '../../../core/services/api/cart.service';
 import { ProductService } from '../../../core/services/api/product.service';
@@ -52,6 +53,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
+    private authModalService: AuthModalService,
     private cartService: CartService,
     private productService: ProductService,
     private categoryService: CategoryService,
@@ -72,11 +74,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscribeToAuthChanges();
     this.initSearch();
 
-    // Reactively update user data when it changes (e.g., avatar upload)
+    // Reactively update user data when it changes (e.g., avatar upload, login, register)
     this.subscriptions.push(
       this.tokenService.userData$.subscribe(user => {
         if (user) {
           this.user = user;
+          this.isAuthenticated = true; // Immediately reflect auth state in the UI
           this.avatarImgError = false; // Reset avatar error so new images are retried
         }
       })
@@ -189,20 +192,33 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscriptions.push(navSub);
   }
 
+  openAuthModal(mode: 'login' | 'register' = 'login'): void {
+    this.authModalService.open(mode).subscribe(result => {
+      if (result?.success) {
+        // Full page reload to ensure all components reinitialize with auth state
+        window.location.reload();
+      }
+    });
+    this.closeMenu();
+    this.isUserMenuOpen = false;
+  }
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
         this.isAuthenticated = false;
         this.user = null;
         this.cartService.resetCartCount();
-        this.router.navigate(['/auth/login']);
+        // Full page reload to ensure all components reinitialize without auth
+        window.location.href = '/';
       },
       error: () => {
         this.tokenService.clearAll();
         this.isAuthenticated = false;
         this.user = null;
         this.cartService.resetCartCount();
-        this.router.navigate(['/auth/login']);
+        // Full page reload to ensure all components reinitialize without auth
+        window.location.href = '/';
       }
     });
   }

@@ -19,7 +19,7 @@ export class NoAuthGuard implements CanActivate {
 
   canActivate(): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     if (this.tokenService.isAuthenticated()) {
-      return this.router.createUrlTree(['/dashboard']);
+      return this.router.createUrlTree(['/auth/profile']);
     }
     return true;
   }

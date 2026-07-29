@@ -70,6 +70,14 @@ export class UserService {
     return this.http.put<void>(`${this.apiUrl}/${id}/verify`, {});
   }
 
+  requestEmailVerification(): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/me/request-verification`, {});
+  }
+
+  cancelEmailVerification(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/me/request-verification`);
+  }
+
   updateUserRole(id: number, role: string): Observable<void> {
     const params = new HttpParams().set('role', role);
     return this.http.put<void>(`${this.apiUrl}/${id}/role`, null, { params });

@@ -1,37 +1,41 @@
-<form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-form">
-  <div class="search-field" [class.focused]="isFocused">
-    <svg class="search-field__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-      <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-
-    <input
-      class="search-field__input"
-      type="text"
-      formControlName="keyword"
-      placeholder="Search by name, description..."
-      (focus)="isFocused = true"
-      (blur)="isFocused = false"
-    />
-
-    <button
-      *ngIf="searchForm.get('keyword')?.value"
-      type="button"
-      class="search-field__clear"
-      aria-label="Clear search"
-      (click)="clearSearch()"
-    >
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+<form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-bar-row">
+  <div class="search-container" [class.focused]="isFocused" [class.has-value]="!!searchForm.get('keyword')?.value">
+    <div class="search-form-inner">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
-    </button>
+
+      <input
+        class="search-input"
+        type="text"
+        formControlName="keyword"
+        placeholder="Search by name, description..."
+        (focus)="isFocused = true"
+        (blur)="isFocused = false"
+        autocomplete="off"
+        spellcheck="false"
+      />
+
+      <button
+        *ngIf="searchForm.get('keyword')?.value"
+        type="button"
+        class="search-clear"
+        aria-label="Clear search"
+        (click)="clearSearch()"
+      >
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <button type="submit" class="search-btn">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <button type="submit" class="search-submit" aria-label="Search">
+    <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
       <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-      <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
     <span>Search</span>
   </button>
