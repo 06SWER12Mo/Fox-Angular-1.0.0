@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { 
   BigArea, 
@@ -10,7 +11,7 @@ import {
   DeliveryAddress, 
   DeliveryAddressRequest 
 } from '../../models/location.model';
-import { PageResponse } from '../../models/common.model';
+import { ApiResponse, PageResponse } from '../../models/common.model';
 
 @Injectable({
   providedIn: 'root'
@@ -127,19 +128,23 @@ export class LocationService {
 
   // Current user self endpoints
   addAddressForCurrentUser(request: DeliveryAddressRequest): Observable<DeliveryAddress> {
-    return this.http.post<DeliveryAddress>(`${this.apiUrl}/users/me/addresses`, request);
+    return this.http.post<ApiResponse<DeliveryAddress>>(`${this.apiUrl}/users/me/addresses`, request)
+      .pipe(map(res => res.data));
   }
 
   getCurrentUserAddresses(): Observable<DeliveryAddress[]> {
-    return this.http.get<DeliveryAddress[]>(`${this.apiUrl}/users/me/addresses`);
+    return this.http.get<ApiResponse<DeliveryAddress[]>>(`${this.apiUrl}/users/me/addresses`)
+      .pipe(map(res => res.data));
   }
 
   getCurrentUserDefaultAddress(): Observable<DeliveryAddress> {
-    return this.http.get<DeliveryAddress>(`${this.apiUrl}/users/me/addresses/default`);
+    return this.http.get<ApiResponse<DeliveryAddress>>(`${this.apiUrl}/users/me/addresses/default`)
+      .pipe(map(res => res.data));
   }
 
   updateCurrentUserAddress(addressId: number, request: DeliveryAddressRequest): Observable<DeliveryAddress> {
-    return this.http.put<DeliveryAddress>(`${this.apiUrl}/users/me/addresses/${addressId}`, request);
+    return this.http.put<ApiResponse<DeliveryAddress>>(`${this.apiUrl}/users/me/addresses/${addressId}`, request)
+      .pipe(map(res => res.data));
   }
 
   deleteCurrentUserAddress(addressId: number): Observable<void> {
@@ -152,19 +157,23 @@ export class LocationService {
 
   // Admin or Self endpoints
   addAddress(userId: number, request: DeliveryAddressRequest): Observable<DeliveryAddress> {
-    return this.http.post<DeliveryAddress>(`${this.apiUrl}/users/${userId}/addresses`, request);
+    return this.http.post<ApiResponse<DeliveryAddress>>(`${this.apiUrl}/users/${userId}/addresses`, request)
+      .pipe(map(res => res.data));
   }
 
   getUserAddresses(userId: number): Observable<DeliveryAddress[]> {
-    return this.http.get<DeliveryAddress[]>(`${this.apiUrl}/users/${userId}/addresses`);
+    return this.http.get<ApiResponse<DeliveryAddress[]>>(`${this.apiUrl}/users/${userId}/addresses`)
+      .pipe(map(res => res.data));
   }
 
   getDefaultAddress(userId: number): Observable<DeliveryAddress> {
-    return this.http.get<DeliveryAddress>(`${this.apiUrl}/users/${userId}/addresses/default`);
+    return this.http.get<ApiResponse<DeliveryAddress>>(`${this.apiUrl}/users/${userId}/addresses/default`)
+      .pipe(map(res => res.data));
   }
 
   updateAddress(userId: number, addressId: number, request: DeliveryAddressRequest): Observable<DeliveryAddress> {
-    return this.http.put<DeliveryAddress>(`${this.apiUrl}/users/${userId}/addresses/${addressId}`, request);
+    return this.http.put<ApiResponse<DeliveryAddress>>(`${this.apiUrl}/users/${userId}/addresses/${addressId}`, request)
+      .pipe(map(res => res.data));
   }
 
   deleteAddress(userId: number, addressId: number): Observable<void> {

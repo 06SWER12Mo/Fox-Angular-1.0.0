@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../../../core/services/api/order.service';
+import { PaymentService } from '../../../../core/services/api/payment.service';
 import { Order } from '../../../../core/models/order.model';
-import { OrderStatus } from '../../../../core/models/enums.model';
+import { OrderStatus, PaymentMethod } from '../../../../core/models/enums.model';
 
 @Component({
   selector: 'app-order-detail',
@@ -14,11 +15,19 @@ export class OrderDetailComponent implements OnInit {
   order: Order | null = null;
   isLoading = true;
   errorMessage = '';
+  showCancelModal = false;
+  isCancelling = false;
+  showPayModal = false;
+  selectedPayMethod: string = 'PAYPAL';
+  isPaying = false;
+  paymentMethods = Object.values(PaymentMethod);
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private paymentService: PaymentService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -31,13 +40,16 @@ export class OrderDetailComponent implements OnInit {
 
   loadOrder(id: number): void {
     this.isLoading = true;
+    this.errorMessage = '';
     this.orderService.getOrderById(id).subscribe({
       next: (response: any) => {
         this.order = response?.data || response;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.errorMessage = error?.error?.message || 'Failed to load order';
         console.error('Error loading order:', error);
       }
@@ -78,18 +90,58 @@ export class OrderDetailComponent implements OnInit {
            status === OrderStatus.READY_FOR_SHIPPING;
   }
 
-  cancelOrder(): void {
+  isPendingPayment(): boolean {
+    return this.order?.orderStatus === 'PENDING_PAYMENT';
+  }
+
+  openPayModal(): void {
+    this.selectedPayMethod = 'PAYPAL';
+    this.showPayModal = true;
+  }
+
+  closePayModal(): void {
+    this.showPayModal = false;
+    this.selectedPayMethod = 'PAYPAL';
+  }
+
+  confirmPay(): void {
     if (!this.order) return;
-    if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(this.order.id).subscribe({
-        next: () => {
-          this.loadOrder(this.order!.id);
-        },
-        error: (error) => {
-          console.error('Error cancelling order:', error);
-        }
-      });
-    }
+    this.isPaying = true;
+    this.paymentService.processPayment({
+      orderId: this.order.id,
+      paymentMethod: this.selectedPayMethod as 'PAYPAL' | 'CREDIT_CARD' | 'BANK_TRANSFER'
+    }).subscribe({
+      next: () => {
+        this.isPaying = false;
+        this.closePayModal();
+        this.loadOrder(this.order!.id);
+      },
+      error: (error) => {
+        this.isPaying = false;
+        this.errorMessage = error?.error?.message || 'Payment failed. Please try again.';
+        console.error('Payment error:', error);
+      }
+    });
+  }
+
+  openCancelModal(): void {
+    this.showCancelModal = true;
+  }
+
+  confirmCancel(): void {
+    if (!this.order) return;
+    this.isCancelling = true;
+    this.orderService.cancelOrder(this.order.id).subscribe({
+      next: () => {
+        this.isCancelling = false;
+        this.showCancelModal = false;
+        this.loadOrder(this.order!.id);
+      },
+      error: (error) => {
+        this.isCancelling = false;
+        console.error('Error cancelling order:', error);
+      }
+    });
   }
 
   trackOrder(): void {

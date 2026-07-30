@@ -321,9 +321,9 @@
                 <div class="form-field-inner">
                   <label class="form-label">Address Type</label>
                   <select formControlName="addressType" class="form-input">
-                    <option value="home">🏠 Home</option>
-                    <option value="work">🏢 Work</option>
-                    <option value="other">📍 Other</option>
+                    <option value="home">Home</option>
+                    <option value="work">Work</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
                 <div class="form-field-inner checkbox-field">
@@ -358,7 +358,26 @@
           <div class="address-item" *ngFor="let addr of addresses">
             <div class="addr-badge" *ngIf="addr.isDefault">Default</div>
             <div class="addr-main">
-              <div class="addr-type-icon">{{ getAddressTypeIcon(addr.addressType) }}</div>
+              <div class="addr-type-icon">
+                <ng-container [ngSwitch]="getAddressTypeIcon(addr.addressType)">
+                  <svg *ngSwitchCase="'home'" viewBox="0 0 24 24" fill="none" width="20" height="20">
+                    <path d="M3 10l9-7 9 7v10a1 1 0 01-1 1H4a1 1 0 01-1-1V10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <svg *ngSwitchCase="'work'" viewBox="0 0 24 24" fill="none" width="20" height="20">
+                    <rect x="2" y="7" width="20" height="15" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M16 22V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v17" stroke="currentColor" stroke-width="1.8"/>
+                    <circle cx="9" cy="12" r="1" fill="currentColor"/>
+                    <circle cx="15" cy="12" r="1" fill="currentColor"/>
+                    <circle cx="9" cy="16" r="1" fill="currentColor"/>
+                    <circle cx="15" cy="16" r="1" fill="currentColor"/>
+                  </svg>
+                  <svg *ngSwitchDefault viewBox="0 0 24 24" fill="none" width="20" height="20">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8"/>
+                    <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                </ng-container>
+              </div>
               <div class="addr-details">
                 <div class="addr-line1">{{ addr.addressLine1 }}, {{ addr.street }}</div>
                 <div class="addr-line2" *ngIf="addr.building || addr.townName">

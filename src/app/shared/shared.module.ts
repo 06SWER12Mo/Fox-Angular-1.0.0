@@ -48,6 +48,8 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
 import { FloatingCartComponent } from './components/floating-cart/floating-cart.component';
+import { AdminHeaderComponent } from './components/admin-header/admin-header.component';
+import { AdminFooterComponent } from './components/admin-footer/admin-footer.component';
 
 const MATERIAL_MODULES = [
   MatToolbarModule,
@@ -88,7 +90,9 @@ const COMPONENTS = [
   ConfirmationDialogComponent,
   PaginationComponent,
   AuthModalComponent,
-  FloatingCartComponent
+  FloatingCartComponent,
+  AdminHeaderComponent,
+  AdminFooterComponent
 ];
 
 @NgModule({
@@ -115,6 +119,8 @@ const COMPONENTS = [
     ...COMPONENTS,
     FloatingCartComponent,
     AuthModalComponent,
+    AdminHeaderComponent,
+    AdminFooterComponent,
     CurrencyPipe,
     TruncatePipe,
     StatusColorPipe,

@@ -1,0 +1,55 @@
+<div class="admin-page form-page">
+  <div class="page-header">
+    <div>
+      <h1>{{ isEditing ? 'Edit Category' : 'Add Category' }}</h1>
+      <p class="page-subtitle">{{ isEditing ? 'Update category details' : 'Create a new category' }}</p>
+    </div>
+  </div>
+
+  <div class="form-card" *ngIf="!isLoading" style="max-width:600px;">
+    <form [formGroup]="categoryForm" (ngSubmit)="save()">
+      <div class="form-grid">
+        <div class="form-field span-2">
+          <label>Category Name <span class="required">*</span></label>
+          <input type="text" formControlName="name" placeholder="Category name" class="form-input">
+        </div>
+        <div class="form-field span-2">
+          <label>Description</label>
+          <textarea formControlName="description" placeholder="Category description" class="form-input form-textarea" rows="3"></textarea>
+        </div>
+        <div class="form-field span-2" style="flex-direction:row;gap:12px;">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="active">
+            <span class="checkbox-custom"></span>
+            <span>Active</span>
+          </label>
+        </div>
+        <div class="form-field span-2">
+          <label>Category Image</label>
+          <div class="image-upload-area" (click)="fileInput.click()">
+            <input #fileInput type="file" accept="image/*" (change)="onImageSelected($event)" hidden>
+            <div class="upload-placeholder" *ngIf="!imagePreview">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.8"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.8"/></svg>
+              <span>Click to upload image</span>
+            </div>
+            <img *ngIf="imagePreview" [src]="imagePreview" class="image-preview" alt="">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="categoryForm.invalid || isSaving">
+          {{ isSaving ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="admin-page" *ngIf="isLoading" style="text-align:center;padding:80px 0;">
+  <div class="spinner"></div>
+  <p style="color:var(--color-text-muted);margin-top:16px;">Loading category...</p>
+</div>

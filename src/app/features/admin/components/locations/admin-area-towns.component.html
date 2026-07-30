@@ -1,0 +1,170 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <a class="breadcrumb-link" (click)="goBack()">Areas &amp; Towns</a>
+        <svg class="breadcrumb-chevron" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="breadcrumb-current">{{ area?.name || 'Loading...' }}</span>
+      </div>
+      <h1>{{ area?.name || 'Area Towns' }}</h1>
+      <p class="page-subtitle">{{ filteredTowns.length }} town{{ filteredTowns.length !== 1 ? 's' : '' }} in this area</p>
+    </div>
+    <div class="header-actions">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" class="search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/></svg>
+        <input type="text" placeholder="Search towns..." [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" class="search-input">
+      </div>
+      <button class="btn btn-primary" (click)="openAddTown()">
+        <svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Add Town
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="table-skeleton">
+    <div class="skeleton-line" *ngFor="let _ of [1,2,3,4,5]"></div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredTowns.length === 0" class="empty-state">
+    <svg class="empty-icon" viewBox="0 0 80 80" fill="none">
+      <circle cx="40" cy="30" r="12" stroke="currentColor" stroke-width="2.5"/>
+      <path d="M20 60c0-11.05 8.95-20 20-20s20 8.95 20 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <h3 class="empty-title" *ngIf="!searchQuery">No towns in this area yet</h3>
+    <h3 class="empty-title" *ngIf="searchQuery">No towns match your search</h3>
+    <p class="empty-desc" *ngIf="!searchQuery">Start by adding the first town to {{ area?.name }}.</p>
+    <p class="empty-desc" *ngIf="searchQuery">Try a different search term.</p>
+    <button *ngIf="!searchQuery" class="btn btn-primary" (click)="openAddTown()">Add Your First Town</button>
+  </div>
+
+  <!-- Towns Table -->
+  <div class="table-card" *ngIf="!isLoading && filteredTowns.length > 0">
+    <div class="table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Town</th>
+            <th>Code</th>
+            <th>ZIP Code</th>
+            <th>Delivery Fee</th>
+            <th>Delivery</th>
+            <th>Status</th>
+            <th style="width:180px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let town of filteredTowns">
+            <td><strong>{{ town.name }}</strong></td>
+            <td><code class="code-tag">{{ town.code || '—' }}</code></td>
+            <td>{{ town.zipCode || '—' }}</td>
+            <td><span class="fee-pill">${{ town.deliveryFee || '0' }}</span></td>
+            <td>
+              <span class="status-pill" [class.active]="town.deliveryAvailable !== false" [class.inactive]="town.deliveryAvailable === false">
+                {{ town.deliveryAvailable !== false ? 'Yes' : 'No' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-dot" [class.active]="town.active !== false" [class.inactive]="town.active === false"></span>
+              {{ town.active !== false ? 'Active' : 'Inactive' }}
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" (click)="openEditTown(town)" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+                <button class="action-btn" (click)="toggleTownDelivery(town)" [title]="town.deliveryAvailable ? 'Disable delivery' : 'Enable delivery'">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M1 3h14v12H1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 7h3l5 4v4h-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="17" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="17" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+                <button class="action-btn" (click)="toggleTownActive(town)" [title]="town.active ? 'Deactivate' : 'Activate'">
+                  <svg viewBox="0 0 24 24" fill="none"><rect x="1" y="5" width="22" height="14" rx="7" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="12" r="3" fill="currentColor"/></svg>
+                </button>
+                <button class="action-btn action-danger" (click)="requestDelete(town.id, town.name)" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TOWN MODAL ========== -->
+<div class="modal-overlay" *ngIf="showTownModal" (click)="closeTownModal()"></div>
+<div class="modal" *ngIf="showTownModal">
+  <div class="modal-header">
+    <h2>{{ isEditingTown ? 'Edit Town' : 'Add New Town' }}</h2>
+    <button class="modal-close" (click)="closeTownModal()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-field">
+        <label>Town Name <span class="required">*</span></label>
+        <input type="text" class="form-input" [(ngModel)]="townForm.name" placeholder="e.g. Downtown">
+      </div>
+      <div class="form-field">
+        <label>Code</label>
+        <input type="text" class="form-input" [(ngModel)]="townForm.code" placeholder="e.g. DT-001">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Zip Code</label>
+        <input type="text" class="form-input" [(ngModel)]="townForm.zipCode" placeholder="e.g. 10001">
+      </div>
+      <div class="form-field">
+        <label>Delivery Fee</label>
+        <input type="number" class="form-input" [(ngModel)]="townForm.deliveryFee" min="0" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Display Order</label>
+        <input type="number" class="form-input" [(ngModel)]="townForm.displayOrder" min="0" placeholder="0">
+      </div>
+      <div class="form-field form-check-field">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="townForm.deliveryAvailable">
+          <span class="checkbox-custom"></span>
+          <span>Delivery Available</span>
+        </label>
+      </div>
+    </div>
+    <div class="form-field">
+      <label>Description</label>
+      <textarea class="form-input form-textarea" [(ngModel)]="townForm.description" placeholder="Optional description..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="closeTownModal()">Cancel</button>
+    <button class="btn btn-primary" (click)="saveTown()" [disabled]="isSavingTown || !townForm.name">
+      <span *ngIf="isSavingTown" class="spinner"></span>
+      {{ isSavingTown ? 'Saving...' : isEditingTown ? 'Update Town' : 'Add Town' }}
+    </button>
+  </div>
+</div>
+
+<!-- ========== DELETE CONFIRMATION ========== -->
+<div class="modal-overlay" *ngIf="confirmDelete" (click)="cancelDelete()"></div>
+<div class="modal modal-sm" *ngIf="confirmDelete">
+  <div class="modal-header">
+    <h2>Confirm Deletion</h2>
+    <button class="modal-close" (click)="cancelDelete()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p style="margin:0;line-height:1.6;font-size:var(--text-sm);color:var(--color-text-secondary);">
+      Are you sure you want to delete <strong>{{ confirmDelete.name }}</strong>? This action cannot be undone.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="cancelDelete()">Cancel</button>
+    <button class="btn btn-primary" style="background:var(--color-danger);" (click)="confirmDeleteAction()">Delete</button>
+  </div>
+</div>

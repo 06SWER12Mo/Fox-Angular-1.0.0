@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { StoreSettings, StoreSettingsRequest } from '../../models/store.model';
 
@@ -11,6 +12,11 @@ export class StoreService {
   private apiUrl = `${environment.apiUrl}/store-settings`;
 
   constructor(private http: HttpClient) {}
+
+  /** Unwrap the backend's ApiResponse wrapper */
+  private unwrap<T>(obs: Observable<any>): Observable<T> {
+    return obs.pipe(map((res: any) => res?.data ?? res));
+  }
 
   // ========== PUBLIC ENDPOINTS ==========
 
@@ -49,17 +55,17 @@ export class StoreService {
   // ========== ADMIN/MANAGER ENDPOINTS ==========
 
   getSettings(): Observable<StoreSettings> {
-    return this.http.get<StoreSettings>(this.apiUrl);
+    return this.unwrap<StoreSettings>(this.http.get(this.apiUrl));
   }
 
   updateSettings(request: StoreSettingsRequest): Observable<StoreSettings> {
-    return this.http.put<StoreSettings>(this.apiUrl, request);
+    return this.unwrap<StoreSettings>(this.http.put(this.apiUrl, request));
   }
 
   uploadLogo(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<any>(`${this.apiUrl}/logo`, formData);
+    return this.http.post(`${this.apiUrl}/logo`, formData).pipe(map((res: any) => res?.data ?? res));
   }
 
   deleteLogo(): Observable<void> {

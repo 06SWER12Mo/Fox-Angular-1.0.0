@@ -1,0 +1,206 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1>Users</h1>
+      <p class="page-subtitle">Manage customer and staff accounts</p>
+    </div>
+    <div class="header-actions">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" class="search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/></svg>
+        <input type="text" placeholder="Search users..." [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" class="search-input">
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="table-skeleton">
+      <div class="skeleton-line" *ngFor="let _ of [1,2,3,4,5]"></div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && errorMessage" class="empty-state error-state">
+      <svg viewBox="0 0 80 80" fill="none" class="empty-icon error-icon">
+        <circle cx="40" cy="40" r="28" stroke="var(--color-danger)" stroke-width="2" opacity="0.5"/>
+        <path d="M40 24v20M40 50v2" stroke="var(--color-danger)" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h3 class="empty-title" style="color:var(--color-danger);">Access Denied</h3>
+      <p class="empty-desc">{{ errorMessage }}</p>
+      <button class="btn btn-primary" style="margin-top:12px;" (click)="loadUsers()">Retry</button>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && !errorMessage && filteredUsers.length === 0" class="empty-state">
+      <svg viewBox="0 0 80 80" fill="none" class="empty-icon">
+        <circle cx="40" cy="25" r="14" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 68c0-15.4 12.5-28 28-28s28 12.6 28 28" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <h3 class="empty-title" *ngIf="users.length === 0">No users found</h3>
+      <h3 class="empty-title" *ngIf="users.length > 0">No results found</h3>
+      <p class="empty-desc" *ngIf="users.length === 0">Users will appear here once they register on the store.</p>
+      <p class="empty-desc" *ngIf="users.length > 0">No users match your search query.</p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="!isLoading && filteredUsers.length > 0">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Verified</th>
+            <th>Joined</th>
+            <th style="width:240px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filteredUsers">
+            <td>
+              <div class="user-cell">
+                <span class="user-avatar">{{ (u.firstName || u.username || 'U')[0] }}{{ (u.lastName || '')[0] }}</span>
+                <div class="user-name-group">
+                  <strong class="user-name">{{ u.firstName || u.username }} {{ u.lastName || '' }}</strong>
+                  <span class="user-handle">@{{ u.username }}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{ u.email }}</td>
+            <td>
+              <span class="role-badge">
+                {{ u.role }}
+              </span>
+            </td>
+            <td>
+              <span class="user-status">
+                <span class="status-dot" [class.active]="u.enabled !== false" [class.inactive]="u.enabled === false"></span>
+                <span *ngIf="u.enabled !== false && !u.locked">Active</span>
+                <span *ngIf="u.enabled === false" style="color:var(--color-text-muted);">Disabled</span>
+                <span *ngIf="u.locked" style="color:var(--color-danger);">Locked</span>
+              </span>
+            </td>
+            <td>
+              <span class="verify-badge" [class.verified]="u.emailVerified" [class.unverified]="!u.emailVerified">
+                {{ u.emailVerified ? 'Verified' : 'Unverified' }}
+              </span>
+            </td>
+            <td class="date-cell">{{ u.createdAt | date: 'MMM dd, yyyy' }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-show-towns" (click)="viewUser(u.id)" title="View user details">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s3-6 7-6 7 6 7 6-3 6-7 6-7-6-7-6z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                  View Details
+                </button>
+                <button class="action-btn" (click)="toggleEnabled(u)" [title]="u.enabled !== false ? 'Disable account' : 'Enable account'">
+                  <svg *ngIf="u.enabled !== false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                  <svg *ngIf="u.enabled === false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+                <button class="action-btn" (click)="toggleLock(u)" [title]="u.locked ? 'Unlock' : 'Lock'">
+                  <svg *ngIf="!u.locked" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V7a4 4 0 118 0v4" stroke="currentColor" stroke-width="1.8"/></svg>
+                  <svg *ngIf="u.locked" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8" opacity="0.4"/><path d="M8 11V7a4 4 0 118 0v4" stroke="currentColor" stroke-width="1.8" opacity="0.4"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor" opacity="0.4"/></svg>
+                </button>
+                <button class="action-btn" *ngIf="!u.emailVerified" (click)="verifyEmail(u)" title="Verify email">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+                <button class="action-btn" (click)="openRoleModal(u)" title="Change role">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+                <button class="action-btn action-danger" (click)="requestDelete(u)" title="Delete user">
+                  <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-footer" *ngIf="!isLoading && filteredUsers.length > 0">
+      <div class="pagination">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} users)</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage >= totalPages - 1">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ROLE CHANGE MODAL ========== -->
+<div class="modal-overlay" *ngIf="showRoleModal" (click)="closeRoleModal()"></div>
+<div class="modal modal-sm" *ngIf="showRoleModal">
+  <div class="modal-header">
+    <h2>Change User Role</h2>
+    <button class="modal-close" (click)="closeRoleModal()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p style="margin:0 0 14px;font-size:var(--text-sm);color:var(--color-text-secondary);line-height:1.6;">
+      Change role for <strong>{{ roleUser?.firstName || roleUser?.username }} {{ roleUser?.lastName || '' }}</strong>
+    </p>
+    <div class="role-options">
+      <label class="role-option" [class.selected]="selectedRole === 'USER'" (click)="selectedRole = 'USER'">
+        <input type="radio" name="role" value="USER" [(ngModel)]="selectedRole">
+        <div class="role-option-content">
+          <span class="role-option-title">Customer</span>
+          <span class="role-option-desc">Regular store customer</span>
+        </div>
+        <span class="role-badge">USER</span>
+      </label>
+      <label class="role-option" [class.selected]="selectedRole === 'MANAGER'" (click)="selectedRole = 'MANAGER'">
+        <input type="radio" name="role" value="MANAGER" [(ngModel)]="selectedRole">
+        <div class="role-option-content">
+          <span class="role-option-title">Manager</span>
+          <span class="role-option-desc">Can manage the store</span>
+        </div>
+        <span class="role-badge">MANAGER</span>
+      </label>
+      <label class="role-option" [class.selected]="selectedRole === 'ADMIN'" (click)="selectedRole = 'ADMIN'">
+        <input type="radio" name="role" value="ADMIN" [(ngModel)]="selectedRole">
+        <div class="role-option-content">
+          <span class="role-option-title">Administrator</span>
+          <span class="role-option-desc">Full system access</span>
+        </div>
+        <span class="role-badge">ADMIN</span>
+      </label>
+    </div>
+
+    <!-- Confirmation -->
+    <div class="role-confirm-section">
+      <label class="role-confirm-label">
+        Type <strong>confirm</strong> to proceed
+      </label>
+      <input type="text" class="form-input" [(ngModel)]="roleConfirmText" placeholder='Type "confirm" to proceed' autocomplete="off">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="closeRoleModal()">Cancel</button>
+    <button class="btn btn-primary" (click)="saveRole()" [disabled]="isSavingRole || roleConfirmText.trim().toLowerCase() !== 'confirm'">
+      <span *ngIf="isSavingRole" class="spinner"></span>
+      {{ isSavingRole ? 'Saving...' : 'Update Role' }}
+    </button>
+  </div>
+</div>
+
+<!-- ========== DELETE CONFIRMATION ========== -->
+<div class="modal-overlay" *ngIf="confirmDelete" (click)="cancelDelete()"></div>
+<div class="modal modal-sm" *ngIf="confirmDelete">
+  <div class="modal-header">
+    <h2>Delete User</h2>
+    <button class="modal-close" (click)="cancelDelete()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p style="margin:0;line-height:1.6;font-size:var(--text-sm);color:var(--color-text-secondary);">
+      Are you sure you want to delete <strong>{{ confirmDelete.firstName || confirmDelete.username }} {{ confirmDelete.lastName || '' }}</strong>?
+      This action cannot be undone.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="cancelDelete()">Cancel</button>
+    <button class="btn btn-primary" style="background:var(--color-danger);" (click)="confirmDeleteAction()">Delete</button>
+  </div>
+</div>

@@ -1,0 +1,168 @@
+<div class="admin-page form-page">
+  <div class="page-header">
+    <div>
+      <h1>New Receipt</h1>
+      <p class="page-subtitle">Create a receipt to record incoming stock from a supplier</p>
+    </div>
+  </div>
+
+  <div class="receipt-form-card">
+    <form [formGroup]="receiptForm" (ngSubmit)="save()">
+      <!-- Header Section -->
+      <div class="form-section">
+        <h2 class="section-title">Receipt Information</h2>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Supplier <span class="required">*</span></label>
+            <select formControlName="supplierId" class="form-input">
+              <option [ngValue]="null">Select supplier...</option>
+              <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s.name }} ({{ s.code }})</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Receipt Date</label>
+            <input type="date" formControlName="receiptDate" class="form-input">
+          </div>
+
+          <div class="form-field">
+            <label>Receipt Type</label>
+            <select formControlName="receiptType" class="form-input">
+              <option value="PURCHASE">Purchase</option>
+              <option value="RETURN">Return</option>
+              <option value="ADJUSTMENT">Adjustment</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Payment Method</label>
+            <select formControlName="paymentMethod" class="form-input">
+              <option value="">Select...</option>
+              <option value="CASH">Cash</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+              <option value="CHECK">Check</option>
+              <option value="CREDIT">Credit</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Notes</label>
+          <textarea formControlName="notes" class="form-input form-textarea" rows="2" placeholder="Additional notes..."></textarea>
+        </div>
+      </div>
+
+      <!-- Items Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h2 class="section-title">Items</h2>
+          <button type="button" class="btn btn-sm btn-outline" (click)="addItem()">
+            <svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            Add Item
+          </button>
+        </div>
+
+        <div class="receipt-items" formArrayName="items">
+          <div *ngFor="let item of items.controls; let i = index" class="receipt-item-row" [formGroupName]="i">
+            <div class="item-header">
+              <span class="item-number">Item #{{ i + 1 }}</span>
+              <button *ngIf="items.length > 1" type="button" class="btn-icon btn-icon-danger" (click)="removeItem(i)" title="Remove item">
+                <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <div class="item-fields">
+              <div class="item-field product-field">
+                <label>Product <span class="required">*</span></label>
+                <div class="product-search-wrapper">
+                  <input type="text"
+                    class="form-input"
+                    [value]="item.get('productName')?.value"
+                    (input)="onSearchProduct(i, $any($event.target).value)"
+                    (focus)="onProductInputFocus(i)"
+                    (blur)="onProductInputBlur(i)"
+                    placeholder="Search product..."
+                    autocomplete="off">
+                  <div class="product-search-dropdown" *ngIf="showProductDropdown[i] && productResults[i]?.length">
+                    <div class="product-option"
+                      *ngFor="let p of productResults[i]"
+                      (mousedown)="selectProduct(i, p)">
+                      <span class="product-option-name">{{ p.name }}</span>
+                      <span class="product-option-sku">{{ p.sku || '—' }}</span>
+                      <span class="product-option-price">{{ p.price | currency }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item-field">
+                <label>Qty <span class="required">*</span></label>
+                <input type="number" formControlName="quantity" class="form-input" min="1" step="1">
+              </div>
+
+              <div class="item-field">
+                <label>Unit Price <span class="required">*</span></label>
+                <input type="number" formControlName="unitPrice" class="form-input" min="0.01" step="0.01">
+              </div>
+
+              <div class="item-field">
+                <label>Disc %</label>
+                <input type="number" formControlName="discountPercent" class="form-input" min="0" max="100" step="0.1">
+              </div>
+
+              <div class="item-field">
+                <label>Tax %</label>
+                <input type="number" formControlName="taxPercent" class="form-input" min="0" max="100" step="0.1">
+              </div>
+
+              <div class="item-field">
+                <label>Notes</label>
+                <input type="text" formControlName="notes" class="form-input" placeholder="Optional">
+              </div>
+
+              <div class="item-field item-total">
+                <label>Total</label>
+                <div class="item-total-value">{{ getItemTotal(i) | currency }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals Summary -->
+      <div class="totals-section">
+        <div class="totals-card">
+          <div class="total-row">
+            <span class="total-label">Subtotal (Items)</span>
+            <span class="total-value">{{ subtotal | currency }}</span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">Shipping Cost</span>
+            <span class="total-value">
+              <input type="number" formControlName="shippingCost" class="total-input" min="0" step="0.01">
+            </span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">Discount</span>
+            <span class="total-value">
+              <input type="number" formControlName="discountAmount" class="total-input" min="0" step="0.01">
+            </span>
+          </div>
+          <div class="total-row total-row-grand">
+            <span class="total-label">Grand Total</span>
+            <span class="total-value total-value-grand">{{ grandTotal | currency }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="receiptForm.invalid || isSaving">
+          <span *ngIf="isSaving" class="spinner"></span>
+          {{ isSaving ? 'Creating Receipt...' : 'Create Receipt' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

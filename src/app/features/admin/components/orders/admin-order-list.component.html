@@ -1,0 +1,80 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1>Orders</h1>
+      <p class="page-subtitle">Manage customer orders</p>
+    </div>
+    <div class="header-actions">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" class="search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/></svg>
+        <input type="text" placeholder="Search orders..." [(ngModel)]="searchQuery" class="search-input">
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Filters -->
+  <div class="filter-chips" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="filter-chip" [class.active]="!statusFilter" (click)="filterByStatus('')">All</button>
+    <button class="filter-chip" *ngFor="let s of statuses.slice(1)" [class.active]="statusFilter === s" (click)="filterByStatus(s)">{{ formatStatus(s) }}</button>
+  </div>
+
+  <div class="table-card">
+    <div *ngIf="isLoading" class="table-skeleton">
+      <div class="skeleton-line" *ngFor="let _ of [1,2,3,4,5]"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="!isLoading && !orders.length">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>No orders with this status</h3>
+      <p>There are currently no <strong>{{ statusFilter ? formatStatus(statusFilter) : '' }}</strong> orders.</p>
+      <button class="btn btn-ghost" *ngIf="statusFilter" (click)="filterByStatus('')">View All Orders</button>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!isLoading && orders.length > 0">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Items</th>
+            <th>Date</th>
+            <th style="width:80px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of orders">
+            <td><strong>#{{ order.orderNumber || order.id }}</strong></td>
+            <td>{{ order.customerName || 'N/A' }}</td>
+            <td><span class="status-badge" [class]="(order.orderStatus || '').toLowerCase()">{{ formatStatus(order.orderStatus) }}</span></td>
+            <td><strong>{{ order.totalPrice | currency }}</strong></td>
+            <td>{{ order.totalItems || order.items?.length || 0 }}</td>
+            <td>{{ order.createdAt | date: 'MMM dd, yyyy' }}</td>
+            <td>
+              <button class="btn-show-towns" (click)="viewOrder(order.id)" title="View order details">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s3-6 7-6 7 6 7 6-3 6-7 6-7-6-7-6z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer" *ngIf="!isLoading && orders.length > 0 && totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)">← Prev</button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+        <button [disabled]="currentPage >= totalPages - 1" (click)="changePage(currentPage + 1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>

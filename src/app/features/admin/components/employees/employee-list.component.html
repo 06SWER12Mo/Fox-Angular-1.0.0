@@ -1,0 +1,239 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1>Employees</h1>
+      <p class="page-subtitle">Manage store employees and staff accounts</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-surface">
+    <div class="filters-row">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" class="search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/></svg>
+        <input type="text" placeholder="Search by name..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" class="search-input">
+      </div>
+
+      <div class="salary-input-group">
+        <span class="salary-label">Salary</span>
+        <div class="salary-range-input">
+          <input type="number" placeholder="Min" [(ngModel)]="salaryMin" (ngModelChange)="onSalaryOrStatusChange()" class="salary-field" min="0">
+          <span class="salary-sep">—</span>
+          <input type="number" placeholder="Max" [(ngModel)]="salaryMax" (ngModelChange)="onSalaryOrStatusChange()" class="salary-field" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="filters-row">
+      <div class="filter-chips">
+        <button class="chip" [class.active]="!activeFilter" (click)="activeFilter=''; onSalaryOrStatusChange()">All</button>
+        <button class="chip" [class.active]="activeFilter === 'active'" (click)="activeFilter='active'; onSalaryOrStatusChange()">
+          <span class="chip-dot chip-dot--active"></span>
+          Active
+        </button>
+        <button class="chip" [class.active]="activeFilter === 'inactive'" (click)="activeFilter='inactive'; onSalaryOrStatusChange()">
+          <span class="chip-dot chip-dot--inactive"></span>
+          Inactive
+        </button>
+      </div>
+
+      <button class="btn-clear" *ngIf="hasActiveFilters()" (click)="clearFilters()">
+        <svg viewBox="0 0 24 24" fill="none" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Clear all
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="table-skeleton">
+      <div class="skeleton-line" *ngFor="let _ of [1,2,3,4,5]"></div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && errorMessage" class="empty-state error-state">
+      <svg viewBox="0 0 80 80" fill="none" class="empty-icon error-icon">
+        <circle cx="40" cy="40" r="28" stroke="var(--color-danger)" stroke-width="2" opacity="0.5"/>
+        <path d="M40 24v20M40 50v2" stroke="var(--color-danger)" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h3 class="empty-title" style="color:var(--color-danger);">Could Not Load Employees</h3>
+      <p class="empty-desc">{{ errorMessage }}</p>
+      <button class="btn btn-primary" style="margin-top:12px;" (click)="loadEmployees()">Retry</button>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && !errorMessage && filteredEmployees.length === 0" class="empty-state">
+      <svg viewBox="0 0 80 80" fill="none" class="empty-icon">
+        <circle cx="40" cy="25" r="14" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 68c0-15.4 12.5-28 28-28s28 12.6 28 28" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <h3 class="empty-title" *ngIf="employees.length === 0">No employees found</h3>
+      <h3 class="empty-title" *ngIf="employees.length > 0">No results match your filters</h3>
+      <p class="empty-desc" *ngIf="employees.length === 0">Employees will appear here once they are added to the system.</p>
+      <p class="empty-desc" *ngIf="employees.length > 0">Try adjusting your search or filter criteria.</p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="!isLoading && filteredEmployees.length > 0">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Salary</th>
+            <th>Status</th>
+            <th>Since</th>
+            <th style="width:120px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of filteredEmployees">
+            <td>
+              <div class="employee-cell">
+                <span class="emp-avatar">{{ (e.name || '?')[0] }}</span>
+                <div>
+                  <strong class="emp-name">{{ e.name }}</strong>
+                  <span class="emp-passport" *ngIf="e.passportNumber">ID: {{ e.passportNumber }}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{ e.email }}</td>
+            <td>{{ e.phoneNumber || '—' }}</td>
+            <td><span class="role-badge">{{ formatRole(e.role) }}</span></td>
+            <td><strong>{{ e.salary != null ? (e.salary | currency) : '—' }}</strong></td>
+            <td>
+              <span class="emp-status">
+                <span class="status-dot" [class.active]="e.active !== false" [class.inactive]="e.active === false"></span>
+                {{ e.active !== false ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="date-cell">{{ e.employeeSince ? (e.employeeSince | date: 'MMM yyyy') : '—' }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" (click)="openEditModal(e)" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+                <button class="action-btn" (click)="toggleActive(e)" [title]="e.active !== false ? 'Deactivate' : 'Activate'">
+                  <svg *ngIf="e.active !== false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                  <svg *ngIf="e.active === false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+                <button class="action-btn action-danger" (click)="deleteEmployee(e)" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-footer" *ngIf="!isLoading && filteredEmployees.length > 0 && totalPages > 1">
+      <div class="pagination">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} employees)</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage >= totalPages - 1">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== EDIT EMPLOYEE MODAL ========== -->
+<div class="modal-overlay" *ngIf="editModalOpen" (click)="closeEditModal()"></div>
+<div class="modal modal-lg" *ngIf="editModalOpen">
+  <div class="modal-header">
+    <h2>Edit Employee</h2>
+    <button class="modal-close" (click)="closeEditModal()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div *ngIf="editLoading" style="text-align:center;padding:40px 0;">
+      <div class="spinner" style="margin:0 auto;border-color:var(--color-border);border-top-color:var(--color-accent);"></div>
+      <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin-top:12px;">Loading employee data...</p>
+    </div>
+
+    <ng-container *ngIf="!editLoading">
+      <div class="modal-form-grid">
+        <div class="form-field">
+          <label>Full Name <span class="required">*</span></label>
+          <input type="text" class="form-input" [(ngModel)]="editForm.name" placeholder="John Doe">
+        </div>
+        <div class="form-field">
+          <label>Passport / ID</label>
+          <input type="text" class="form-input" [(ngModel)]="editForm.passportNumber" placeholder="AB-123456">
+        </div>
+
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" class="form-input" [(ngModel)]="editForm.email" placeholder="john@company.com">
+        </div>
+        <div class="form-field">
+          <label>Phone</label>
+          <input type="tel" class="form-input" [(ngModel)]="editForm.phoneNumber" placeholder="+1 234 567 890">
+        </div>
+
+        <div class="form-field">
+          <label>Role</label>
+          <select class="form-input" [(ngModel)]="editForm.role">
+            <option value="EMPLOYEE">Employee</option>
+            <option value="MANAGER">Manager</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Salary</label>
+          <input type="number" class="form-input" [(ngModel)]="editForm.salary" placeholder="0" min="0">
+        </div>
+
+        <div class="form-field">
+          <label>Days / Week</label>
+          <input type="number" class="form-input" [(ngModel)]="editForm.daysOfWork" placeholder="5" min="0" max="7">
+        </div>
+        <div class="form-field">
+          <label>Hours / Day</label>
+          <input type="number" class="form-input" [(ngModel)]="editForm.hoursOfWork" placeholder="8" min="0" max="24">
+        </div>
+
+        <div class="form-field">
+          <label>Employee Since</label>
+          <input type="date" class="form-input" [(ngModel)]="editForm.employeeSince">
+        </div>
+        <div class="form-field">
+          <label>Date of Birth</label>
+          <input type="date" class="form-input" [(ngModel)]="editForm.dateOfBirth">
+        </div>
+
+        <div class="form-field span-2">
+          <label>Address</label>
+          <input type="text" class="form-input" [(ngModel)]="editForm.address" placeholder="123 Main St, City">
+        </div>
+
+        <div class="form-field">
+          <label>Emergency Contact</label>
+          <input type="text" class="form-input" [(ngModel)]="editForm.emergencyContact" placeholder="Jane Doe">
+        </div>
+        <div class="form-field">
+          <label>Emergency Phone</label>
+          <input type="tel" class="form-input" [(ngModel)]="editForm.emergencyPhone" placeholder="+1 234 567 891">
+        </div>
+
+        <div class="form-field span-2">
+          <label>Notes</label>
+          <textarea class="form-input form-textarea" [(ngModel)]="editForm.notes" rows="3" placeholder="Additional notes..."></textarea>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="closeEditModal()">Cancel</button>
+    <button class="btn btn-primary" (click)="saveEditEmployee()" [disabled]="isSavingEdit || editLoading || !editForm.name">
+      <span *ngIf="isSavingEdit" class="spinner"></span>
+      {{ isSavingEdit ? 'Saving...' : 'Save Changes' }}
+    </button>
+  </div>
+</div>

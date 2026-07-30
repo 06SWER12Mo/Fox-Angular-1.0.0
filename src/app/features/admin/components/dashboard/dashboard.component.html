@@ -1,0 +1,179 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p *ngIf="!error">Welcome back. Here's what's happening with your store today.</p>
+  </div>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading" class="stats-grid">
+    <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="skeleton skeleton-card"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" style="text-align:center;padding:60px 20px;color:var(--color-text-muted);">
+    <p>Could not load dashboard data. Please try again later.</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error">
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">₪{{ totalSales.toLocaleString() }}</div>
+        <div class="stat-label">Total Sales</div>
+        <div class="stat-change up" *ngIf="revenueGrowth">↑ {{ revenueGrowth }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-success">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">₪{{ todaySales.toLocaleString() }}</div>
+        <div class="stat-label">Today's Sales</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-warning">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.8"/><path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalOrders }}</div>
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-change up" *ngIf="orderGrowth">↑ {{ orderGrowth }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-danger">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ pendingOrders }}</div>
+        <div class="stat-label">Pending Orders</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalProducts }}</div>
+        <div class="stat-label">Total Products</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalCategories }}</div>
+        <div class="stat-label">Total Categories</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-success">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalCustomers }}</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-warning">
+        <svg viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ lowStockCount }}</div>
+        <div class="stat-label">Low Stock Products</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a *ngFor="let action of quickActions" [routerLink]="action.path" class="quick-action">
+      <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+      {{ action.label }}
+    </a>
+  </div>
+
+  <!-- Dashboard Grid -->
+  <div class="dashboard-grid">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>Sales by Day (This Week)</h3>
+        <span style="font-size:12px;color:var(--color-text-muted)">Last 7 days</span>
+      </div>
+      <div class="card-body">
+        <div class="chart-area">
+          <div *ngFor="let val of salesByDay; let i = index" class="chart-bar" [style.height.%]="(val / getMaxValue()) * 80 + 4"></div>
+        </div>
+        <div class="chart-legend">
+          <span *ngFor="let day of days">{{ day }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="card-header"><h3>Top Selling Products</h3></div>
+      <div class="card-body" style="padding: 8px 22px;">
+        <div *ngIf="!topSellingProducts.length" style="padding: 20px; text-align: center; color: var(--color-text-muted); font-size: 13px;">
+          No products sold yet.
+        </div>
+        <div class="activity-list" *ngIf="topSellingProducts.length">
+          <div class="activity-item" *ngFor="let product of topSellingProducts">
+            <div class="activity-dot dot-success" style="flex-shrink:0;"></div>
+            <div class="activity-content">
+              <p class="activity-text">{{ product.productName }}</p>
+              <span class="activity-time">{{ product.totalSold }} sold · ₪{{ product.revenue.toLocaleString() }} revenue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders -->
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h3>Recent Orders</h3>
+      <a routerLink="/admin/orders" style="font-size:13px;color:var(--color-accent);text-decoration:none;">View All →</a>
+    </div>
+    <div class="card-body" style="padding: 0;">
+      <div *ngIf="isLoading" style="padding:22px;">
+        <div class="skeleton skeleton-row"></div>
+        <div class="skeleton skeleton-row"></div>
+        <div class="skeleton skeleton-row"></div>
+        <div class="skeleton skeleton-row"></div>
+        <div class="skeleton skeleton-row"></div>
+      </div>
+      <div class="table-wrapper" *ngIf="!isLoading">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of recentOrders" (click)="viewOrder(order.id)" style="cursor:pointer;">
+              <td><strong>#{{ order.orderNumber || order.id }}</strong></td>
+              <td>
+                <div class="customer-cell">
+                  <span class="customer-avatar">{{ (order.userName || 'U')[0] }}</span>
+                  <span>{{ order.userName || 'User' }}</span>
+                </div>
+              </td>
+              <td><span class="status-badge" [class]="(order.orderStatus || '').toLowerCase()">{{ order.orderStatus }}</span></td>
+              <td><strong>{{ order.totalPrice | currency }}</strong></td>
+              <td>{{ order.createdAt | date: 'MMM dd, yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ng-container>
+</div>

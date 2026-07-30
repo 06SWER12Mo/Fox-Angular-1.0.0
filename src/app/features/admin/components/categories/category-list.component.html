@@ -1,0 +1,57 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1>Categories</h1>
+      <p class="page-subtitle">{{ categories.length }} categories</p>
+    </div>
+    <button class="btn btn-primary" routerLink="/admin/categories/new">+ Add Category</button>
+  </div>
+
+  <div class="table-card">
+    <div *ngIf="isLoading" class="table-skeleton">
+      <div class="skeleton-line" *ngFor="let _ of [1,2,3]"></div>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!isLoading">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th style="width:50px;">Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Subcategories</th>
+            <th style="width:90px;">Status</th>
+            <th style="width:120px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cat of categories">
+            <td>
+              <div class="cat-thumb">
+                <span *ngIf="!cat.imageUrl">{{ cat.name?.[0] }}</span>
+                <img *ngIf="cat.imageUrl" [src]="cat.imageUrl.startsWith('http') ? cat.imageUrl : 'http://localhost:8081' + cat.imageUrl" alt="">
+              </div>
+            </td>
+            <td><strong>{{ cat.name }}</strong></td>
+            <td class="desc-cell">{{ cat.description || '—' }}</td>
+            <td>{{ cat.subcategoryCount || cat.subcategories?.length || 0 }}</td>
+            <td class="status-cell">
+              <span class="status-dot" [class.active]="cat.active !== false" [class.inactive]="cat.active === false"></span>
+              <span class="status-text">{{ cat.active !== false ? 'Active' : 'Inactive' }}</span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" (click)="editCategory(cat.id)" title="Edit"><svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.8"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8"/></svg></button>
+                <button class="action-btn" (click)="toggleStatus(cat)" [title]="cat.active !== false ? 'Deactivate' : 'Activate'">
+                  <svg *ngIf="cat.active !== false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                  <svg *ngIf="cat.active === false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+                <button class="action-btn action-danger" (click)="deleteCategory(cat.id)" title="Delete"><svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.8"/></svg></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -56,6 +56,11 @@ const routes: Routes = [
     loadChildren: () => import('./features/locations/location.module').then(m => m.LocationModule)
   },
   
+  // Admin - Manager/Admin only
+  {
+    path: 'admin',
+    loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule)
+  },
   
   //  Fallback - redirect to home
   { path: '**', redirectTo: '' }

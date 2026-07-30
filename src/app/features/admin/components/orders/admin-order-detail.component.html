@@ -1,0 +1,126 @@
+<div class="detail-page">
+  <a class="back-link" (click)="goBack()" style="cursor:pointer;">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2"/></svg>
+    Back to Orders
+  </a>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" style="text-align:center;padding:80px 0;">
+    <div class="spinner"></div>
+    <p style="color:var(--color-text-muted);margin-top:16px;">Loading order...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!isLoading && errorMessage" style="text-align:center;padding:80px 20px;">
+    <p style="color:var(--color-danger);font-size:var(--text-md);font-weight:var(--weight-semibold);margin:0 0 8px;">Could not load order</p>
+    <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin:0 0 20px;">{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="loadOrder(orderId)" *ngIf="orderId">Retry</button>
+    <button class="btn btn-ghost" (click)="goBack()">Back to Orders</button>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !errorMessage && order">
+    <div class="detail-header">
+      <h1>Order #{{ order.orderNumber || order.id }}</h1>
+      <div class="header-actions">
+        <!-- Change State dropdown button -->
+        <div class="status-dropdown" *ngIf="order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED'">
+          <button class="btn btn-primary" (click)="toggleStatusMenu()" [disabled]="isUpdatingStatus">
+            <span *ngIf="isUpdatingStatus" class="btn-spinner"></span>
+            {{ isUpdatingStatus ? 'Updating...' : 'Change State' }}
+            <svg *ngIf="!isUpdatingStatus" viewBox="0 0 24 24" fill="none" class="chevron" [class.open]="showStatusMenu">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="dropdown-menu" *ngIf="showStatusMenu" (click)="closeStatusMenu()">
+            <div class="dropdown-backdrop"></div>
+            <div class="dropdown-list">
+              <button class="dropdown-item" *ngFor="let s of availableStatuses" (click)="changeStatus(s); $event.stopPropagation()">
+                <span class="dd-status-dot" [class]="s.toLowerCase()"></span>
+                {{ formatStatus(s) }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-danger" (click)="cancelOrder()" *ngIf="order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED'">Cancel Order</button>
+        <button class="btn btn-ghost" (click)="goBack()">Close</button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div>
+        <!-- Order Items -->
+        <div class="detail-card" style="margin-bottom:24px;">
+          <div class="card-header"><h3>Order Items</h3></div>
+          <div class="card-body" style="padding:0;">
+            <table class="order-items-table">
+              <thead>
+                <tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of order.items || []">
+                  <td>{{ item.productName || 'Product' }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.price || item.unitPrice | currency }}</td>
+                  <td><strong>{{ (item.price || item.unitPrice || 0) * (item.quantity || 0) | currency }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="detail-card">
+          <div class="card-header"><h3>Order Timeline</h3></div>
+          <div class="card-body">
+            <div class="step-roadmap">
+              <div class="step" *ngFor="let status of statusFlow; let i = index"
+                   [class.completed]="i < getStatusIndex() || (i === getStatusIndex() && i === statusFlow.length - 1)"
+                   [class.current]="i === getStatusIndex() && i < statusFlow.length - 1"
+                   [class.pending]="i > getStatusIndex()">
+                <div class="step-connector" [class.completed]="i <= getStatusIndex()"></div>
+                <div class="step-node">
+                  <div class="step-circle">
+                    <svg *ngIf="i < getStatusIndex() || (i === getStatusIndex() && i === statusFlow.length - 1)" viewBox="0 0 24 24" fill="none" class="check-icon"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span *ngIf="i > getStatusIndex() || (i === getStatusIndex() && i < statusFlow.length - 1)" class="step-number">{{ i + 1 }}</span>
+                  </div>
+                  <div class="step-label">{{ formatStatus(status) }}</div>
+                  <div class="step-status-text">
+                    <span *ngIf="i < getStatusIndex() || (i === getStatusIndex() && i === statusFlow.length - 1)">Completed</span>
+                    <span *ngIf="i === getStatusIndex() && i < statusFlow.length - 1" class="current-text">Current</span>
+                    <span *ngIf="i > getStatusIndex()">Pending</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="detail-card" style="margin-bottom:16px;">
+          <div class="card-header"><h3>Order Info</h3></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-row"><span class="info-label">Status</span><span class="info-value"><span class="status-badge" [class]="(order.orderStatus || '').toLowerCase()">{{ formatStatus(order.orderStatus) }}</span></span></div>
+              <div class="info-row"><span class="info-label">Total</span><span class="info-value" style="font-weight:600;">{{ order.totalPrice | currency }}</span></div>
+              <div class="info-row"><span class="info-label">Date</span><span class="info-value">{{ order.createdAt | date: 'MMM dd, yyyy HH:mm' }}</span></div>
+              <div class="info-row"><span class="info-label">Payment</span><span class="info-value">{{ order.paymentMethod || 'N/A' }}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header"><h3>Customer</h3></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-row"><span class="info-label">Name</span><span class="info-value">{{ order.userName || order.shippingName || 'N/A' }}</span></div>
+              <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ order.userEmail || '—' }}</span></div>
+              <div class="info-row"><span class="info-label">Phone</span><span class="info-value">{{ order.userPhone || '—' }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

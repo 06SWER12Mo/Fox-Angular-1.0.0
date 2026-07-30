@@ -1,0 +1,101 @@
+<div class="admin-page form-page">
+  <div class="page-header">
+    <div>
+      <h1>{{ isEditing ? 'Edit Product' : 'Add Product' }}</h1>
+      <p class="page-subtitle">{{ isEditing ? 'Update product details' : 'Create a new product' }}</p>
+    </div>
+  </div>
+
+  <div class="form-card" *ngIf="!isLoading">
+    <form [formGroup]="productForm" (ngSubmit)="save()">
+      <div class="form-grid">
+        <div class="form-field span-2">
+          <label>Product Name <span class="required">*</span></label>
+          <input type="text" formControlName="name" placeholder="Enter product name" class="form-input">
+        </div>
+
+        <div class="form-field span-2">
+          <label>Description</label>
+          <textarea formControlName="description" placeholder="Product description" class="form-input form-textarea" rows="4"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label>Price <span class="required">*</span></label>
+          <input type="number" formControlName="price" placeholder="0.00" class="form-input" step="0.01">
+        </div>
+
+        <div class="form-field">
+          <label>Discount (%)</label>
+          <input type="number" formControlName="discount" placeholder="0" class="form-input" min="0" max="100">
+        </div>
+
+        <div class="form-field">
+          <label>Stock Quantity</label>
+          <input type="number" formControlName="stockQuantity" placeholder="0" class="form-input" min="0">
+        </div>
+
+        <div class="form-field">
+          <label>SKU</label>
+          <input type="text" formControlName="sku" placeholder="SKU-001" class="form-input">
+        </div>
+
+        <div class="form-field">
+          <label>Barcode</label>
+          <input type="text" formControlName="barcode" placeholder="Optional" class="form-input">
+        </div>
+
+        <div class="form-field">
+          <label>Brand</label>
+          <input type="text" formControlName="brand" placeholder="Brand name" class="form-input">
+        </div>
+
+        <div class="form-field">
+          <label>Category <span class="required">*</span></label>
+          <select formControlName="categoryId" class="form-input">
+            <option [ngValue]="null">Select category...</option>
+            <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-field form-field-checkbox">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="featured">
+            <span class="checkbox-custom"></span>
+            <span>Featured product</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="active">
+            <span class="checkbox-custom"></span>
+            <span>Active</span>
+          </label>
+        </div>
+
+        <div class="form-field span-2">
+          <label>Product Image</label>
+          <div class="image-upload-area" (click)="fileInput.click()">
+            <input #fileInput type="file" accept="image/*" (change)="onImageSelected($event)" hidden>
+            <div class="upload-placeholder" *ngIf="!imagePreview">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.8"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.8"/></svg>
+              <span>Click to upload image</span>
+            </div>
+            <img *ngIf="imagePreview" [src]="imagePreview" class="image-preview" alt="Preview">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || isSaving">
+          {{ isSaving ? 'Saving...' : (isEditing ? 'Update Product' : 'Create Product') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="admin-page" *ngIf="isLoading" style="text-align:center;padding:80px 0;">
+  <div class="spinner"></div>
+  <p style="color:var(--color-text-muted);margin-top:16px;">Loading product...</p>
+</div>

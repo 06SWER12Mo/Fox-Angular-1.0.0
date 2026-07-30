@@ -1,0 +1,212 @@
+/* ============================================================
+   ADMIN HEADER — Ink & Brass top bar
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,600&display=swap');
+
+$ink: #14171c;
+$ink-soft: #1f232b;
+$brass: #c9a24b;
+$brass-dim: #8a7238;
+$ash: #a9afbb;
+$bone: #ecece4;
+
+.admin-header {
+  background: $ink;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  height: 56px;
+  border-bottom: 1px solid rgba($brass, 0.15);
+
+  &::after {
+    content: '';
+    display: block;
+    height: 1.5px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      $brass 20%,
+      $brass 80%,
+      transparent 100%
+    );
+    opacity: 0.5;
+  }
+}
+
+.admin-header-inner {
+  max-width: 100%;
+  height: 100%;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ============================================================
+   LEFT
+   ============================================================ */
+
+.ah-left {
+  flex-shrink: 0;
+}
+
+.ah-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+
+  .ah-brand-icon {
+    width: 28px;
+    height: 28px;
+    color: $brass;
+
+    svg { width: 100%; height: 100%; }
+  }
+
+  .ah-brand-text {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+    color: $bone;
+
+    &::after {
+      content: '.';
+      color: $brass;
+    }
+  }
+}
+
+/* ============================================================
+   CENTER
+   ============================================================ */
+
+.ah-center {
+  flex: 1;
+  text-align: center;
+
+  .ah-page-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba($ash, 0.6);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+/* ============================================================
+   RIGHT
+   ============================================================ */
+
+.ah-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.ah-store-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: $ink-soft;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: $ash;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg { width: 15px; height: 15px; }
+
+  &:hover {
+    border-color: rgba($brass, 0.3);
+    color: $brass;
+    background: rgba($brass, 0.08);
+  }
+}
+
+.ah-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: $ink-soft;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ah-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba($brass, 0.15);
+  color: $brass;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba($brass, 0.2);
+  flex-shrink: 0;
+}
+
+.ah-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+
+  .ah-user-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: $bone;
+  }
+
+  .ah-user-role {
+    font-size: 10px;
+    color: rgba($ash, 0.7);
+  }
+}
+
+.ah-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: $ash;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+
+  svg { width: 16px; height: 16px; }
+
+  &:hover {
+    color: #e2596a;
+    background: rgba(226, 89, 106, 0.1);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .admin-header-inner { padding: 0 16px; }
+  .ah-center { display: none; }
+  .ah-user-info { display: none; }
+  .ah-store-btn span { display: none; }
+}
+
+@media (max-width: 480px) {
+  .ah-brand-text { font-size: 15px; }
+  .ah-store-btn { padding: 6px 8px; }
+}

@@ -9,13 +9,15 @@ export interface User {
   phoneNumber: string;
   profilePictureUrl: string;
   enabled: boolean;
+  locked?: boolean;
   emailVerified: boolean;
   verificationRequested: boolean;
   role: 'USER' | 'MANAGER' | 'ADMIN';
   lastLogin: string;
   createdAt: string;
   updatedAt: string;
-  addresses: DeliveryAddress[];
+  deliveryAddresses?: DeliveryAddress[];
+  addresses?: DeliveryAddress[];
 }
 
 export interface UserUpdateRequest {

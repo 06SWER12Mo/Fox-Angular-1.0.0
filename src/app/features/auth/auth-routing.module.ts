@@ -8,12 +8,13 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 
 import { AuthGuard } from '../../core/guards/auth.guard';
 import { NoAuthGuard } from '../../core/guards/no-auth.guard';
+import { CustomerGuard } from '../../core/guards/customer.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [NoAuthGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [NoAuthGuard] },
   { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [NoAuthGuard] },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard, CustomerGuard] },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

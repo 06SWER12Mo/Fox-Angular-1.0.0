@@ -21,6 +21,8 @@ export class AddressFormComponent implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
 
+  returnUrl: string | null = null;
+
   // Town search
   towns: Town[] = [];
   filteredTowns: Town[] = [];
@@ -41,6 +43,10 @@ export class AddressFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initForm();
     this.initTownSearch();
+
+    this.route.queryParams.subscribe(qParams => {
+      this.returnUrl = qParams['returnUrl'] || null;
+    });
 
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -199,9 +205,7 @@ export class AddressFormComponent implements OnInit, OnDestroy {
         next: () => {
           this.isSaving = false;
           this.successMessage = 'Address updated successfully!';
-          setTimeout(() => {
-            this.router.navigate(['/locations']);
-          }, 1500);
+          this.navigateAfterSave();
         },
         error: (error) => {
           this.isSaving = false;
@@ -214,9 +218,7 @@ export class AddressFormComponent implements OnInit, OnDestroy {
         next: () => {
           this.isSaving = false;
           this.successMessage = 'Address added successfully!';
-          setTimeout(() => {
-            this.router.navigate(['/locations']);
-          }, 1500);
+          this.navigateAfterSave();
         },
         error: (error) => {
           this.isSaving = false;
@@ -227,7 +229,19 @@ export class AddressFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  private navigateAfterSave(): void {
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    } else {
+      this.router.navigate(['/locations']);
+    }
+  }
+
   goBack(): void {
-    this.router.navigate(['/locations']);
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    } else {
+      this.router.navigate(['/locations']);
+    }
   }
 }

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { User, UserUpdateRequest, UserRequest } from '../../models/user.model';
-import { PageResponse } from '../../models/common.model';
+import { ApiResponse, PageResponse } from '../../models/common.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,32 +14,37 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
+  /** Unwrap the backend's ApiResponse wrapper: extract `.data` if present */
+  private unwrap<T>(obs: Observable<any>): Observable<T> {
+    return obs.pipe(map((res: any) => res?.data ?? res));
+  }
+
   // ========== USER ENDPOINTS ==========
 
   getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/me`);
+    return this.unwrap<User>(this.http.get(`${this.apiUrl}/me`));
   }
 
   updateCurrentUser(request: UserUpdateRequest): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/me`, request);
+    return this.unwrap<User>(this.http.put(`${this.apiUrl}/me`, request));
   }
 
   deleteCurrentUser(): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/me`);
+    return this.unwrap<void>(this.http.delete(`${this.apiUrl}/me`));
   }
 
   // ========== ADMIN OR SELF ENDPOINTS ==========
 
   getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`);
+    return this.unwrap<User>(this.http.get(`${this.apiUrl}/${id}`));
   }
 
   updateUserById(id: number, request: UserUpdateRequest): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, request);
+    return this.unwrap<User>(this.http.put(`${this.apiUrl}/${id}`, request));
   }
 
   deleteUserById(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.unwrap<void>(this.http.delete(`${this.apiUrl}/${id}`));
   }
 
   // ========== ADMIN ONLY ENDPOINTS ==========
@@ -47,56 +53,56 @@ export class UserService {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<User>>(this.apiUrl, { params });
+    return this.unwrap<PageResponse<User>>(this.http.get(this.apiUrl, { params }));
   }
 
   enableUser(id: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/enable`, {});
+    return this.unwrap<void>(this.http.put(`${this.apiUrl}/${id}/enable`, {}));
   }
 
   disableUser(id: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/disable`, {});
+    return this.unwrap<void>(this.http.put(`${this.apiUrl}/${id}/disable`, {}));
   }
 
   lockUser(id: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/lock`, {});
+    return this.unwrap<void>(this.http.put(`${this.apiUrl}/${id}/lock`, {}));
   }
 
   unlockUser(id: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/unlock`, {});
+    return this.unwrap<void>(this.http.put(`${this.apiUrl}/${id}/unlock`, {}));
   }
 
   verifyUserEmail(id: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/verify`, {});
+    return this.unwrap<void>(this.http.put(`${this.apiUrl}/${id}/verify`, {}));
   }
 
   requestEmailVerification(): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/me/request-verification`, {});
+    return this.unwrap<void>(this.http.post(`${this.apiUrl}/me/request-verification`, {}));
   }
 
   cancelEmailVerification(): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/me/request-verification`);
+    return this.unwrap<void>(this.http.delete(`${this.apiUrl}/me/request-verification`));
   }
 
   updateUserRole(id: number, role: string): Observable<void> {
     const params = new HttpParams().set('role', role);
-    return this.http.put<void>(`${this.apiUrl}/${id}/role`, null, { params });
+    return this.unwrap<void>(this.http.put(`${this.apiUrl}/${id}/role`, null, { params }));
   }
 
   // ========== STATISTICS ==========
 
   getTotalUsers(): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/stats/count`);
+    return this.unwrap<number>(this.http.get(`${this.apiUrl}/stats/count`));
   }
 
   getActiveUsers(): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/stats/active`);
+    return this.unwrap<number>(this.http.get(`${this.apiUrl}/stats/active`));
   }
 
   getUsersRegisteredBetween(startDate: string, endDate: string): Observable<number> {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<number>(`${this.apiUrl}/stats/registered`, { params });
+    return this.unwrap<number>(this.http.get(`${this.apiUrl}/stats/registered`, { params }));
   }
 }

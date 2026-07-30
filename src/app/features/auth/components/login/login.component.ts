@@ -30,7 +30,12 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.tokenService.isAuthenticated()) {
-      window.location.href = '/auth/profile';
+      const role = this.tokenService.getUserRole();
+      if (role === 'MANAGER' || role === 'ADMIN') {
+        window.location.href = '/admin/dashboard';
+      } else {
+        window.location.href = '/auth/profile';
+      }
       return;
     }
 
@@ -58,9 +63,13 @@ export class LoginComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.cdr.detectChanges();
-        console.log('Login successful!');
-        // Full page reload to ensure all components reinitialize with auth state
-        window.location.href = this.returnUrl;
+        // Redirect MANAGER/ADMIN to admin dashboard, others to returnUrl
+        const role = this.tokenService.getUserRole();
+        if (role === 'MANAGER' || role === 'ADMIN') {
+          window.location.href = '/admin/dashboard';
+        } else {
+          window.location.href = this.returnUrl;
+        }
       },
       error: (error) => {
         this.isLoading = false;

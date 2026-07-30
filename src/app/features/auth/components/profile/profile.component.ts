@@ -529,9 +529,9 @@ export class ProfileComponent implements OnInit {
 
   getAddressTypeIcon(type: string): string {
     switch (type?.toLowerCase()) {
-      case 'home': return '🏠';
-      case 'work': return '🏢';
-      default: return '📍';
+      case 'home': return 'home';
+      case 'work': return 'work';
+      default: return 'other';
     }
   }
 

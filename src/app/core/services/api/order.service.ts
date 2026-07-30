@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { 
   Order, 
@@ -19,6 +20,11 @@ export class OrderService {
   private apiUrl = `${environment.apiUrl}/orders`;
 
   constructor(private http: HttpClient) {}
+
+  /** Unwrap the backend's ApiResponse wrapper */
+  private unwrap<T>(obs: Observable<any>): Observable<T> {
+    return obs.pipe(map((res: any) => res?.data ?? res));
+  }
 
   // ========== USER ENDPOINTS ==========
 
@@ -60,7 +66,7 @@ export class OrderService {
   // ========== PUBLIC ENDPOINTS ==========
 
   getOrderById(id: number): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${id}`);
+    return this.unwrap<Order>(this.http.get(`${this.apiUrl}/${id}`));
   }
 
   getOrderByNumber(orderNumber: string): Observable<Order> {

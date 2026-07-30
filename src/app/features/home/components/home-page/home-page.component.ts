@@ -41,6 +41,16 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isAuthenticated = this.tokenService.isAuthenticated();
+
+    // MANAGER/ADMIN users must not see the home page — redirect to admin
+    if (this.isAuthenticated) {
+      const role = this.tokenService.getUserRole();
+      if (role === 'MANAGER' || role === 'ADMIN') {
+        window.location.href = '/admin/dashboard';
+        return;
+      }
+    }
+
     this.loadHomePage();
     this.startSlideShow();
   }
@@ -98,8 +108,13 @@ export class HomePageComponent implements OnInit, OnDestroy {
   openAuthModal(mode: AuthModalMode = 'login'): void {
     this.authModalService.open(mode).subscribe(result => {
       if (result?.success) {
-        // Full page reload to ensure all components reinitialize with auth state
-        window.location.reload();
+        // Redirect MANAGER/ADMIN users to admin dashboard
+        const role = this.tokenService.getUserRole();
+        if (role === 'MANAGER' || role === 'ADMIN') {
+          window.location.href = '/admin/dashboard';
+        } else {
+          window.location.reload();
+        }
       }
     });
   }

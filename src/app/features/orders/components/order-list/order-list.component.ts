@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { OrderService } from '../../../../core/services/api/order.service';
+import { PaymentService } from '../../../../core/services/api/payment.service';
 import { OrderSummary } from '../../../../core/models/order.model';
-import { OrderStatus } from '../../../../core/models/enums.model';
+import { OrderStatus, PaymentMethod } from '../../../../core/models/enums.model';
 import { PageResponse } from '../../../../core/models/common.model';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -23,14 +24,20 @@ export class OrderListComponent implements OnInit {
   filterForm!: FormGroup;
   statusOptions = Object.values(OrderStatus);
 
-  filtersExpanded = true;
   cancelOrderToConfirm: OrderSummary | null = null;
   isCancelling = false;
+  showPayModal = false;
+  payOrderToConfirm: OrderSummary | null = null;
+  selectedPayMethod: string = 'PAYPAL';
+  isPaying = false;
+  paymentMethods = Object.values(PaymentMethod);
 
   constructor(
     private orderService: OrderService,
+    private paymentService: PaymentService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -69,9 +76,11 @@ export class OrderListComponent implements OnInit {
         this.orders = page.content || [];
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.errorMessage = error?.error?.message || 'Failed to load orders';
         console.error('Error loading orders:', error);
       }
@@ -125,16 +134,66 @@ export class OrderListComponent implements OnInit {
     return s === 'PENDING_PAYMENT' || s === 'PAID' || s === 'READY_FOR_SHIPPING';
   }
 
-  getStatusLabel(status: OrderStatus): string {
-    const labels: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING_PAYMENT]: 'Pending Payment',
-      [OrderStatus.PAID]: 'Paid',
-      [OrderStatus.READY_FOR_SHIPPING]: 'Ready for Shipping',
-      [OrderStatus.ASSIGNED_TO_BATCH]: 'Assigned to Batch',
-      [OrderStatus.SHIPPED]: 'Shipped',
-      [OrderStatus.DELIVERED]: 'Delivered',
-      [OrderStatus.CANCELLED]: 'Cancelled'
+  getStatusLabel(status: OrderStatus | string): string {
+    const labels: Record<string, string> = {
+      'PENDING_PAYMENT': 'Pending Payment',
+      'PAID': 'Paid',
+      'READY_FOR_SHIPPING': 'Ready for Shipping',
+      'ASSIGNED_TO_BATCH': 'Assigned to Batch',
+      'SHIPPED': 'Shipped',
+      'DELIVERED': 'Delivered',
+      'CANCELLED': 'Cancelled'
     };
     return labels[status] || status;
+  }
+
+  isPendingPayment(status: string | OrderStatus): boolean {
+    const s = typeof status === 'string' ? status : status;
+    return s === 'PENDING_PAYMENT';
+  }
+
+  openPayModal(order: OrderSummary): void {
+    this.payOrderToConfirm = order;
+    this.selectedPayMethod = 'PAYPAL';
+    this.showPayModal = true;
+  }
+
+  closePayModal(): void {
+    this.showPayModal = false;
+    this.payOrderToConfirm = null;
+    this.selectedPayMethod = 'PAYPAL';
+  }
+
+  confirmPay(): void {
+    if (!this.payOrderToConfirm) return;
+    this.isPaying = true;
+    this.paymentService.processPayment({
+      orderId: this.payOrderToConfirm.id,
+      paymentMethod: this.selectedPayMethod as 'PAYPAL' | 'CREDIT_CARD' | 'BANK_TRANSFER'
+    }).subscribe({
+      next: () => {
+        this.isPaying = false;
+        this.closePayModal();
+        this.loadOrders();
+      },
+      error: (error) => {
+        this.isPaying = false;
+        this.errorMessage = error?.error?.message || 'Payment failed. Please try again.';
+        console.error('Payment error:', error);
+      }
+    });
+  }
+
+  getStatusColor(status: OrderStatus | string): string {
+    const colors: Record<string, string> = {
+      'PENDING_PAYMENT': '#ecc94b',
+      'PAID': '#48bb78',
+      'READY_FOR_SHIPPING': '#4299e1',
+      'ASSIGNED_TO_BATCH': '#667eea',
+      'SHIPPED': '#4299e1',
+      'DELIVERED': '#48bb78',
+      'CANCELLED': '#fc8181'
+    };
+    return colors[status] || '#a0aec0';
   }
 }

@@ -1,25 +1,27 @@
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 14px;
-  border-radius: 20px;
-  color: white;
-  font-weight: 600;
-  font-size: 13px;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 9999px);
+  color: #fff;
+  font-weight: var(--weight-semibold, 600);
+  font-size: 11px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
+  text-transform: uppercase;
+  line-height: 1;
+}
 
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
 
-  &.delivered {
-    background-color: #48bb78 !important;
-  }
-
-  &.cancelled {
-    background-color: #fc8181 !important;
-  }
+.status-label {
+  line-height: 1;
 }

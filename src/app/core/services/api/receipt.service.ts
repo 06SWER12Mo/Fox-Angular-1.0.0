@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Receipt, ReceiptRequest, Supplier, SupplierRequest } from '../../models/receipt.model';
 import { PageResponse } from '../../models/common.model';
@@ -12,6 +13,11 @@ export class ReceiptService {
   private apiUrl = `${environment.apiUrl}/receipts`;
 
   constructor(private http: HttpClient) {}
+
+  /** Unwrap the backend's ApiResponse wrapper */
+  private unwrap<T>(obs: Observable<any>): Observable<T> {
+    return obs.pipe(map((res: any) => res?.data ?? res));
+  }
 
   // ========== RECEIPT OPERATIONS ==========
 
@@ -31,7 +37,7 @@ export class ReceiptService {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Receipt>>(this.apiUrl, { params });
+    return this.unwrap<PageResponse<Receipt>>(this.http.get(this.apiUrl, { params }));
   }
 
   getReceiptsBySupplier(supplierId: number, page: number = 0, size: number = 20): Observable<PageResponse<Receipt>> {

@@ -1,0 +1,197 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1>Suppliers</h1>
+      <p class="page-subtitle">Manage your product suppliers</p>
+    </div>
+    <div class="header-actions">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" class="search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/></svg>
+        <input type="text" placeholder="Search suppliers..." [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" class="search-input">
+      </div>
+      <button class="btn btn-primary" (click)="openAddModal()">
+        <svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Add Supplier
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="table-skeleton">
+      <div class="skeleton-line" *ngFor="let _ of [1,2,3,4,5]"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && suppliers.length === 0" class="empty-state">
+      <svg class="empty-icon" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="28" stroke="currentColor" stroke-width="2.5"/>
+        <path d="M28 40h24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M40 28v24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h3 class="empty-title">No suppliers found</h3>
+      <p class="empty-desc">Start by adding your first supplier to manage receipts effectively.</p>
+      <button class="btn btn-primary" (click)="openAddModal()">
+        <svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Add Your First Supplier
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="!isLoading && suppliers.length > 0">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Receipts</th>
+            <th>Status</th>
+            <th style="width:130px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of suppliers">
+            <td><strong>{{ s.name }}</strong></td>
+            <td><code class="code-tag">{{ s.code }}</code></td>
+            <td>{{ s.contactPerson || '—' }}</td>
+            <td>{{ s.email || '—' }}</td>
+            <td><span class="count-badge">{{ s.receiptCount || 0 }}</span></td>
+            <td>
+              <span class="status-dot" [class.active]="s.active !== false" [class.inactive]="s.active === false"></span>
+              {{ s.active !== false ? 'Active' : 'Inactive' }}
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" (click)="openEditModal(s)" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+                <button class="action-btn" (click)="toggleActive(s)" [title]="s.active !== false ? 'Deactivate' : 'Activate'">
+                  <svg *ngIf="s.active !== false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                  <svg *ngIf="s.active === false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+                <button class="action-btn action-danger" (click)="deleteSupplier(s)" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-footer" *ngIf="!isLoading && suppliers.length > 0 && totalPages > 1 && !searchQuery">
+      <div class="pagination">
+        <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()"></div>
+<div class="modal" *ngIf="showModal">
+  <div class="modal-header">
+    <h2>{{ editMode ? 'Edit Supplier' : 'Add New Supplier' }}</h2>
+    <button class="modal-close" (click)="closeModal()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name <span class="required">*</span></label>
+        <input type="text" class="form-input" [(ngModel)]="form.name" placeholder="Supplier name">
+      </div>
+      <div class="form-group">
+        <label>Code <span class="required">*</span></label>
+        <input type="text" class="form-input" [(ngModel)]="form.code" placeholder="SUP-001">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="form-input" [(ngModel)]="form.email" placeholder="contact@supplier.com">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" class="form-input" [(ngModel)]="form.phone" placeholder="+1 234 567 890">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Contact Person</label>
+        <input type="text" class="form-input" [(ngModel)]="form.contactPerson" placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label>Contact Phone</label>
+        <input type="text" class="form-input" [(ngModel)]="form.contactPhone" placeholder="+1 234 567 891">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Contact Email</label>
+        <input type="email" class="form-input" [(ngModel)]="form.contactEmail" placeholder="john@supplier.com">
+      </div>
+      <div class="form-group">
+        <label>Website</label>
+        <input type="url" class="form-input" [(ngModel)]="form.website" placeholder="https://supplier.com">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" class="form-input" [(ngModel)]="form.address" placeholder="123 Main St">
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input type="text" class="form-input" [(ngModel)]="form.city" placeholder="New York">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>State</label>
+        <input type="text" class="form-input" [(ngModel)]="form.state" placeholder="NY">
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <input type="text" class="form-input" [(ngModel)]="form.country" placeholder="USA">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tax ID</label>
+        <input type="text" class="form-input" [(ngModel)]="form.taxId" placeholder="XX-XXXXXXX">
+      </div>
+      <div class="form-group">
+        <label>Registration #</label>
+        <input type="text" class="form-input" [(ngModel)]="form.registrationNumber" placeholder="REG-001">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Payment Terms</label>
+        <input type="text" class="form-input" [(ngModel)]="form.paymentTerms" placeholder="Net 30">
+      </div>
+      <div class="form-group">
+        <label>Delivery Terms</label>
+        <input type="text" class="form-input" [(ngModel)]="form.deliveryTerms" placeholder="FOB">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea class="form-input form-textarea" [(ngModel)]="form.notes" placeholder="Additional notes..." rows="3"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="closeModal()">Cancel</button>
+    <button class="btn btn-primary" (click)="saveSupplier()" [disabled]="isSaving || !form.name || !form.code">
+      <span *ngIf="isSaving" class="spinner"></span>
+      {{ isSaving ? 'Saving...' : editMode ? 'Update Supplier' : 'Add Supplier' }}
+    </button>
+  </div>
+</div>

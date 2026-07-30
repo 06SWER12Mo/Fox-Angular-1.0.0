@@ -35,25 +35,4 @@ export class OrderStatusBadgeComponent {
     };
     return colors[this.status as string] || '#a0aec0';
   }
-
-  getStatusIcon(): string {
-    const icons: Record<string, string> = {
-      'PENDING_PAYMENT': 'payment',
-      'PAID': 'check_circle',
-      'READY_FOR_SHIPPING': 'inventory',
-      'ASSIGNED_TO_BATCH': 'assignment',
-      'SHIPPED': 'local_shipping',
-      'DELIVERED': 'home',
-      'CANCELLED': 'cancel'
-    };
-    return icons[this.status as string] || 'help';
-  }
-
-  isDelivered(): boolean {
-    return this.status === 'DELIVERED';
-  }
-
-  isCancelled(): boolean {
-    return this.status === 'CANCELLED';
-  }
 }

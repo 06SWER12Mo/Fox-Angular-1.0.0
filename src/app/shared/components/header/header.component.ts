@@ -195,8 +195,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   openAuthModal(mode: 'login' | 'register' = 'login'): void {
     this.authModalService.open(mode).subscribe(result => {
       if (result?.success) {
-        // Full page reload to ensure all components reinitialize with auth state
-        window.location.reload();
+        // Redirect MANAGER/ADMIN users to admin dashboard
+        const role = this.tokenService.getUserRole();
+        if (role === 'MANAGER' || role === 'ADMIN') {
+          window.location.href = '/admin/dashboard';
+        } else {
+          window.location.reload();
+        }
       }
     });
     this.closeMenu();

@@ -34,8 +34,15 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 401:
               errorMessage = 'Session expired. Please login again.';
               this.tokenService.clearAll();
-              // Open the auth modal popup instead of redirecting to the old full-page login
-              this.authModalService.open('login').subscribe();
+              // Open the auth modal popup — after login, redirect MANAGER/ADMIN users
+              this.authModalService.open('login').subscribe(result => {
+                if (result?.success) {
+                  const role = this.tokenService.getUserRole();
+                  if (role === 'MANAGER' || role === 'ADMIN') {
+                    window.location.href = '/admin/dashboard';
+                  }
+                }
+              });
               break;
             case 403:
               errorMessage = error.error?.message || 'You do not have permission to access this resource';

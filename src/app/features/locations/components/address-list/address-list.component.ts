@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { LocationService } from '../../../../core/services/api/location.service';
 import { DeliveryAddress} from '../../../../core/models/location.model';
 import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
@@ -19,7 +20,8 @@ export class AddressListComponent implements OnInit {
   constructor(
     private locationService: LocationService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -28,13 +30,16 @@ export class AddressListComponent implements OnInit {
 
   loadAddresses(): void {
     this.isLoading = true;
-    this.locationService.getCurrentUserAddresses().subscribe({
-      next: (response: any) => {
-        this.addresses = response?.data || response || [];
+    this.locationService.getCurrentUserAddresses().pipe(
+      finalize(() => {
         this.isLoading = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: (addresses) => {
+        this.addresses = addresses;
       },
       error: (error) => {
-        this.isLoading = false;
         this.errorMessage = error?.error?.message || 'Failed to load addresses';
         console.error('Error loading addresses:', error);
       }
@@ -87,9 +92,9 @@ export class AddressListComponent implements OnInit {
 
   getAddressTypeIcon(type: string): string {
     switch (type?.toLowerCase()) {
-      case 'home': return '🏠';
-      case 'work': return '🏢';
-      default: return '📍';
+      case 'home': return 'home';
+      case 'work': return 'work';
+      default: return 'other';
     }
   }
 

@@ -1,0 +1,221 @@
+<div class="detail-page">
+  <a class="back-link" (click)="goBack()" style="cursor:pointer;">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2"/></svg>
+    Back to Users
+  </a>
+
+  <div *ngIf="isLoading" style="text-align:center;padding:80px 0;">
+    <div class="spinner"></div>
+  </div>
+
+  <ng-container *ngIf="!isLoading && user">
+    <div class="detail-header">
+      <div class="detail-header-left">
+        <div class="detail-avatar">{{ (user.firstName || user.username || 'U')[0] }}{{ (user.lastName || '')[0] }}</div>
+        <div>
+          <h1>{{ user.firstName || user.username }} {{ user.lastName || '' }}</h1>
+          <div class="detail-meta">
+            <span class="role-badge">{{ user.role }}</span>
+            <span class="verify-badge" [class.verified]="user.emailVerified" [class.unverified]="!user.emailVerified">{{ user.emailVerified ? 'Verified' : 'Unverified' }}</span>
+            <span class="status-label" [class.active]="user.enabled !== false && !user.locked" [class.disabled]="user.enabled === false" [class.locked]="user.locked">
+              {{ user.enabled === false ? 'Disabled' : user.locked ? 'Locked' : 'Active' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost" (click)="toggleEnabled()">{{ user.enabled !== false ? 'Disable' : 'Enable' }}</button>
+        <button class="btn btn-ghost" (click)="toggleLock()">{{ user.locked ? 'Unlock' : 'Lock' }}</button>
+        <button class="btn btn-ghost" *ngIf="!user.emailVerified" (click)="verifyEmail()">Verify Email</button>
+        <button class="btn btn-primary" (click)="openRoleModal()">Change Role</button>
+        <button class="btn btn-danger" (click)="requestDelete()">Delete</button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Left Column -->
+      <div>
+        <!-- User Information -->
+        <div class="detail-card">
+          <div class="card-header"><h3>User Information</h3></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-row"><span class="info-label">Username</span><span class="info-value">{{ user.username }}</span></div>
+              <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ user.email }}</span></div>
+              <div class="info-row"><span class="info-label">Phone</span><span class="info-value">{{ user.phoneNumber || 'N/A' }}</span></div>
+              <div class="info-row"><span class="info-label">Role</span><span class="info-value">{{ user.role }}</span></div>
+              <div class="info-row"><span class="info-label">Status</span>
+                <span class="info-value">
+                  {{ user.enabled === false ? 'Disabled' : user.locked ? 'Locked' : 'Active' }}
+                </span>
+              </div>
+              <div class="info-row"><span class="info-label">Email Verified</span><span class="info-value">{{ user.emailVerified ? 'Yes' : 'No' }}</span></div>
+              <div class="info-row"><span class="info-label">Joined</span><span class="info-value">{{ user.createdAt | date: 'MMM dd, yyyy' }}</span></div>
+              <div class="info-row"><span class="info-label">Last Login</span><span class="info-value">{{ user.lastLogin ? (user.lastLogin | date: 'MMM dd, yyyy HH:mm') : 'N/A' }}</span></div>
+              <div class="info-row"><span class="info-label">Updated</span><span class="info-value">{{ user.updatedAt ? (user.updatedAt | date: 'MMM dd, yyyy') : 'N/A' }}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="detail-card" style="margin-top:20px;">
+          <div class="card-header"><h3>Recent Orders ({{ orders.length }})</h3></div>
+          <div class="card-body" style="padding:0;">
+            <div *ngIf="orders.length === 0" style="padding:22px;text-align:center;color:var(--color-text-muted);font-size:var(--text-sm);">No orders yet.</div>
+            <table class="order-items-table" *ngIf="orders.length > 0">
+              <thead><tr><th>Order</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let o of orders">
+                  <td><strong>#{{ o.orderNumber || o.id }}</strong></td>
+                  <td>{{ o.totalPrice | currency }}</td>
+                  <td><span class="status-badge" [class]="(o.orderStatus || '').toLowerCase()">{{ o.orderStatus }}</span></td>
+                  <td style="font-size:var(--text-xs);color:var(--color-text-muted);">{{ o.createdAt | date: 'MMM dd' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <!-- Account Actions -->
+        <div class="detail-card">
+          <div class="card-header"><h3>Account Actions</h3></div>
+          <div class="card-body action-list">
+            <div class="action-item" (click)="toggleEnabled()">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+              <div>
+                <strong>{{ user.enabled !== false ? 'Disable Account' : 'Enable Account' }}</strong>
+                <p>{{ user.enabled !== false ? 'Prevent this user from logging in' : 'Restore access to this user' }}</p>
+              </div>
+            </div>
+            <div class="action-item" (click)="toggleLock()">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V7a4 4 0 118 0v4" stroke="currentColor" stroke-width="1.8"/></svg>
+              <div>
+                <strong>{{ user.locked ? 'Unlock Account' : 'Lock Account' }}</strong>
+                <p>{{ user.locked ? 'Remove the lock on this account' : 'Temporarily lock this account' }}</p>
+              </div>
+            </div>
+            <div class="action-item" *ngIf="!user.emailVerified" (click)="verifyEmail()">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.8"/></svg>
+              <div>
+                <strong>Verify Email</strong>
+                <p>Manually verify this user's email address</p>
+              </div>
+            </div>
+            <div class="action-item" (click)="openRoleModal()">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
+              <div>
+                <strong>Change Role</strong>
+                <p>Current: {{ user.role }}</p>
+              </div>
+            </div>
+            <div class="action-item action-danger" (click)="requestDelete()">
+              <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.8"/></svg>
+              <div>
+                <strong>Delete Account</strong>
+                <p>Permanently remove this user</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Addresses -->
+        <div class="detail-card" style="margin-top:20px;">
+          <div class="card-header"><h3>Saved Addresses</h3></div>
+          <div class="card-body" style="padding:0;">
+            <div *ngIf="!user.deliveryAddresses?.length" style="padding:22px;text-align:center;color:var(--color-text-muted);font-size:var(--text-sm);">No saved addresses.</div>
+            <div class="address-list" *ngIf="user.deliveryAddresses?.length">
+              <div class="address-item" *ngFor="let addr of user.deliveryAddresses">
+                <div class="address-header">
+                  <strong>{{ addr.label || 'Address' }}</strong>
+                  <span class="default-badge" *ngIf="addr.isDefault">Default</span>
+                </div>
+                <p class="address-text">{{ addr.street }}, {{ addr.city }}, {{ addr.state }} {{ addr.zipCode }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- ========== ROLE CHANGE MODAL ========== -->
+<div class="modal-overlay" *ngIf="showRoleModal" (click)="closeRoleModal()"></div>
+<div class="modal modal-sm" *ngIf="showRoleModal">
+  <div class="modal-header">
+    <h2>Change User Role</h2>
+    <button class="modal-close" (click)="closeRoleModal()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p style="margin:0 0 14px;font-size:var(--text-sm);color:var(--color-text-secondary);line-height:1.6;">
+      Change role for <strong>{{ user?.firstName || user?.username }} {{ user?.lastName || '' }}</strong>
+    </p>
+    <div class="role-options">
+      <label class="role-option" [class.selected]="selectedRole === 'USER'" (click)="selectedRole = 'USER'">
+        <input type="radio" name="detailRole" value="USER" [(ngModel)]="selectedRole">
+        <div class="role-option-content">
+          <span class="role-option-title">Customer</span>
+          <span class="role-option-desc">Regular store customer</span>
+        </div>
+        <span class="role-badge">USER</span>
+      </label>
+      <label class="role-option" [class.selected]="selectedRole === 'MANAGER'" (click)="selectedRole = 'MANAGER'">
+        <input type="radio" name="detailRole" value="MANAGER" [(ngModel)]="selectedRole">
+        <div class="role-option-content">
+          <span class="role-option-title">Manager</span>
+          <span class="role-option-desc">Can manage the store</span>
+        </div>
+        <span class="role-badge">MANAGER</span>
+      </label>
+      <label class="role-option" [class.selected]="selectedRole === 'ADMIN'" (click)="selectedRole = 'ADMIN'">
+        <input type="radio" name="detailRole" value="ADMIN" [(ngModel)]="selectedRole">
+        <div class="role-option-content">
+          <span class="role-option-title">Administrator</span>
+          <span class="role-option-desc">Full system access</span>
+        </div>
+        <span class="role-badge">ADMIN</span>
+      </label>
+    </div>
+
+    <!-- Confirmation -->
+    <div class="role-confirm-section">
+      <label class="role-confirm-label">
+        Type <strong>confirm</strong> to proceed
+      </label>
+      <input type="text" class="form-input" [(ngModel)]="roleConfirmText" placeholder='Type "confirm" to proceed' autocomplete="off">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="closeRoleModal()">Cancel</button>
+    <button class="btn btn-primary" (click)="saveRole()" [disabled]="isSavingRole || roleConfirmText.trim().toLowerCase() !== 'confirm'">
+      <span *ngIf="isSavingRole" class="spinner"></span>
+      {{ isSavingRole ? 'Saving...' : 'Update Role' }}
+    </button>
+  </div>
+</div>
+
+<!-- ========== DELETE CONFIRMATION ========== -->
+<div class="modal-overlay" *ngIf="confirmDelete" (click)="cancelDelete()"></div>
+<div class="modal modal-sm" *ngIf="confirmDelete">
+  <div class="modal-header">
+    <h2>Delete User</h2>
+    <button class="modal-close" (click)="cancelDelete()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p style="margin:0;line-height:1.6;font-size:var(--text-sm);color:var(--color-text-secondary);">
+      Are you sure you want to delete <strong>{{ user?.firstName || user?.username }} {{ user?.lastName || '' }}</strong>?
+      This action cannot be undone.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="cancelDelete()">Cancel</button>
+    <button class="btn btn-primary" style="background:var(--color-danger);" (click)="confirmDeleteAction()">Delete</button>
+  </div>
+</div>

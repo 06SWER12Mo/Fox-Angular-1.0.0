@@ -44,7 +44,7 @@
   </div>
 
   <!-- Credit Card Fields -->
-  <div *ngIf="selectedMethod === PaymentMethod.CREDIT_CARD" class="payment-fields">
+  <div *ngIf="selectedMethod === PaymentMethod.CREDIT_CARD" class="payment-fields" [formGroup]="paymentForm">
     <div class="pf-row">
       <div class="pf-group pf-full">
         <label class="pf-label">Card Number</label>
@@ -52,7 +52,7 @@
           type="text"
           class="pf-input"
           placeholder="1234-5678-9012-3456"
-          [formControl]="paymentForm.get('cardNumber')!"
+          formControlName="cardNumber"
           (input)="formatCardNumber()"
           maxlength="19"
         >
@@ -62,7 +62,7 @@
     <div class="pf-row pf-row-3">
       <div class="pf-group">
         <label class="pf-label">Cardholder Name</label>
-        <input type="text" class="pf-input" placeholder="John Doe" [formControl]="paymentForm.get('cardName')!">
+        <input type="text" class="pf-input" placeholder="John Doe" formControlName="cardName">
       </div>
       <div class="pf-group">
         <label class="pf-label">Expiry</label>
@@ -70,7 +70,7 @@
           type="text"
           class="pf-input"
           placeholder="MM/YY"
-          [formControl]="paymentForm.get('cardExpiry')!"
+          formControlName="cardExpiry"
           (input)="formatExpiry()"
           maxlength="5"
         >
@@ -82,7 +82,7 @@
           type="text"
           class="pf-input"
           placeholder="123"
-          [formControl]="paymentForm.get('cardCvv')!"
+          formControlName="cardCvv"
           maxlength="4"
         >
         <p *ngIf="paymentForm.get('cardCvv')?.touched && paymentForm.get('cardCvv')?.invalid" class="pf-error">Enter 3-4 digits</p>
@@ -91,11 +91,11 @@
   </div>
 
   <!-- PayPal Fields -->
-  <div *ngIf="selectedMethod === PaymentMethod.PAYPAL" class="payment-fields">
+  <div *ngIf="selectedMethod === PaymentMethod.PAYPAL" class="payment-fields" [formGroup]="paymentForm">
     <div class="pf-row">
       <div class="pf-group pf-full">
         <label class="pf-label">PayPal Email</label>
-        <input type="email" class="pf-input" placeholder="your@email.com" [formControl]="paymentForm.get('paypalEmail')!">
+        <input type="email" class="pf-input" placeholder="your@email.com" formControlName="paypalEmail">
         <p *ngIf="paymentForm.get('paypalEmail')?.touched && paymentForm.get('paypalEmail')?.invalid" class="pf-error">Enter a valid email address</p>
       </div>
     </div>

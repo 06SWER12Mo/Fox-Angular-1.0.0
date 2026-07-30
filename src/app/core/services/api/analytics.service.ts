@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import {
   DashboardResponse,
@@ -19,17 +20,26 @@ export class AnalyticsService {
 
   constructor(private http: HttpClient) {}
 
+  /** Unwrap the backend's ApiResponse wrapper: extract `.data` if present */
+  private unwrap<T>(obs: Observable<any>): Observable<T> {
+    return obs.pipe(map((res: any) => res?.data ?? res));
+  }
+
   // ========== DASHBOARD ==========
 
   getDashboard(): Observable<DashboardResponse> {
-    return this.http.get<DashboardResponse>(`${this.apiUrl}/dashboard`);
+    return this.http.get<any>(`${this.apiUrl}/dashboard`).pipe(
+      map(res => res?.data || res)
+    );
   }
 
   getDashboardFiltered(startDate: string, endDate: string): Observable<DashboardResponse> {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<DashboardResponse>(`${this.apiUrl}/dashboard/filtered`, { params });
+    return this.http.get<any>(`${this.apiUrl}/dashboard/filtered`, { params }).pipe(
+      map(res => res?.data || res)
+    );
   }
 
   // ========== SALES REPORT ==========
@@ -38,59 +48,81 @@ export class AnalyticsService {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<SalesReport>(`${this.apiUrl}/sales`, { params });
+    return this.unwrap<SalesReport>(
+      this.http.get(`${this.apiUrl}/sales`, { params })
+    );
   }
 
   getSalesReportByDateRange(startDate: string, endDate: string): Observable<SalesReport> {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<SalesReport>(`${this.apiUrl}/sales/by-date-range`, { params });
+    return this.unwrap<SalesReport>(
+      this.http.get(`${this.apiUrl}/sales/by-date-range`, { params })
+    );
   }
 
   // ========== PRODUCT ANALYTICS ==========
 
   getTopSellingProducts(limit: number = 10): Observable<ProductAnalytics[]> {
     const params = new HttpParams().set('limit', limit.toString());
-    return this.http.get<ProductAnalytics[]>(`${this.apiUrl}/products/top`, { params });
+    return this.unwrap<ProductAnalytics[]>(
+      this.http.get(`${this.apiUrl}/products/top`, { params })
+    );
   }
 
   getTopSellingProductsByCategory(categoryId: number, limit: number = 10): Observable<ProductAnalytics[]> {
     const params = new HttpParams().set('limit', limit.toString());
-    return this.http.get<ProductAnalytics[]>(`${this.apiUrl}/products/top-by-category/${categoryId}`, { params });
+    return this.unwrap<ProductAnalytics[]>(
+      this.http.get(`${this.apiUrl}/products/top-by-category/${categoryId}`, { params })
+    );
   }
 
   getProductAnalytics(): Observable<ProductAnalytics[]> {
-    return this.http.get<ProductAnalytics[]>(`${this.apiUrl}/products`);
+    return this.unwrap<ProductAnalytics[]>(
+      this.http.get(`${this.apiUrl}/products`)
+    );
   }
 
   getProductAnalyticsById(productId: number): Observable<ProductAnalytics> {
-    return this.http.get<ProductAnalytics>(`${this.apiUrl}/products/${productId}`);
+    return this.unwrap<ProductAnalytics>(
+      this.http.get(`${this.apiUrl}/products/${productId}`)
+    );
   }
 
   getLowPerformingProducts(threshold: number = 10): Observable<ProductAnalytics[]> {
     const params = new HttpParams().set('threshold', threshold.toString());
-    return this.http.get<ProductAnalytics[]>(`${this.apiUrl}/products/low-performing`, { params });
+    return this.unwrap<ProductAnalytics[]>(
+      this.http.get(`${this.apiUrl}/products/low-performing`, { params })
+    );
   }
 
   // ========== CATEGORY ANALYTICS ==========
 
   getCategoryAnalytics(): Observable<CategoryAnalytics[]> {
-    return this.http.get<CategoryAnalytics[]>(`${this.apiUrl}/categories`);
+    return this.unwrap<CategoryAnalytics[]>(
+      this.http.get(`${this.apiUrl}/categories`)
+    );
   }
 
   getCategoryAnalyticsById(categoryId: number): Observable<CategoryAnalytics> {
-    return this.http.get<CategoryAnalytics>(`${this.apiUrl}/categories/${categoryId}`);
+    return this.unwrap<CategoryAnalytics>(
+      this.http.get(`${this.apiUrl}/categories/${categoryId}`)
+    );
   }
 
   // ========== GEOGRAPHIC REPORT ==========
 
   getGeographicReport(): Observable<GeographicReport> {
-    return this.http.get<GeographicReport>(`${this.apiUrl}/geographic`);
+    return this.unwrap<GeographicReport>(
+      this.http.get(`${this.apiUrl}/geographic`)
+    );
   }
 
   getGeographicReportByCountry(country: string): Observable<GeographicReport> {
-    return this.http.get<GeographicReport>(`${this.apiUrl}/geographic/${country}`);
+    return this.unwrap<GeographicReport>(
+      this.http.get(`${this.apiUrl}/geographic/${country}`)
+    );
   }
 
   // ========== TIME SERIES ==========
@@ -99,7 +131,9 @@ export class AnalyticsService {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<SalesByDay[]>(`${this.apiUrl}/sales/daily`, { params });
+    return this.unwrap<SalesByDay[]>(
+      this.http.get(`${this.apiUrl}/sales/daily`, { params })
+    );
   }
 
   // ========== CUSTOMER ANALYTICS ==========
@@ -108,26 +142,34 @@ export class AnalyticsService {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<number>(`${this.apiUrl}/customers/new`, { params });
+    return this.unwrap<number>(
+      this.http.get(`${this.apiUrl}/customers/new`, { params })
+    );
   }
 
   getActiveCustomersCount(startDate: string, endDate: string): Observable<number> {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<number>(`${this.apiUrl}/customers/active`, { params });
+    return this.unwrap<number>(
+      this.http.get(`${this.apiUrl}/customers/active`, { params })
+    );
   }
 
   // ========== ORDER ANALYTICS ==========
 
   getOrderStatusDistribution(status: string): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/orders/status/${status}`);
+    return this.unwrap<number>(
+      this.http.get(`${this.apiUrl}/orders/status/${status}`)
+    );
   }
 
   getAverageOrderValue(startDate: string, endDate: string): Observable<number> {
     const params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate);
-    return this.http.get<number>(`${this.apiUrl}/orders/average-value`, { params });
+    return this.unwrap<number>(
+      this.http.get(`${this.apiUrl}/orders/average-value`, { params })
+    );
   }
 }

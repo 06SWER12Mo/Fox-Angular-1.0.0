@@ -120,7 +120,14 @@ export class TokenService {
     if (!token) return null;
     
     const payload = this.decodeToken(token);
-    return payload?.role || null;
+    let role = payload?.role || null;
+    // Backend stores ROLE_MANAGER, ROLE_ADMIN, ROLE_USER in the JWT (with ROLE_ prefix
+    // from Spring Security's SimpleGrantedAuthority). Strip the prefix so the rest of
+    // the app can compare against 'MANAGER', 'ADMIN', 'USER' directly.
+    if (role && role.startsWith('ROLE_')) {
+      role = role.substring(5);
+    }
+    return role;
   }
 
   getUsername(): string | null {

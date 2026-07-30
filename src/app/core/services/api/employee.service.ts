@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Employee, EmployeeRequest, EmployeeStats } from '../../models/employee.model';
 import { PageResponse } from '../../models/common.model';
@@ -13,16 +14,21 @@ export class EmployeeService {
 
   constructor(private http: HttpClient) {}
 
+  /** Unwrap the backend's ApiResponse wrapper */
+  private unwrap<T>(obs: Observable<any>): Observable<T> {
+    return obs.pipe(map((res: any) => res?.data ?? res));
+  }
+
   // ========== CREATE ==========
 
   createEmployee(request: EmployeeRequest): Observable<Employee> {
-    return this.http.post<Employee>(this.apiUrl, request);
+    return this.unwrap<Employee>(this.http.post(this.apiUrl, request));
   }
 
   // ========== UPDATE ==========
 
   updateEmployee(id: number, request: EmployeeRequest): Observable<Employee> {
-    return this.http.put<Employee>(`${this.apiUrl}/${id}`, request);
+    return this.unwrap<Employee>(this.http.put(`${this.apiUrl}/${id}`, request));
   }
 
   // ========== DELETE ==========
@@ -40,7 +46,7 @@ export class EmployeeService {
   // ========== GET BY ID ==========
 
   getEmployeeById(id: number): Observable<Employee> {
-    return this.http.get<Employee>(`${this.apiUrl}/${id}`);
+    return this.unwrap<Employee>(this.http.get(`${this.apiUrl}/${id}`));
   }
 
   getEmployeeByPassportNumber(passportNumber: string): Observable<Employee> {
@@ -57,21 +63,21 @@ export class EmployeeService {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(this.apiUrl, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(this.apiUrl, { params }));
   }
 
   getActiveEmployees(page: number = 0, size: number = 20): Observable<PageResponse<Employee>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(`${this.apiUrl}/active`, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(`${this.apiUrl}/active`, { params }));
   }
 
   getInactiveEmployees(page: number = 0, size: number = 20): Observable<PageResponse<Employee>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(`${this.apiUrl}/inactive`, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(`${this.apiUrl}/inactive`, { params }));
   }
 
   // ========== SEARCH ==========
@@ -81,7 +87,7 @@ export class EmployeeService {
       .set('name', name)
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(`${this.apiUrl}/search/name`, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(`${this.apiUrl}/search/name`, { params }));
   }
 
   searchEmployeesByRole(role: string, page: number = 0, size: number = 20): Observable<PageResponse<Employee>> {
@@ -89,7 +95,7 @@ export class EmployeeService {
       .set('role', role)
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(`${this.apiUrl}/search/role`, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(`${this.apiUrl}/search/role`, { params }));
   }
 
   searchEmployeesByNameAndRole(name: string, role: string, page: number = 0, size: number = 20): Observable<PageResponse<Employee>> {
@@ -98,7 +104,7 @@ export class EmployeeService {
       .set('role', role || '')
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(`${this.apiUrl}/search/name-role`, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(`${this.apiUrl}/search/name-role`, { params }));
   }
 
   searchEmployees(keyword: string, page: number = 0, size: number = 20): Observable<PageResponse<Employee>> {
@@ -106,7 +112,7 @@ export class EmployeeService {
       .set('keyword', keyword)
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(`${this.apiUrl}/search`, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(`${this.apiUrl}/search`, { params }));
   }
 
   // ========== ROLE BASED ==========
@@ -119,7 +125,7 @@ export class EmployeeService {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<Employee>>(`${this.apiUrl}/role/${role}/paginated`, { params });
+    return this.unwrap<PageResponse<Employee>>(this.http.get(`${this.apiUrl}/role/${role}/paginated`, { params }));
   }
 
   getActiveEmployeesByRole(role: string): Observable<Employee[]> {

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CartService } from '../../../../core/services/api/cart.service';
 import { OrderService } from '../../../../core/services/api/order.service';
+import { PaymentService } from '../../../../core/services/api/payment.service';
 import { LocationService } from '../../../../core/services/api/location.service';
 import { Cart } from '../../../../core/models/cart.model';
 import { DeliveryAddress } from '../../../../core/models/location.model';
@@ -34,7 +35,7 @@ export class CheckoutMainComponent implements OnInit {
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
-
+    private paymentService: PaymentService,
     private locationService: LocationService,
     private fb: FormBuilder,
     private router: Router
@@ -143,7 +144,7 @@ export class CheckoutMainComponent implements OnInit {
       cartId: this.cart.id
     };
 
-    // Place order — backend handles payment internally
+    // Step 1: Place the order
     this.orderService.placeOrder(request).subscribe({
       next: (orderResponse: any) => {
         const orderId = orderResponse?.data?.id || orderResponse?.id;
@@ -154,13 +155,24 @@ export class CheckoutMainComponent implements OnInit {
           return;
         }
 
-        // Show success and navigate to orders page
-        this.isPlacingOrder = false;
-        this.successMessage = 'Order placed successfully!';
-        this.cartService.refreshCartCount();
-        setTimeout(() => {
-          this.router.navigate(['/orders']);
-        }, 1200);
+        // Step 2: Process payment immediately (auto-pay)
+        this.paymentService.processPayment({
+          orderId: orderId,
+          paymentMethod: this.selectedPaymentMethod!
+        }).subscribe({
+          next: () => {
+            this.isPlacingOrder = false;
+            this.successMessage = 'Order placed & payment confirmed!';
+            this.cartService.refreshCartCount();
+            setTimeout(() => this.router.navigate(['/orders']), 1200);
+          },
+          error: () => {
+            this.isPlacingOrder = false;
+            this.successMessage = 'Order placed. Payment could not be processed — you can pay from My Orders.';
+            this.cartService.refreshCartCount();
+            setTimeout(() => this.router.navigate(['/orders']), 2500);
+          }
+        });
       },
       error: (orderError) => {
         this.isPlacingOrder = false;

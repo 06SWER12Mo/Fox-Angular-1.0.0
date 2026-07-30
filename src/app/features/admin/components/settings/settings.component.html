@@ -1,0 +1,140 @@
+<div class="admin-page form-page">
+  <div class="page-header">
+    <div>
+      <h1>Store Settings</h1>
+      <p>Manage your store information and preferences.</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" style="text-align:center;padding:60px 0;">
+    <div class="spinner"></div>
+    <p style="color:var(--color-text-muted);margin-top:16px;">Loading store settings...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" style="text-align:center;padding:60px 20px;">
+    <p style="color:var(--color-danger);font-size:var(--text-md);font-weight:var(--weight-semibold);margin:0 0 8px;">Could not load settings</p>
+    <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin:0 0 20px;">{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="loadSettings()">Retry</button>
+  </div>
+
+  <!-- Settings Form -->
+  <div class="form-card" *ngIf="!isLoading && !errorMessage" style="max-width:800px;">
+    <div *ngIf="lastUpdated" style="font-size:11px;color:var(--color-text-muted);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--color-border-light);">
+      Last updated: {{ lastUpdated | date:'MMM dd, yyyy HH:mm' }} <span *ngIf="updatedBy">by {{ updatedBy }}</span>
+    </div>
+
+    <form [formGroup]="settingsForm" (ngSubmit)="save()">
+      <div class="form-grid">
+        <!-- Store Name -->
+        <div class="form-field span-2">
+          <label>Store Name <span class="required">*</span></label>
+          <input type="text" formControlName="storeName" class="form-input" placeholder="My Store">
+        </div>
+
+        <!-- Store Description -->
+        <div class="form-field span-2">
+          <label>Store Description</label>
+          <textarea formControlName="storeDescription" class="form-input form-textarea" rows="3" placeholder="Describe your store..."></textarea>
+        </div>
+
+        <!-- Logo -->
+        <div class="form-field span-2">
+          <label>Store Logo</label>
+          <div class="image-upload-area" (click)="logoInput.click()" style="max-width:220px;">
+            <input #logoInput type="file" accept="image/*" (change)="onLogoSelected($event)" hidden>
+            <div class="upload-placeholder" *ngIf="!logoPreview">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.8"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.8"/></svg>
+              <span>Upload Logo</span>
+            </div>
+            <img *ngIf="logoPreview" [src]="logoPreview" class="image-preview" alt="Store Logo">
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <h3 class="span-2" style="font-size:var(--text-xs);font-weight:var(--weight-semibold);color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 0;padding-top:16px;border-top:1px solid var(--color-border-light);">Contact Information</h3>
+
+        <div class="form-field">
+          <label>Contact Email</label>
+          <input type="email" formControlName="contactEmail" class="form-input" placeholder="store@example.com">
+        </div>
+
+        <div class="form-field">
+          <label>Phone Number</label>
+          <input type="tel" formControlName="contactPhone" class="form-input" placeholder="+1 (555) 000-0000">
+        </div>
+
+        <div class="form-field span-2">
+          <label>Address</label>
+          <input type="text" formControlName="contactAddress" class="form-input" placeholder="123 Main St, City">
+        </div>
+
+
+
+        <!-- Currency & Pricing -->
+        <h3 class="span-2" style="font-size:var(--text-xs);font-weight:var(--weight-semibold);color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 0;padding-top:16px;border-top:1px solid var(--color-border-light);">Currency &amp; Pricing</h3>
+
+        <div class="form-field">
+          <label>Currency Code</label>
+          <select formControlName="currencyCode" class="form-input">
+            <option value="ILS">ILS (₪)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Currency Symbol</label>
+          <input type="text" formControlName="currencySymbol" class="form-input" placeholder="₪" maxlength="5">
+        </div>
+
+        <div class="form-field">
+          <label>Tax Rate (%)</label>
+          <input type="number" formControlName="taxRate" class="form-input" step="0.1" min="0" max="100">
+        </div>
+
+        <div class="form-field">
+          <label>Default Shipping Cost</label>
+          <input type="number" formControlName="defaultShippingCost" class="form-input" step="0.01" min="0">
+        </div>
+
+        <div class="form-field">
+          <label>Free Shipping Threshold</label>
+          <input type="number" formControlName="freeShippingThreshold" class="form-input" step="0.01" min="0">
+        </div>
+
+        <!-- Social Media -->
+        <h3 class="span-2" style="font-size:var(--text-xs);font-weight:var(--weight-semibold);color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 0;padding-top:16px;border-top:1px solid var(--color-border-light);">Social Media</h3>
+
+        <div class="form-field">
+          <label>Facebook URL</label>
+          <input type="text" formControlName="facebookUrl" class="form-input" placeholder="https://facebook.com/store">
+        </div>
+
+        <div class="form-field">
+          <label>Twitter URL</label>
+          <input type="text" formControlName="twitterUrl" class="form-input" placeholder="https://twitter.com/store">
+        </div>
+
+        <div class="form-field span-2">
+          <label>Instagram URL</label>
+          <input type="text" formControlName="instagramUrl" class="form-input" placeholder="https://instagram.com/store">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving">
+          <svg *ngIf="!isSaving" viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
+          {{ isSaving ? 'Saving...' : 'Save Settings' }}
+        </button>
+      </div>
+
+      <div class="form-success" *ngIf="saveSuccess">
+        <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Settings saved successfully!
+      </div>
+    </form>
+  </div>
+</div>

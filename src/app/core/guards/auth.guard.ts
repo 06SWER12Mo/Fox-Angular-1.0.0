@@ -38,11 +38,21 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
 
   private checkAuth(): boolean | UrlTree {
     if (this.tokenService.isAuthenticated()) {
+      // Authenticated — allow the guard to pass.
+      // CustomerGuard (applied on the same route) will block MANAGER/ADMIN
+      // from customer-only pages and redirect them to /admin/dashboard.
       return true;
     }
     
-    // Open the auth modal popup instead of redirecting to the old full-page login
-    this.authModalService.open('login').subscribe();
+    // Open the auth modal popup — after login, redirect MANAGER/ADMIN users
+    this.authModalService.open('login').subscribe(result => {
+      if (result?.success) {
+        const role = this.tokenService.getUserRole();
+        if (role === 'MANAGER' || role === 'ADMIN') {
+          window.location.href = '/admin/dashboard';
+        }
+      }
+    });
     return false;
   }
 }

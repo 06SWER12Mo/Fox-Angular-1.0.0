@@ -1,4 +1,40 @@
 <div class="addresses-page">
+  <!-- ==================== MAP BANNER ==================== -->
+  <div class="map-banner">
+    <div class="map-banner-bg" aria-hidden="true">
+      <!-- Decorative map lines -->
+      <svg class="map-grid" viewBox="0 0 960 200" preserveAspectRatio="none" fill="none">
+        <path d="M0 40 Q120 20 240 50 T480 30 T720 60 T960 40" stroke="currentColor" stroke-width="0.5" opacity="0.12"/>
+        <path d="M0 80 Q160 60 320 90 T640 70 T960 80" stroke="currentColor" stroke-width="0.5" opacity="0.10"/>
+        <path d="M0 120 Q200 100 400 130 T800 110 T960 120" stroke="currentColor" stroke-width="0.5" opacity="0.08"/>
+        <path d="M0 160 Q100 140 300 170 T700 150 T960 160" stroke="currentColor" stroke-width="0.5" opacity="0.06"/>
+      </svg>
+      <!-- Animated dots simulating signal/pulse -->
+      <div class="map-dot map-dot-1"></div>
+      <div class="map-dot map-dot-2"></div>
+      <div class="map-dot map-dot-3"></div>
+      <!-- Radial pulse rings -->
+      <div class="map-pulse map-pulse-1"></div>
+      <div class="map-pulse map-pulse-2"></div>
+      <!-- Accent gradient overlays -->
+      <div class="map-overlay-left"></div>
+      <div class="map-overlay-right"></div>
+    </div>
+    <div class="map-banner-content">
+      <div class="map-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" class="map-marker-svg">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8"/>
+          <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        <div class="map-marker-ring"></div>
+      </div>
+      <div class="map-text">
+        <h2 class="map-title">Your Delivery Addresses</h2>
+        <p class="map-subtitle">Manage where we deliver your orders. Add, edit, or set a default address.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-left">
@@ -67,7 +103,26 @@
       <div class="card-body">
         <!-- Address Type Badge -->
         <div class="addr-type">
-          <span class="type-icon">{{ getAddressTypeIcon(address.addressType) }}</span>
+          <span class="type-icon">
+            <ng-container [ngSwitch]="getAddressTypeIcon(address.addressType)">
+              <svg *ngSwitchCase="'home'" viewBox="0 0 24 24" fill="none" width="18" height="18">
+                <path d="M3 10l9-7 9 7v10a1 1 0 01-1 1H4a1 1 0 01-1-1V10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg *ngSwitchCase="'work'" viewBox="0 0 24 24" fill="none" width="18" height="18">
+                <rect x="2" y="7" width="20" height="15" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M16 22V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v17" stroke="currentColor" stroke-width="1.8"/>
+                <circle cx="9" cy="12" r="1" fill="currentColor"/>
+                <circle cx="15" cy="12" r="1" fill="currentColor"/>
+                <circle cx="9" cy="16" r="1" fill="currentColor"/>
+                <circle cx="15" cy="16" r="1" fill="currentColor"/>
+              </svg>
+              <svg *ngSwitchDefault viewBox="0 0 24 24" fill="none" width="18" height="18">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8"/>
+                <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </ng-container>
+          </span>
           <span class="type-label">{{ address.addressType | titlecase }}</span>
         </div>
 

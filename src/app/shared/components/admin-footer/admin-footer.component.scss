@@ -1,0 +1,106 @@
+/* ============================================================
+   ADMIN FOOTER — Minimal footer for admin routes
+   ============================================================ */
+
+$ink: #14171c;
+$ink-soft: #1f232b;
+$brass: #c9a24b;
+$brass-dim: #8a7238;
+$ash: #a9afbb;
+$bone: #ecece4;
+
+.admin-footer {
+  background: $ink;
+  border-top: 1px solid rgba($brass, 0.12);
+
+  &::before {
+    content: '';
+    display: block;
+    height: 1.5px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      $brass 20%,
+      $brass 80%,
+      transparent 100%
+    );
+    opacity: 0.35;
+  }
+}
+
+.admin-footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.af-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  .af-brand-icon {
+    width: 18px;
+    height: 18px;
+    color: $brass;
+  }
+
+  .af-brand-text {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: $bone;
+  }
+
+  .af-brand-dot {
+    color: $brass;
+  }
+}
+
+.af-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 16px;
+
+  a {
+    color: $ash;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+
+    &:hover {
+      color: $brass;
+      background: rgba($brass, 0.08);
+    }
+  }
+}
+
+.af-copyright {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  span {
+    color: rgba($ash, 0.45);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-footer-inner { padding: 16px; }
+  .af-links { gap: 2px; }
+  .af-links a { padding: 4px 8px; font-size: 11px; }
+}
