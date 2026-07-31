@@ -24,6 +24,9 @@ export class UserDetailComponent implements OnInit {
   // Delete confirmation
   confirmDelete = false;
 
+  // Avatar image fallback (broken image falls back to initials)
+  avatarImgError = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -40,6 +43,8 @@ export class UserDetailComponent implements OnInit {
 
   loadUser(id: number): void {
     this.isLoading = true;
+    // Reset avatar error so a newly loaded/fixed profile picture gets a chance to render
+    this.avatarImgError = false;
     this.userService.getUserById(id).pipe(
       finalize(() => { this.isLoading = false; this.cdr.detectChanges(); })
     ).subscribe({
@@ -62,6 +67,20 @@ export class UserDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/admin/users']);
+  }
+
+  // ========== AVATAR ==========
+
+  getImageUrl(url: string | undefined | null): string {
+    if (!url) return 'assets/images/placeholder.svg';
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/api')) return `http://localhost:8081${url}`;
+    return `http://localhost:8081/api/images/${url}`;
+  }
+
+  onAvatarError(): void {
+    this.avatarImgError = true;
+    this.cdr.detectChanges();
   }
 
   // ========== ENABLE / DISABLE ==========

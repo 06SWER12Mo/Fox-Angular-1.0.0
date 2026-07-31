@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../core/services/api/product.service';
 import { CategoryService } from '../../../../core/services/api/category.service';
+import { ImageService } from '../../../../core/services/api/image.service';
 
 @Component({
   selector: 'app-admin-product-form',
@@ -18,6 +19,7 @@ export class ProductFormComponent implements OnInit {
   isLoading = false;
   categories: any[] = [];
   imagePreview: string | null = null;
+  selectedImageFile: File | null = null;
   errorMessage = '';
 
   constructor(
@@ -26,6 +28,7 @@ export class ProductFormComponent implements OnInit {
     private router: Router,
     private productService: ProductService,
     private categoryService: CategoryService,
+    private imageService: ImageService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -34,9 +37,10 @@ export class ProductFormComponent implements OnInit {
       name: ['', Validators.required],
       description: [''],
       price: [0, [Validators.required, Validators.min(0)]],
-      discount: [0],
+      costPrice: [null, [Validators.required, Validators.min(0)]],
+      compareAtPrice: [null, [Validators.required, Validators.min(0)]],
       stockQuantity: [0, Validators.min(0)],
-      sku: [''],
+      sku: ['', Validators.required],
       barcode: [''],
       brand: [''],
       categoryId: [null, Validators.required],
@@ -70,7 +74,8 @@ export class ProductFormComponent implements OnInit {
           name: p.name,
           description: p.description,
           price: p.price,
-          discount: p.discountPercentage || 0,
+          costPrice: p.costPrice,
+          compareAtPrice: p.compareAtPrice,
           stockQuantity: p.stockQuantity || 0,
           sku: p.sku,
           barcode: p.barcode,
@@ -96,6 +101,7 @@ export class ProductFormComponent implements OnInit {
   onImageSelected(event: any): void {
     const file = event.target.files?.[0];
     if (file) {
+      this.selectedImageFile = file;
       const reader = new FileReader();
       reader.onload = (e) => this.imagePreview = e.target?.result as string;
       reader.readAsDataURL(file);
@@ -113,7 +119,21 @@ export class ProductFormComponent implements OnInit {
       : this.productService.createProduct(data);
 
     obs.subscribe({
-      next: () => this.router.navigate(['/admin/products']),
+      next: (product: any) => {
+        // Upload the selected image so it is actually saved with the product
+        if (this.selectedImageFile && product?.id) {
+          this.imageService.uploadProductImage(product.id, this.selectedImageFile, 'MAIN', 0).subscribe({
+            next: () => this.router.navigate(['/admin/products']),
+            error: (err) => {
+              console.error('Product image upload failed:', err);
+              this.errorMessage = 'Product saved, but the image could not be uploaded.';
+              this.isSaving = false;
+            }
+          });
+        } else {
+          this.router.navigate(['/admin/products']);
+        }
+      },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Failed to save product';
         this.isSaving = false;

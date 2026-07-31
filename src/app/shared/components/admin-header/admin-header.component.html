@@ -20,13 +20,16 @@
 
     <!-- Right: Actions -->
     <div class="ah-right">
-      <div class="ah-user" *ngIf="user">
-        <div class="ah-avatar">{{ getInitials() }}</div>
+      <a class="ah-user" *ngIf="user" routerLink="/admin/profile" title="My Profile">
+        <div class="ah-avatar">
+          <img *ngIf="user.profilePictureUrl && !avatarImgError" [src]="getImageUrl(user.profilePictureUrl)" alt="" (error)="onAvatarError()">
+          <span *ngIf="!user.profilePictureUrl || avatarImgError" class="ah-avatar-initials">{{ getInitials() }}</span>
+        </div>
         <div class="ah-user-info">
           <span class="ah-user-name">{{ user.firstName || user.username }}</span>
           <span class="ah-user-role">{{ getRoleLabel() }}</span>
         </div>
-      </div>
+      </a>
 
       <button class="ah-logout" (click)="logout()" title="Logout">
         <svg viewBox="0 0 24 24" fill="none">

@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from '../../../../core/services/api/product.service';
+import { CategoryService } from '../../../../core/services/api/category.service';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
@@ -12,9 +13,12 @@ import { Subject } from 'rxjs';
 })
 export class ProductListComponent implements OnInit {
   products: any[] = [];
+  categories: any[] = [];
   isLoading = true;
   searchQuery = '';
+  selectedCategoryId: number | null = null;
   private searchSubject = new Subject<string>();
+  private requestId = 0;
   currentPage = 0;
   totalPages = 0;
   totalElements = 0;
@@ -25,13 +29,27 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
+    private categoryService: CategoryService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.loadCategories();
     this.loadProducts();
     this.searchSubject.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => this.loadProducts());
+  }
+
+  loadCategories(): void {
+    this.categoryService.getAllCategories(0, 500).subscribe({
+      next: (res: any) => this.categories = Array.isArray(res) ? res : res?.content || [],
+      error: () => this.categories = []
+    });
+  }
+
+  onCategoryChange(): void {
+    this.currentPage = 0;
+    this.loadProducts();
   }
 
   onSearch(): void {
@@ -40,17 +58,38 @@ export class ProductListComponent implements OnInit {
 
   loadProducts(): void {
     this.isLoading = true;
-    const obs = this.searchQuery
-      ? this.productService.searchProducts(this.searchQuery, this.currentPage, this.pageSize)
-      : this.productService.getAllProducts(this.currentPage, this.pageSize);
+    const requestId = ++this.requestId;
+    let obs: any;
 
-    obs.pipe(finalize(() => { this.isLoading = false; this.cdr.detectChanges(); })).subscribe({
+    if (this.selectedCategoryId && this.searchQuery) {
+      obs = this.productService.advancedSearch({
+        keyword: this.searchQuery,
+        categoryId: this.selectedCategoryId,
+        page: this.currentPage,
+        size: this.pageSize
+      });
+    } else if (this.selectedCategoryId) {
+      obs = this.productService.getProductsByCategory(this.selectedCategoryId, this.currentPage, this.pageSize);
+    } else if (this.searchQuery) {
+      obs = this.productService.searchProducts(this.searchQuery, this.currentPage, this.pageSize);
+    } else {
+      obs = this.productService.getAllProducts(this.currentPage, this.pageSize);
+    }
+
+    obs.pipe(finalize(() => {
+      if (requestId === this.requestId) {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    })).subscribe({
       next: (res: any) => {
+        // Ignore stale responses from an earlier filter change
+        if (requestId !== this.requestId) return;
         this.products = res?.content || res || [];
         this.totalPages = res?.totalPages || 1;
         this.totalElements = res?.totalElements || this.products.length;
       },
-      error: () => this.products = []
+      error: () => { if (requestId === this.requestId) this.products = []; }
     });
   }
 
@@ -62,6 +101,10 @@ export class ProductListComponent implements OnInit {
 
   editProduct(id: number): void {
     this.router.navigate(['/admin/products', id, 'edit']);
+  }
+
+  viewProduct(id: number): void {
+    this.router.navigate(['/admin/products', id]);
   }
 
   toggleStatus(product: any): void {

@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <!-- Supplier Filter -->
+  <!-- Filters -->
   <div class="filter-bar">
     <div class="filter-group">
       <label class="filter-label">Filter by Supplier</label>
@@ -24,11 +24,31 @@
           <option [ngValue]="null">All Suppliers</option>
           <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s.name }}</option>
         </select>
-        <button *ngIf="selectedSupplierId" class="btn btn-ghost btn-sm" (click)="clearFilter()">
-          Clear Filter
-        </button>
       </div>
     </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Filter by Date Range</label>
+      <div class="filter-row">
+        <input
+          type="date"
+          class="filter-select filter-date"
+          [(ngModel)]="startDate"
+          (ngModelChange)="onDateFilter()"
+          title="From date" />
+        <span class="filter-sep">to</span>
+        <input
+          type="date"
+          class="filter-select filter-date"
+          [(ngModel)]="endDate"
+          (ngModelChange)="onDateFilter()"
+          title="To date" />
+      </div>
+    </div>
+
+    <button *ngIf="hasActiveFilters()" class="btn btn-ghost btn-sm" (click)="clearFilter()">
+      Clear Filters
+    </button>
   </div>
 
   <div class="table-card">
@@ -47,12 +67,12 @@
         <line x1="44" y1="48" x2="56" y2="48" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         <path d="M18 62h44" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
-      <h3 *ngIf="!selectedSupplierId" class="empty-title">No receipts yet</h3>
-      <h3 *ngIf="selectedSupplierId" class="empty-title">No receipts from this supplier</h3>
+      <h3 *ngIf="!hasActiveFilters()" class="empty-title">No receipts yet</h3>
+      <h3 *ngIf="hasActiveFilters()" class="empty-title">No receipts match your filters</h3>
       <p class="empty-desc">
-        {{ selectedSupplierId ? 'There are currently no receipts for the selected supplier.' : 'Receipts will appear here once orders are completed and receipts are generated.' }}
+        {{ hasActiveFilters() ? 'There are currently no receipts matching the selected supplier or date range.' : 'Receipts will appear here once orders are completed and receipts are generated.' }}
       </p>
-      <button *ngIf="selectedSupplierId" class="btn btn-ghost" (click)="clearFilter()">
+      <button *ngIf="hasActiveFilters()" class="btn btn-ghost" (click)="clearFilter()">
         View All Receipts
       </button>
     </div>
@@ -63,27 +83,24 @@
         <thead>
           <tr>
             <th>Receipt #</th>
-            <th>Order #</th>
             <th>Supplier</th>
-            <th>Customer</th>
             <th>Date</th>
             <th>Payment</th>
             <th>Total</th>
-            <th style="width:80px;">Actions</th>
+            <th style="width:110px;">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let r of receipts">
             <td><strong>{{ r.receiptNumber }}</strong></td>
-            <td>{{ r.orderNumber }}</td>
             <td><span class="supplier-badge">{{ r.supplierName || '—' }}</span></td>
-            <td>{{ r.customerName }}</td>
             <td>{{ (r.receiptDate || r.createdAt) | date: 'MMM dd, yyyy' }}</td>
             <td>{{ r.paymentMethod }}</td>
             <td><strong>{{ r.totalAmount | currency }}</strong></td>
             <td>
-              <button class="action-btn" (click)="printReceipt(r)" title="Print">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M6 9V2h12v7" stroke="currentColor" stroke-width="1.8"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="14" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/></svg>
+              <button class="btn-show-towns" (click)="viewReceipt(r)" title="View receipt">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s3-6 7-6 7 6 7 6-3 6-7 6-7-6-7-6z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                View
               </button>
             </td>
           </tr>
@@ -99,5 +116,96 @@
         <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Next</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ========== RECEIPT VIEW MODAL ========== -->
+<div class="modal-overlay" *ngIf="showReceiptModal" (click)="closeReceiptModal()"></div>
+<div class="modal modal-lg" *ngIf="showReceiptModal">
+  <div class="modal-header">
+    <h2>Receipt {{ selectedReceipt?.receiptNumber }}</h2>
+    <button class="modal-close" (click)="closeReceiptModal()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <!-- Loading -->
+    <div *ngIf="receiptLoading" style="text-align:center;padding:60px 0;">
+      <div class="spinner"></div>
+      <p style="color:var(--color-text-muted);margin-top:16px;">Loading receipt...</p>
+    </div>
+
+    <ng-container *ngIf="!receiptLoading && selectedReceipt">
+      <div class="bill">
+        <!-- Bill header -->
+        <div class="bill-header">
+          <div class="bill-brand">
+            <span class="bill-eyebrow">RECEIPT</span>
+            <span class="bill-number">#{{ selectedReceipt.receiptNumber }}</span>
+          </div>
+          <div class="bill-meta">
+            <div class="bill-meta-row"><span>Date</span><strong>{{ (selectedReceipt.receiptDate || selectedReceipt.createdAt) | date: 'MMM dd, yyyy' }}</strong></div>
+            <div class="bill-meta-row"><span>Status</span>
+              <span class="bill-badge" [class.bill-badge-success]="selectedReceipt.status === 'APPROVED'" [class.bill-badge-warning]="selectedReceipt.status === 'PENDING'" [class.bill-badge-danger]="selectedReceipt.status === 'REJECTED' || selectedReceipt.status === 'CANCELLED'">{{ selectedReceipt.status || '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parties -->
+        <div class="bill-parties">
+          <div class="bill-party">
+            <span class="bill-party-label">SUPPLIER</span>
+            <strong>{{ selectedReceipt.supplierName || '—' }}</strong>
+            <span *ngIf="selectedReceipt.supplierCode" class="bill-party-sub">{{ selectedReceipt.supplierCode }}</span>
+          </div>
+          <div class="bill-party bill-party-right">
+            <span class="bill-party-label">PAYMENT</span>
+            <strong>{{ selectedReceipt.paymentMethod || '—' }}</strong>
+            <span *ngIf="selectedReceipt.paymentStatus" class="bill-party-sub">Status: {{ selectedReceipt.paymentStatus }}</span>
+          </div>
+        </div>
+
+        <!-- Items table -->
+        <table class="bill-table">
+          <thead>
+            <tr><th>#</th><th>Product</th><th>SKU</th><th class="bill-num">Qty</th><th class="bill-num">Unit Price</th><th class="bill-num">Total</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of selectedReceipt.items || []; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><strong>{{ item.productName }}</strong></td>
+              <td class="bill-muted">{{ item.productSku || '—' }}</td>
+              <td class="bill-num">{{ item.quantity }}</td>
+              <td class="bill-num">{{ item.unitPrice | currency }}</td>
+              <td class="bill-num bill-strong">{{ item.totalPrice | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="bill-totals">
+          <div class="bill-total-row"><span>Subtotal</span><span>{{ selectedReceipt.subtotal | currency }}</span></div>
+          <div class="bill-total-row" *ngIf="selectedReceipt.shippingCost"><span>Shipping</span><span>{{ selectedReceipt.shippingCost | currency }}</span></div>
+          <div class="bill-total-row" *ngIf="selectedReceipt.discountAmount"><span>Discount</span><span>-{{ selectedReceipt.discountAmount | currency }}</span></div>
+          <div class="bill-total-row" *ngIf="selectedReceipt.taxAmount"><span>Tax</span><span>{{ selectedReceipt.taxAmount | currency }}</span></div>
+          <div class="bill-total-row bill-grand-total"><span>Grand Total</span><span>{{ selectedReceipt.totalAmount | currency }}</span></div>
+        </div>
+
+        <!-- Notes -->
+        <div class="bill-footer" *ngIf="selectedReceipt.notes">
+          <span class="bill-party-label">NOTES</span>
+          <p>{{ selectedReceipt.notes }}</p>
+        </div>
+        <div class="bill-footer" *ngIf="selectedReceipt.createdByName">
+          <span class="bill-party-label">CREATED BY</span>
+          <p>{{ selectedReceipt.createdByName }}</p>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-ghost" (click)="closeReceiptModal()">Close</button>
   </div>
 </div>

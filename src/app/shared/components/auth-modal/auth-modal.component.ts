@@ -23,6 +23,7 @@ export class AuthModalComponent implements OnInit, OnDestroy {
   isLoading = false;
   submitted = false;
   errorMessage = '';
+  loginFailed = false;
 
   // Login form fields
   loginForm!: FormGroup;
@@ -85,15 +86,31 @@ export class AuthModalComponent implements OnInit, OnDestroy {
       ? null : { mismatch: true };
   }
 
+  /** Map backend errors to a clean, friendly message shown inline in the form. */
+  private getFriendlyError(error: any, kind: 'login' | 'register'): string {
+    if (error?.status === 401 && kind === 'login') {
+      return 'Invalid username or password.';
+    }
+    if (error?.status === 0) {
+      return 'Cannot reach the server. Please check your connection and try again.';
+    }
+    if (kind === 'login') {
+      return error?.error?.message || 'Login failed. Please try again.';
+    }
+    return error?.error?.message || 'Registration failed. Please try again.';
+  }
+
   switchMode(mode: AuthModalMode): void {
     this.mode = mode;
     this.errorMessage = '';
+    this.loginFailed = false;
     this.submitted = false;
   }
 
   onLoginSubmit(): void {
     this.submitted = true;
     this.errorMessage = '';
+    this.loginFailed = false;
 
     if (this.loginForm.invalid) return;
 
@@ -108,7 +125,9 @@ export class AuthModalComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+        this.errorMessage = this.getFriendlyError(error, 'login');
+        // Highlight the username/password fields on authentication failure
+        this.loginFailed = error?.status === 401;
         this.cdr.detectChanges();
         console.error('Login error:', error);
       }
@@ -140,7 +159,7 @@ export class AuthModalComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+        this.errorMessage = this.getFriendlyError(error, 'register');
         this.cdr.detectChanges();
         console.error('Registration error:', error);
       }

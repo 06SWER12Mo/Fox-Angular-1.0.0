@@ -30,6 +30,10 @@
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-card);
   border-radius: var(--radius-lg);
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .filter-group {
@@ -68,6 +72,27 @@
     border-color: var(--color-accent);
     outline: none;
   }
+}
+
+.filter-date {
+  min-width: 0;
+  width: 170px;
+  cursor: text;
+
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+  }
+
+  &:hover::-webkit-calendar-picker-indicator {
+    opacity: 1;
+  }
+}
+
+.filter-sep {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .btn {
@@ -253,4 +278,258 @@
     font-size: var(--text-xs);
     color: var(--color-text-muted);
   }
+}
+
+/* ---- Modal ---- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  z-index: var(--z-modal);
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 520px;
+  max-height: 85vh;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  z-index: calc(var(--z-modal) + 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+
+  &.modal-lg { max-width: 720px; }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border-light);
+
+  h2 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-heading);
+    margin: 0;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+
+    svg { width: 18px; height: 18px; }
+
+    &:hover {
+      color: var(--color-text-primary);
+      background: var(--color-bg-hover);
+    }
+  }
+}
+
+.modal-body {
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Professional Bill ---- */
+
+.bill {
+  padding: 28px 32px;
+}
+
+.bill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.bill-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .bill-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--color-text-muted);
+  }
+
+  .bill-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-heading);
+  }
+}
+
+.bill-meta {
+  text-align: right;
+}
+
+.bill-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: var(--text-sm);
+
+  span { color: var(--color-text-muted); }
+}
+
+.bill-badge {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+}
+
+.bill-badge-success { background: var(--color-success-soft); color: var(--color-success); }
+.bill-badge-warning { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+.bill-badge-danger  { background: var(--color-danger-soft); color: var(--color-danger); }
+
+.bill-parties {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: 20px;
+}
+
+.bill-party {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--text-sm);
+
+  &.bill-party-right { text-align: right; }
+}
+
+.bill-party-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.bill-party-sub {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.bill-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  td {
+    padding: 10px 12px;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .bill-num { text-align: right; }
+  .bill-muted { color: var(--color-text-muted); }
+  .bill-strong { font-weight: var(--weight-semibold); color: var(--color-text-primary); }
+}
+
+.bill-totals {
+  max-width: 320px;
+  margin-left: auto;
+  padding-top: 16px;
+}
+
+.bill-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.bill-grand-total {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 2px solid var(--color-border);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-heading);
+}
+
+.bill-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+
+  p {
+    margin: 4px 0 0;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 600px) {
+  .bill { padding: 20px; }
+  .bill-header { flex-direction: column; gap: 12px; }
+  .bill-meta { text-align: left; }
+  .bill-meta-row { justify-content: flex-start; }
+  .bill-parties { flex-direction: column; }
+  .bill-party-right { text-align: left; }
 }

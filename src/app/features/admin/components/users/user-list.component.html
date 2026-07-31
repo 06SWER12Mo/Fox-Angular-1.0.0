@@ -59,7 +59,10 @@
           <tr *ngFor="let u of filteredUsers">
             <td>
               <div class="user-cell">
-                <span class="user-avatar">{{ (u.firstName || u.username || 'U')[0] }}{{ (u.lastName || '')[0] }}</span>
+                <span class="user-avatar">
+                  <img *ngIf="u.profilePictureUrl && !avatarFailed(u.id)" [src]="getImageUrl(u.profilePictureUrl)" alt="{{ u.firstName || u.username }}'s avatar" (error)="onAvatarError(u)">
+                  <span *ngIf="!u.profilePictureUrl || avatarFailed(u.id)" class="avatar-initials">{{ (u.firstName || u.username || 'U')[0] }}{{ (u.lastName || '')[0] }}</span>
+                </span>
                 <div class="user-name-group">
                   <strong class="user-name">{{ u.firstName || u.username }} {{ u.lastName || '' }}</strong>
                   <span class="user-handle">@{{ u.username }}</span>
@@ -93,8 +96,8 @@
                   View Details
                 </button>
                 <button class="action-btn" (click)="toggleEnabled(u)" [title]="u.enabled !== false ? 'Disable account' : 'Enable account'">
-                  <svg *ngIf="u.enabled !== false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
-                  <svg *ngIf="u.enabled === false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
+                  <svg *ngIf="u.enabled !== false" viewBox="0 0 24 24" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <svg *ngIf="u.enabled === false" viewBox="0 0 24 24" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/><line x1="12" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
                 </button>
                 <button class="action-btn" (click)="toggleLock(u)" [title]="u.locked ? 'Unlock' : 'Lock'">
                   <svg *ngIf="!u.locked" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V7a4 4 0 118 0v4" stroke="currentColor" stroke-width="1.8"/></svg>

@@ -1,0 +1,105 @@
+/* ============================================================
+   ADMIN PRODUCT DETAIL — Image gallery, badges
+   (shared detail-page/card styles come from admin-order-detail)
+   ============================================================ */
+
+.detail-header .badges {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.badge-success { background: var(--color-success-soft); color: var(--color-success); }
+.badge-warning { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+.badge-danger  { background: var(--color-danger-soft); color: var(--color-danger); }
+.badge-neutral { background: var(--color-bg-hover); color: var(--color-text-muted); }
+.badge-info    { background: var(--color-info-soft); color: var(--color-info); }
+
+/* ---- Product image ---- */
+
+.product-detail-image {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.main-image {
+  flex: 1;
+  min-height: 280px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    max-width: 100%;
+    max-height: 340px;
+    object-fit: contain;
+  }
+
+  .thumb-placeholder {
+    font-size: 48px;
+    font-weight: var(--weight-bold);
+    color: var(--color-text-muted);
+  }
+}
+
+.thumb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .thumb {
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--color-bg-hover);
+    transition: border-color var(--transition-fast);
+
+    &.active { border-color: var(--color-accent); }
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+}
+
+/* ---- Reuse of shared bits ---- */
+
+.stock-badge {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+
+  &.low { background: var(--color-danger-soft); color: var(--color-danger); }
+}
+
+@media (max-width: 768px) {
+  .product-detail-image {
+    flex-direction: column-reverse;
+
+    .thumb-list {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+}

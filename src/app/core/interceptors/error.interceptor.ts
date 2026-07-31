@@ -32,6 +32,12 @@ export class ErrorInterceptor implements HttpInterceptor {
               }
               break;
             case 401:
+              // A 401 from the login/register endpoints means the credentials were
+              // rejected — the form shows a friendly inline error, so do NOT treat
+              // it as a session expiry and do NOT pop up the auth modal on top.
+              if (this.isAuthEndpoint(req.url)) {
+                break;
+              }
               errorMessage = 'Session expired. Please login again.';
               this.tokenService.clearAll();
               // Open the auth modal popup — after login, redirect MANAGER/ADMIN users
@@ -74,11 +80,14 @@ export class ErrorInterceptor implements HttpInterceptor {
           url: req.url
         });
 
-        // Simple alert fallback (remove if you don't want alerts)
-        // alert(errorMessage);
-
         return throwError(() => error);
       })
     );
+  }
+
+  /** True for the login/register endpoints, where a 401 means 'bad credentials' rather than an expired session. */
+  private isAuthEndpoint(url: string): boolean {
+    return url.includes('/auth/login') ||
+           url.includes('/auth/register');
   }
 }

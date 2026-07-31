@@ -21,7 +21,7 @@ export class AdminOrderListComponent implements OnInit {
   dateTo = '';
   searchQuery = '';
 
-  statuses = ['', 'PENDING_PAYMENT', 'PAID', 'READY_FOR_SHIPPING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+  statuses = ['', 'PENDING_PAYMENT', 'READY_FOR_SHIPPING', 'ASSIGNED_TO_BATCH', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
   constructor(
     private orderService: OrderService,

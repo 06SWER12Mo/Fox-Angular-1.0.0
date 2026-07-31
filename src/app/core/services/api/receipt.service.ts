@@ -33,17 +33,21 @@ export class ReceiptService {
     return this.http.get<Receipt>(`${this.apiUrl}/number/${receiptNumber}`);
   }
 
-  getAllReceipts(page: number = 0, size: number = 20): Observable<PageResponse<Receipt>> {
-    const params = new HttpParams()
+  getAllReceipts(page: number = 0, size: number = 20, startDate?: string, endDate?: string): Observable<PageResponse<Receipt>> {
+    let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
     return this.unwrap<PageResponse<Receipt>>(this.http.get(this.apiUrl, { params }));
   }
 
-  getReceiptsBySupplier(supplierId: number, page: number = 0, size: number = 20): Observable<PageResponse<Receipt>> {
-    const params = new HttpParams()
+  getReceiptsBySupplier(supplierId: number, page: number = 0, size: number = 20, startDate?: string, endDate?: string): Observable<PageResponse<Receipt>> {
+    let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
     return this.http.get<PageResponse<Receipt>>(`${this.apiUrl}/supplier/${supplierId}`, { params });
   }
 

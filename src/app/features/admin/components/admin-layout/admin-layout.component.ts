@@ -29,6 +29,7 @@ export class AdminLayoutComponent implements OnInit {
     { path: '/admin/users', icon: 'users', label: 'Users' },
     { path: '/admin/sessions', icon: 'activity', label: 'Sessions' },
     { path: '/admin/settings', icon: 'settings', label: 'Settings' },
+    { path: '/admin/profile', icon: 'user', label: 'My Profile' },
   ];
 
   constructor(

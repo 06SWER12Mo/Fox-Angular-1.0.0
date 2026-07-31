@@ -14,6 +14,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 // Products
 import { ProductListComponent } from './components/products/product-list.component';
 import { ProductFormComponent } from './components/products/product-form.component';
+import { AdminProductDetailComponent } from './components/products/admin-product-detail.component';
 
 // Categories
 import { CategoryListComponent } from './components/categories/category-list.component';
@@ -50,12 +51,16 @@ import { EmployeeListComponent } from './components/employees/employee-list.comp
 // Suppliers
 import { SupplierListComponent } from './components/suppliers/supplier-list.component';
 
+// Profile
+import { AdminProfileComponent } from './components/profile/admin-profile.component';
+
 @NgModule({
   declarations: [
     AdminLayoutComponent,
     DashboardComponent,
     ProductListComponent,
     ProductFormComponent,
+    AdminProductDetailComponent,
     CategoryListComponent,
     CategoryFormComponent,
     AdminOrderListComponent,
@@ -71,6 +76,7 @@ import { SupplierListComponent } from './components/suppliers/supplier-list.comp
     ReceiptFormComponent,
     EmployeeListComponent,
     SupplierListComponent,
+    AdminProfileComponent,
   ],
   imports: [
     CommonModule,

@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryService } from '../../../../core/services/api/category.service';
+import { ImageService } from '../../../../core/services/api/image.service';
 
 @Component({
   selector: 'app-admin-category-form',
@@ -16,6 +17,7 @@ export class CategoryFormComponent implements OnInit {
   isSaving = false;
   isLoading = false;
   imagePreview: string | null = null;
+  selectedImageFile: File | null = null;
   errorMessage = '';
 
   constructor(
@@ -23,6 +25,7 @@ export class CategoryFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private categoryService: CategoryService,
+    private imageService: ImageService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -70,6 +73,7 @@ export class CategoryFormComponent implements OnInit {
   onImageSelected(event: any): void {
     const file = event.target.files?.[0];
     if (file) {
+      this.selectedImageFile = file;
       const reader = new FileReader();
       reader.onload = (e) => this.imagePreview = e.target?.result as string;
       reader.readAsDataURL(file);
@@ -87,7 +91,21 @@ export class CategoryFormComponent implements OnInit {
       : this.categoryService.createCategory(data);
 
     obs.subscribe({
-      next: () => this.router.navigate(['/admin/categories']),
+      next: (category: any) => {
+        // Upload the selected image so it is actually saved with the category
+        if (this.selectedImageFile && category?.id) {
+          this.imageService.uploadCategoryImage(category.id, this.selectedImageFile).subscribe({
+            next: () => this.router.navigate(['/admin/categories']),
+            error: (err) => {
+              console.error('Category image upload failed:', err);
+              this.errorMessage = 'Category saved, but the image could not be uploaded.';
+              this.isSaving = false;
+            }
+          });
+        } else {
+          this.router.navigate(['/admin/categories']);
+        }
+      },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Failed to save category';
         this.isSaving = false;

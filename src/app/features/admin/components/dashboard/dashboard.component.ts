@@ -5,6 +5,8 @@ import { OrderService } from '../../../../core/services/api/order.service';
 import { ProductService } from '../../../../core/services/api/product.service';
 import { UserService } from '../../../../core/services/api/user.service';
 import { CategoryService } from '../../../../core/services/api/category.service';
+import { LocationService } from '../../../../core/services/api/location.service';
+import { EmployeeService } from '../../../../core/services/api/employee.service';
 import { OrderSummary } from '../../../../core/models/order.model';
 import { DashboardResponse, TopProduct } from '../../../../core/models/analytics.model';
 
@@ -27,6 +29,8 @@ export class DashboardComponent implements OnInit {
   totalCategories = 0;
   totalCustomers = 0;
   lowStockCount = 0;
+  deliveryTowns = 0;
+  totalEmployees = 0;
 
   // Growth
   revenueGrowth = '';
@@ -44,16 +48,19 @@ export class DashboardComponent implements OnInit {
 
   // Quick actions
   quickActions = [
-    { path: '/admin/products/new', label: 'Add Product' },
-    { path: '/admin/categories/new', label: 'Add Category' },
-    { path: '/admin/orders', label: 'View Orders' },
-    { path: '/admin/settings', label: 'Store Settings' },
+    { path: '/admin/products/new', label: 'Add Product', icon: 'plus' },
+    { path: '/admin/categories/new', label: 'Add Category', icon: 'plus' },
+    { path: '/admin/receipts/new', label: 'New Receipt', icon: 'plus' },
+    { path: '/admin/orders', label: 'View Orders', icon: 'eye' },
+    { path: '/admin/settings', label: 'Store Settings', icon: 'eye' },
   ];
 
   constructor(
     private analyticsService: AnalyticsService,
     private orderService: OrderService,
     private productService: ProductService,
+    private locationService: LocationService,
+    private employeeService: EmployeeService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -66,7 +73,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     this.error = false;
 
-    let remaining = 3;
+    let remaining = 5;
     const finalize = () => {
       if (--remaining <= 0) {
         this.isLoading = false;
@@ -91,6 +98,24 @@ export class DashboardComponent implements OnInit {
         finalize();
       },
       error: () => { console.warn('Dashboard low stock failed'); finalize(); }
+    });
+
+    // Delivery towns: count towns across all areas where delivery is enabled
+    this.locationService.getAllBigAreas().subscribe({
+      next: (areas) => {
+        const list: any[] = Array.isArray(areas) ? areas : (areas as any)?.content || [];
+        this.deliveryTowns = list.reduce((count, area) => {
+          const towns: any[] = Array.isArray(area?.towns) ? area.towns : [];
+          return count + towns.filter((t: any) => t.deliveryAvailable !== false).length;
+        }, 0);
+        finalize();
+      },
+      error: () => { console.warn('Dashboard delivery towns failed'); finalize(); }
+    });
+
+    this.employeeService.getEmployeeStats().subscribe({
+      next: (stats) => { this.totalEmployees = stats?.totalEmployees || 0; finalize(); },
+      error: () => { console.warn('Dashboard employee count failed'); finalize(); }
     });
   }
 
@@ -128,6 +153,14 @@ export class DashboardComponent implements OnInit {
   private processOrders(response: any): void {
     const content = response?.content || response || [];
     this.recentOrders = Array.isArray(content) ? content.slice(0, 5) : [];
+  }
+
+  formatStatus(status: string): string {
+    if (!status) return '';
+    return status
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 
   getMaxValue(): number {

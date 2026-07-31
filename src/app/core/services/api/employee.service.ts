@@ -135,6 +135,6 @@ export class EmployeeService {
   // ========== STATISTICS ==========
 
   getEmployeeStats(): Observable<EmployeeStats> {
-    return this.http.get<EmployeeStats>(`${this.apiUrl}/stats/count`);
+    return this.unwrap<EmployeeStats>(this.http.get(`${this.apiUrl}/stats/count`));
   }
 }

@@ -1,0 +1,149 @@
+<div class="detail-page">
+  <a class="back-link" (click)="goBack()" style="cursor:pointer;">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2"/></svg>
+    Back to Products
+  </a>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" style="text-align:center;padding:80px 0;">
+    <div class="spinner"></div>
+    <p style="color:var(--color-text-muted);margin-top:16px;">Loading product...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!isLoading && errorMessage" style="text-align:center;padding:80px 20px;">
+    <p style="color:var(--color-danger);font-size:var(--text-md);font-weight:var(--weight-semibold);margin:0 0 8px;">Could not load product</p>
+    <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin:0 0 20px;">{{ errorMessage }}</p>
+    <button class="btn btn-ghost" (click)="goBack()">Back to Products</button>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !errorMessage && product">
+    <div class="detail-header">
+      <div>
+        <h1>{{ product.name }}</h1>
+        <div class="badges">
+          <span class="badge badge-info">{{ product.categoryName || 'Uncategorized' }}</span>
+          <span class="badge" [class.badge-success]="product.active !== false" [class.badge-neutral]="product.active === false">{{ product.active !== false ? 'Active' : 'Inactive' }}</span>
+          <span class="badge badge-warning" *ngIf="product.featured">Featured</span>
+          <span class="badge badge-neutral" *ngIf="product.digital">Digital</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" (click)="edit()">Edit Product</button>
+        <button class="btn btn-ghost" (click)="goBack()">Close</button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Main column -->
+      <div>
+        <!-- Image -->
+        <div class="detail-card" style="margin-bottom:24px;">
+          <div class="card-header"><h3>Product Image</h3></div>
+          <div class="card-body">
+            <div class="product-detail-image">
+              <div class="main-image">
+                <img *ngIf="activeImage" [src]="activeImage" alt="{{ product.name }}">
+                <span *ngIf="!activeImage" class="thumb-placeholder">{{ product.name?.[0] || 'P' }}</span>
+              </div>
+              <div class="thumb-list" *ngIf="galleryImages.length > 1">
+                <button class="thumb" *ngFor="let img of galleryImages" [class.active]="img.url === activeImage" (click)="setActiveImage(img.url)" title="{{ img.altText || 'Image' }}">
+                  <img [src]="img.url" alt="">
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specifications -->
+        <div class="detail-card" style="margin-bottom:24px;" *ngIf="product.specifications?.length">
+          <div class="card-header"><h3>Specifications</h3></div>
+          <div class="card-body" style="padding:0;">
+            <table class="order-items-table">
+              <thead><tr><th>Specification</th><th>Value</th><th>Unit</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let spec of product.specifications">
+                  <td>{{ spec.name }}</td>
+                  <td>{{ spec.value }}</td>
+                  <td>{{ spec.unit || '—' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Variants -->
+        <div class="detail-card" *ngIf="product.variants?.length">
+          <div class="card-header"><h3>Variants</h3></div>
+          <div class="card-body" style="padding:0;">
+            <table class="order-items-table">
+              <thead><tr><th>Name</th><th>SKU</th><th>Price</th><th>Stock</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let variant of product.variants">
+                  <td>{{ variant.name }}</td>
+                  <td>{{ variant.sku }}</td>
+                  <td>{{ variant.price | currency }}</td>
+                  <td><span class="stock-badge" [class.low]="variant.stockQuantity < 10">{{ variant.stockQuantity || 0 }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <!-- Pricing -->
+        <div class="detail-card" style="margin-bottom:16px;">
+          <div class="card-header"><h3>Pricing</h3></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-row"><span class="info-label">Price</span><span class="info-value" style="font-weight:600;">{{ product.price | currency }}</span></div>
+              <div class="info-row"><span class="info-label">Compare At</span><span class="info-value">{{ product.compareAtPrice ? (product.compareAtPrice | currency) : '—' }}</span></div>
+              <div class="info-row"><span class="info-label">Cost Price</span><span class="info-value">{{ product.costPrice ? (product.costPrice | currency) : '—' }}</span></div>
+              <div class="info-row"><span class="info-label">Discount</span><span class="info-value"><span class="badge badge-warning" *ngIf="getDiscountPercentage() > 0">{{ getDiscountPercentage() }}% off</span><span *ngIf="!getDiscountPercentage()">—</span></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory -->
+        <div class="detail-card" style="margin-bottom:16px;">
+          <div class="card-header"><h3>Inventory</h3></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-row"><span class="info-label">Stock</span><span class="info-value">{{ product.stockQuantity || 0 }}</span></div>
+              <div class="info-row"><span class="info-label">Low Stock At</span><span class="info-value">{{ product.lowStockThreshold || 0 }}</span></div>
+              <div class="info-row"><span class="info-label">Status</span><span class="info-value"><span class="badge" [ngClass]="getStockStatus().cls">{{ getStockStatus().label }}</span></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="detail-card" style="margin-bottom:16px;">
+          <div class="card-header"><h3>Product Info</h3></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-row"><span class="info-label">SKU</span><span class="info-value">{{ product.sku || '—' }}</span></div>
+              <div class="info-row"><span class="info-label">Barcode</span><span class="info-value">{{ product.barcode || '—' }}</span></div>
+              <div class="info-row"><span class="info-label">Views</span><span class="info-value">{{ product.viewCount || 0 }}</span></div>
+              <div class="info-row"><span class="info-label">Sold</span><span class="info-value">{{ product.soldCount || 0 }}</span></div>
+              <div class="info-row"><span class="info-label">Rating</span><span class="info-value">{{ getAverageRating() }} ({{ product.totalReviews || 0 }} reviews)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit -->
+        <div class="detail-card">
+          <div class="card-header"><h3>Details</h3></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-row"><span class="info-label">Created</span><span class="info-value">{{ product.createdAt | date: 'MMM dd, yyyy' }}</span></div>
+              <div class="info-row"><span class="info-label">Updated</span><span class="info-value">{{ product.updatedAt | date: 'MMM dd, yyyy' }}</span></div>
+              <div class="info-row"><span class="info-label">Description</span><span class="info-value" style="white-space:pre-line;">{{ product.description || '—' }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

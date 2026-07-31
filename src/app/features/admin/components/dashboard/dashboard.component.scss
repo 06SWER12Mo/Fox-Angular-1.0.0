@@ -71,6 +71,7 @@
   &.stat-icon-danger { background: var(--color-danger-soft); color: var(--color-danger); }
   &.stat-icon-success { background: var(--color-success-soft); color: var(--color-success); }
   &.stat-icon-warning { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+  &.stat-icon-info { background: var(--color-info-soft); color: var(--color-info); }
 }
 
 .stat-info {

@@ -11,7 +11,10 @@
   <ng-container *ngIf="!isLoading && user">
     <div class="detail-header">
       <div class="detail-header-left">
-        <div class="detail-avatar">{{ (user.firstName || user.username || 'U')[0] }}{{ (user.lastName || '')[0] }}</div>
+        <div class="detail-avatar">
+          <img *ngIf="user.profilePictureUrl && !avatarImgError" [src]="getImageUrl(user.profilePictureUrl)" alt="{{ user.firstName || user.username }}'s avatar" (error)="onAvatarError()">
+          <span *ngIf="!user.profilePictureUrl || avatarImgError" class="avatar-initials">{{ (user.firstName || user.username || 'U')[0] }}{{ (user.lastName || '')[0] }}</span>
+        </div>
         <div>
           <h1>{{ user.firstName || user.username }} {{ user.lastName || '' }}</h1>
           <div class="detail-meta">
@@ -84,7 +87,7 @@
           <div class="card-header"><h3>Account Actions</h3></div>
           <div class="card-body action-list">
             <div class="action-item" (click)="toggleEnabled()">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               <div>
                 <strong>{{ user.enabled !== false ? 'Disable Account' : 'Enable Account' }}</strong>
                 <p>{{ user.enabled !== false ? 'Prevent this user from logging in' : 'Restore access to this user' }}</p>

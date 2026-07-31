@@ -176,9 +176,10 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-bg-input);
+  border: 1.5px solid var(--color-border-input);
   border-radius: 12px;
+  overflow: hidden;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:focus-within {
@@ -188,12 +189,14 @@
   }
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: var(--color-border-input-hover);
   }
 }
 
 .has-error .input-wrapper {
   border-color: var(--color-danger);
+  border-width: 2px;
+  background: var(--color-danger-soft);
 
   &:focus-within {
     border-color: var(--color-danger);
@@ -272,7 +275,7 @@
 /* --- Field errors --- */
 
 .field-error {
-  color: #ff8a8a;
+  color: var(--color-danger-text);
   font-size: 12px;
   margin-top: 6px;
   padding-left: 2px;
@@ -544,32 +547,73 @@
   margin-bottom: 20px;
   padding: 12px 14px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  background: rgba(226, 89, 106, 0.08);
-  border: 1px solid rgba(226, 89, 106, 0.2);
-  color: #ffb8b8;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger-text);
   border-radius: 10px;
   font-size: 13.5px;
   line-height: 1.45;
+  animation: errorFadeIn 0.25s ease;
+
+  &.auth-failed {
+    background: var(--color-danger-soft);
+    border-color: var(--color-danger);
+    animation: errorFadeIn 0.25s ease, errorShake 0.4s ease 0.15s;
+  }
+
+  .error-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-danger-soft);
+    color: var(--color-danger-text);
+    flex-shrink: 0;
+    margin-top: 1px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .error-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-danger-text-strong);
+    }
+
+    span {
+      font-size: 12.5px;
+      color: var(--color-danger-text);
+    }
+  }
+}
+
+@keyframes errorFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-.error-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(226, 89, 106, 0.25);
-  color: #ff8a8a;
-  font-size: 12px;
-  font-weight: 700;
-  flex-shrink: 0;
 }
 
 /* ============================================================

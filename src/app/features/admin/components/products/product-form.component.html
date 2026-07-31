@@ -25,8 +25,13 @@
         </div>
 
         <div class="form-field">
-          <label>Discount (%)</label>
-          <input type="number" formControlName="discount" placeholder="0" class="form-input" min="0" max="100">
+          <label>Cost Price <span class="required">*</span></label>
+          <input type="number" formControlName="costPrice" placeholder="0.00" class="form-input" step="0.01">
+        </div>
+
+        <div class="form-field">
+          <label>Compare At Price <span class="required">*</span></label>
+          <input type="number" formControlName="compareAtPrice" placeholder="0.00" class="form-input" step="0.01">
         </div>
 
         <div class="form-field">
@@ -35,7 +40,7 @@
         </div>
 
         <div class="form-field">
-          <label>SKU</label>
+          <label>SKU <span class="required">*</span></label>
           <input type="text" formControlName="sku" placeholder="SKU-001" class="form-input">
         </div>
 

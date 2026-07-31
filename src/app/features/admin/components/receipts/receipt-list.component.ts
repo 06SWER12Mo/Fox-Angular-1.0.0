@@ -13,9 +13,16 @@ export class ReceiptListComponent implements OnInit {
   isLoading = true;
   suppliers: any[] = [];
   selectedSupplierId: number | null = null;
+  startDate: string = '';
+  endDate: string = '';
   currentPage = 0;
   pageSize = 20;
   totalPages = 0;
+
+  // View receipt modal
+  showReceiptModal = false;
+  selectedReceipt: any = null;
+  receiptLoading = false;
 
   constructor(
     private receiptService: ReceiptService,
@@ -42,19 +49,37 @@ export class ReceiptListComponent implements OnInit {
     this.loadReceipts();
   }
 
-  clearFilter(): void {
-    this.selectedSupplierId = null;
+  onDateFilter(): void {
     this.currentPage = 0;
     this.loadReceipts();
   }
 
+  clearFilter(): void {
+    this.selectedSupplierId = null;
+    this.startDate = '';
+    this.endDate = '';
+    this.currentPage = 0;
+    this.loadReceipts();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!this.selectedSupplierId || !!this.startDate || !!this.endDate;
+  }
+
+  private toIsoDateTime(dateStr: string, endOfDay: boolean): string | undefined {
+    if (!dateStr) return undefined;
+    return endOfDay ? `${dateStr}T23:59:59` : `${dateStr}T00:00:00`;
+  }
+
   loadReceipts(): void {
     this.isLoading = true;
+    const start = this.toIsoDateTime(this.startDate, false);
+    const end = this.toIsoDateTime(this.endDate, true);
     let obs;
     if (this.selectedSupplierId) {
-      obs = this.receiptService.getReceiptsBySupplier(this.selectedSupplierId, this.currentPage, this.pageSize);
+      obs = this.receiptService.getReceiptsBySupplier(this.selectedSupplierId, this.currentPage, this.pageSize, start, end);
     } else {
-      obs = this.receiptService.getAllReceipts(this.currentPage, this.pageSize);
+      obs = this.receiptService.getAllReceipts(this.currentPage, this.pageSize, start, end);
     }
     obs.pipe(
       finalize(() => { this.isLoading = false; this.cdr.detectChanges(); })
@@ -86,7 +111,26 @@ export class ReceiptListComponent implements OnInit {
     }
   }
 
-  printReceipt(receipt: any): void {
-    window.open(`/admin/receipts/${receipt.id}/print`, '_blank');
+  viewReceipt(receipt: any): void {
+    this.selectedReceipt = receipt;
+    this.showReceiptModal = true;
+    this.receiptLoading = true;
+    // Load the full receipt (with items) for the bill view
+    this.receiptService.getReceiptById(receipt.id).subscribe({
+      next: (res: any) => {
+        this.selectedReceipt = res?.data || res || receipt;
+        this.receiptLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.receiptLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  closeReceiptModal(): void {
+    this.showReceiptModal = false;
+    this.selectedReceipt = null;
   }
 }

@@ -5,6 +5,13 @@
       <p class="page-subtitle">{{ totalElements }} products total</p>
     </div>
     <div class="header-actions">
+      <div class="filter-group" title="Filter by category">
+        <svg viewBox="0 0 24 24" fill="none" class="filter-icon"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <select class="filter-select" [(ngModel)]="selectedCategoryId" (ngModelChange)="onCategoryChange()">
+          <option [ngValue]="null">All Categories</option>
+          <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" class="search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/></svg>
         <input type="text" placeholder="Search products..." [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" class="search-input">
@@ -28,7 +35,7 @@
             <th>Stock</th>
             <th>Category</th>
             <th style="width:90px;">Status</th>
-            <th style="width:140px;">Actions</th>
+            <th style="width:230px;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -49,10 +56,14 @@
             </td>
             <td>
               <div class="action-btns">
+                <button class="btn-show-towns" (click)="viewProduct(p.id)" title="View product details">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s3-6 7-6 7 6 7 6-3 6-7 6-7-6-7-6z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                  View Details
+                </button>
                 <button class="action-btn" (click)="editProduct(p.id)" title="Edit"><svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.8"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8"/></svg></button>
                 <button class="action-btn" (click)="toggleStatus(p)" [title]="p.active !== false ? 'Disable' : 'Enable'">
-                  <svg *ngIf="p.active !== false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
-                  <svg *ngIf="p.active === false" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" opacity="0.3"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
+                  <svg *ngIf="p.active !== false" viewBox="0 0 24 24" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <svg *ngIf="p.active === false" viewBox="0 0 24 24" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/><line x1="12" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/><line x1="4" y1="4" x2="20" y2="20" stroke="var(--color-danger)" stroke-width="2" stroke-linecap="round"/></svg>
                 </button>
                 <button class="action-btn action-danger" (click)="deleteProduct(p.id)" title="Delete"><svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.8"/></svg></button>
               </div>

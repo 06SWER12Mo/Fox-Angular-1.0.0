@@ -6,7 +6,7 @@
 
   <!-- Skeleton loading -->
   <div *ngIf="isLoading" class="stats-grid">
-    <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="skeleton skeleton-card"></div>
+    <div *ngFor="let _ of [1,2,3,4,5,6,7,8,9,10]" class="skeleton skeleton-card"></div>
   </div>
 
   <!-- Error -->
@@ -92,12 +92,31 @@
         <div class="stat-label">Low Stock Products</div>
       </div>
     </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-info">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ deliveryTowns }}</div>
+        <div class="stat-label">Towns We Deliver To</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-info">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalEmployees }}</div>
+        <div class="stat-label">Total Employees</div>
+      </div>
+    </div>
   </div>
 
   <!-- Quick Actions -->
   <div class="quick-actions">
     <a *ngFor="let action of quickActions" [routerLink]="action.path" class="quick-action">
-      <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+      <svg *ngIf="action.icon !== 'eye'" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+      <svg *ngIf="action.icon === 'eye'" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
       {{ action.label }}
     </a>
   </div>
@@ -166,7 +185,7 @@
                   <span>{{ order.userName || 'User' }}</span>
                 </div>
               </td>
-              <td><span class="status-badge" [class]="(order.orderStatus || '').toLowerCase()">{{ order.orderStatus }}</span></td>
+              <td><span class="status-badge" [class]="(order.orderStatus || '').toLowerCase()">{{ formatStatus(order.orderStatus) }}</span></td>
               <td><strong>{{ order.totalPrice | currency }}</strong></td>
               <td>{{ order.createdAt | date: 'MMM dd, yyyy' }}</td>
             </tr>

@@ -21,15 +21,21 @@
     </div>
 
     <!-- Error message -->
-    <div class="error-message" *ngIf="errorMessage">
-      <span class="error-icon">!</span>
-      {{ errorMessage }}
+    <div class="error-message" *ngIf="errorMessage" [class.auth-failed]="loginFailed">
+      <span class="error-icon">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <span class="error-text">
+        <strong *ngIf="loginFailed">Sign in failed</strong>
+        <strong *ngIf="!loginFailed">Something went wrong</strong>
+        <span>{{ errorMessage }}</span>
+      </span>
     </div>
 
     <!-- Login Form -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <!-- Username/Email Field -->
-      <div class="form-field" [class.has-error]="submitted && f['usernameOrEmail'].errors">
+      <div class="form-field" [class.has-error]="(submitted && f['usernameOrEmail'].errors) || loginFailed">
         <label class="form-label" for="usernameOrEmail">Username or Email</label>
         <div class="input-wrapper">
           <svg class="input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -43,6 +49,7 @@
             placeholder="Enter your email or username"
             class="form-input"
             autocomplete="username"
+            (input)="loginFailed = false"
           >
         </div>
         <div class="field-error" *ngIf="submitted && f['usernameOrEmail'].errors?.['required']">
@@ -51,7 +58,7 @@
       </div>
 
       <!-- Password Field -->
-      <div class="form-field" [class.has-error]="submitted && f['password'].errors">
+      <div class="form-field" [class.has-error]="(submitted && f['password'].errors) || loginFailed">
         <label class="form-label" for="password">Password</label>
         <div class="input-wrapper">
           <svg class="input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -65,6 +72,7 @@
             placeholder="Enter your password"
             class="form-input"
             autocomplete="current-password"
+            (input)="loginFailed = false"
           >
           <button
             type="button"

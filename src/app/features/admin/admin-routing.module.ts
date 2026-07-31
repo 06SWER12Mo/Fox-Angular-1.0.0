@@ -5,6 +5,7 @@ import { AdminLayoutComponent } from './components/admin-layout/admin-layout.com
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ProductListComponent } from './components/products/product-list.component';
 import { ProductFormComponent } from './components/products/product-form.component';
+import { AdminProductDetailComponent } from './components/products/admin-product-detail.component';
 import { CategoryListComponent } from './components/categories/category-list.component';
 import { CategoryFormComponent } from './components/categories/category-form.component';
 import { AdminOrderListComponent } from './components/orders/admin-order-list.component';
@@ -20,6 +21,7 @@ import { ReceiptListComponent } from './components/receipts/receipt-list.compone
 import { ReceiptFormComponent } from './components/receipts/receipt-form.component';
 import { SupplierListComponent } from './components/suppliers/supplier-list.component';
 import { EmployeeListComponent } from './components/employees/employee-list.component';
+import { AdminProfileComponent } from './components/profile/admin-profile.component';
 
 const routes: Routes = [
   {
@@ -33,6 +35,7 @@ const routes: Routes = [
       { path: 'products', component: ProductListComponent },
       { path: 'products/new', component: ProductFormComponent },
       { path: 'products/:id/edit', component: ProductFormComponent },
+      { path: 'products/:id', component: AdminProductDetailComponent },
       { path: 'categories', component: CategoryListComponent },
       { path: 'categories/new', component: CategoryFormComponent },
       { path: 'categories/:id/edit', component: CategoryFormComponent },
@@ -49,6 +52,7 @@ const routes: Routes = [
       { path: 'receipts/new', component: ReceiptFormComponent },
       { path: 'employees', component: EmployeeListComponent },
       { path: 'suppliers', component: SupplierListComponent },
+      { path: 'profile', component: AdminProfileComponent },
     ]
   }
 ];

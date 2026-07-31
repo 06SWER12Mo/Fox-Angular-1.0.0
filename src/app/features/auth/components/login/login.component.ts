@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   returnUrl: string = '/auth/profile';
   hidePassword = true;
   errorMessage: string = '';
+  loginFailed = false;
 
   get f() { return this.loginForm.controls; }
 
@@ -48,9 +49,21 @@ export class LoginComponent implements OnInit {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/auth/profile';
   }
 
+  /** Map backend errors to a clean, friendly message shown inline in the form. */
+  private getFriendlyError(error: any): string {
+    if (error?.status === 401) {
+      return 'Invalid username or password.';
+    }
+    if (error?.status === 0) {
+      return 'Cannot reach the server. Please check your connection and try again.';
+    }
+    return error?.error?.message || 'Login failed. Please try again.';
+  }
+
   onSubmit(): void {
     this.submitted = true;
     this.errorMessage = '';
+    this.loginFailed = false;
 
     if (this.loginForm.invalid) {
       return;
@@ -73,7 +86,9 @@ export class LoginComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+        this.errorMessage = this.getFriendlyError(error);
+        // Highlight the username/password fields on authentication failure
+        this.loginFailed = error?.status === 401;
         console.error('Login error:', error);
       }
     });
